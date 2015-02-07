@@ -4,7 +4,6 @@ import(
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "time"
-    "fmt"
 )
 
 type ServerStatus struct {
@@ -126,12 +125,12 @@ type NetworkStats struct {
 
 //Opcount and OpcountersRepl
 type OpcountStats struct {
-  Insert  float64 `bson:"insert"`
-  Query   float64 `bson:"query"`
-  Update  float64 `bson:"update"`
-  Delete  float64 `bson:"delete"`
-  GetMore float64 `bson:"getmore"`
-  Command float64 `bson:"command"`
+    Insert  float64 `bson:"insert" type:"gauge"`
+    Query   float64 `bson:"query" type:"gauge"`
+    Update  float64 `bson:"update" type:"gauge"`
+    Delete  float64 `bson:"delete" type:"gauge"`
+    GetMore float64 `bson:"getmore" type:"gauge"`
+    Command float64 `bson:"command" type:"gauge"`
 }
 
 //Mem
@@ -139,11 +138,10 @@ type MemStats struct {
   Bits              float64       `bson:"bits"`
   Resident          float64       `bson:"resident"`
   Virtual           float64       `bson:"virtual"`
-  Supported         interface{} `bson:"supported"`
+  Supported         interface{}   `bson:"supported"`
   Mapped            float64       `bson:"mapped"`
   MappedWithJournal float64       `bson:"mappedWithJournal"`
 }
-
 
 func NewServerStatus() *ServerStatus {
     result := &ServerStatus{}
@@ -161,7 +159,6 @@ func NewServerStatus() *ServerStatus {
     }()
 
     err = session.DB("admin").Run(bson.D{{"serverStatus", 1}, {"recordStats", 0}}, result)
-    fmt.Println("serverStatus:", result.Connections.Current)
 
     return result
 }
