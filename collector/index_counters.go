@@ -13,8 +13,8 @@ type IndexCounterStats struct {
     Resets float64 `bson:"resets" type:"gauge"`
     MissRatio float64 `bson:"missRatio" type:"gauge"`
 }
-func (connectionStats *IndexCounterStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("index_counters")
+func (connectionStats *IndexCounterStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(connectionStats, "Accesses", ch)
     group.Collect(connectionStats, "Hits", ch)
     group.Collect(connectionStats, "Misses", ch)

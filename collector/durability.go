@@ -13,8 +13,8 @@ type DurTiming struct {
     WriteToDataFiles   float64 `bson:"writeToDataFiles" type:"summary"`
     RemapPrivateView   float64 `bson:"remapPrivateView" type:"summary"`
 }
-func (durTiming *DurTiming) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("durability_timing")
+func (durTiming *DurTiming) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(durTiming, "Dt", ch)
     group.Collect(durTiming, "PrepLogBuffer", ch)
     group.Collect(durTiming, "WriteToJournal", ch)
@@ -32,14 +32,16 @@ type DurStats struct {
     TimeMs             DurTiming `bson:"timeMs"`
 }
 
-func (durStats *DurStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("durability")
+func (durStats *DurStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(durStats, "Commits", ch)
     group.Collect(durStats, "JournaledMB", ch)
     group.Collect(durStats, "WriteToDataFilesMB", ch)
     group.Collect(durStats, "Compression", ch)
     group.Collect(durStats, "CommitsInWriteLock", ch)
     group.Collect(durStats, "EarlyCommits", ch)
+
+    durStats.TimeMs.Collect(groupName+"_time_ms", exporter, ch)
 }
 
 

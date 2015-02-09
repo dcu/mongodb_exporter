@@ -15,8 +15,8 @@ type FlushStats struct {
     LastFinished time.Time `bson:"last_finished" type:"gauge"`
 }
 
-func (flushStats *FlushStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("background_flushing")
+func (flushStats *FlushStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(flushStats, "Flushes", ch)
     group.Collect(flushStats, "TotalMs", ch)
     group.Collect(flushStats, "AverageMs", ch)

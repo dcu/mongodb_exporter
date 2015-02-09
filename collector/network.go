@@ -11,8 +11,8 @@ type NetworkStats struct {
     NumRequests         float64 `bson:"numRequests" type:"gauge"`
 }
 
-func (networkStats *NetworkStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("network")
+func (networkStats *NetworkStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(networkStats, "BytesIn", ch)
     group.Collect(networkStats, "BytesOut", ch)
     group.Collect(networkStats, "NumRequests", ch)

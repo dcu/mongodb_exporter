@@ -12,8 +12,8 @@ type ConnectionStats struct {
     TotalCreated float64 `bson:"totalCreated" type:"counter"`
 }
 
-func (connectionStats *ConnectionStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("connections")
+func (connectionStats *ConnectionStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(connectionStats, "Current", ch)
     group.Collect(connectionStats, "Available", ch)
     group.Collect(connectionStats, "TotalCreated", ch)

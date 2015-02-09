@@ -13,7 +13,7 @@ type AssertsStats struct {
 }
 
 func (asserts *AssertsStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("asserts")
+    group := exporter.FindOrCreateGroupByName(groupName)
 
     group.Collect(asserts, "Regular", ch)
     group.Collect(asserts, "Warning", ch)

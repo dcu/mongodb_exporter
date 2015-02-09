@@ -14,8 +14,8 @@ type OpcountersStats struct {
     Command float64 `bson:"command" type:"gauge"`
 }
 
-func (opCounters *OpcountersStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("op_counters")
+func (opCounters *OpcountersStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(opCounters, "Insert", ch)
     group.Collect(opCounters, "Query", ch)
     group.Collect(opCounters, "Update", ch)

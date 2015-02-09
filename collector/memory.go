@@ -13,8 +13,8 @@ type MemStats struct {
     MappedWithJournal   float64 `bson:"mappedWithJournal" type:"counter"`
 }
 
-func (memStats *MemStats) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("memory")
+func (memStats *MemStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
     group.Collect(memStats, "Bits", ch)
     group.Collect(memStats, "Resident", ch)
     group.Collect(memStats, "Virtual", ch)

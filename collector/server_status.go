@@ -8,7 +8,7 @@ import(
 )
 
 type Collectable interface {
-    Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric)
+    Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric)
 }
 
 type ServerStatus struct {
@@ -39,24 +39,24 @@ type ServerStatus struct {
     Mem                *MemStats              `bson:"mem" group:"memory" type:"group"`
 }
 
-func (status *ServerStatus) Collect(exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName("instance")
+func (status *ServerStatus) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
+    group := exporter.FindOrCreateGroupByName(groupName)
 
     group.Collect(status, "Uptime", ch)
     group.Collect(status, "UptimeEstimate", ch)
     group.Collect(status, "LocalTime", ch)
 
-    status.Asserts.Collect(exporter, ch)
-    status.Dur.Collect(exporter, ch)
-    status.BackgroundFlushing.Collect(exporter, ch)
-    status.Connections.Collect(exporter, ch)
-    status.ExtraInfo.Collect(exporter, ch)
-    status.GlobalLock.Collect(exporter, ch)
-    status.IndexCounter.Collect(exporter, ch)
-    status.Network.Collect(exporter, ch)
-    status.Opcounters.Collect(exporter, ch)
-    status.OpcountersRepl.Collect(exporter, ch)
-    status.Mem.Collect(exporter, ch)
+    status.Asserts.Collect("asserts", exporter, ch)
+    status.Dur.Collect("durability", exporter, ch)
+    status.BackgroundFlushing.Collect("background_flushing", exporter, ch)
+    status.Connections.Collect("connections", exporter, ch)
+    status.ExtraInfo.Collect("extra_info", exporter, ch)
+    status.GlobalLock.Collect("global_lock", exporter, ch)
+    status.IndexCounter.Collect("index_counters", exporter, ch)
+    status.Network.Collect("network", exporter, ch)
+    status.Opcounters.Collect("op_counters", exporter, ch)
+    status.OpcountersRepl.Collect("op_counters_repl", exporter, ch)
+    status.Mem.Collect("memory", exporter, ch)
 }
 
 func GetServerStatus() *ServerStatus {

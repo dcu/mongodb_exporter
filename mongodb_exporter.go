@@ -7,9 +7,8 @@ import(
 )
 
 func main() {
-    mongodb_collector := collector.NewMongodbCollector()
-
-    prometheus.MustRegister(mongodb_collector)
+    mongodbCollector := collector.NewMongodbCollector()
+    prometheus.MustRegister(mongodbCollector)
 
     http.Handle("/metrics", prometheus.Handler())
     http.ListenAndServe(":9001", nil)
