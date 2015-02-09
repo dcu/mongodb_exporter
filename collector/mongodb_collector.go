@@ -19,6 +19,8 @@ func NewMongodbCollector() *MongodbCollector {
 }
 
 func (exporter *MongodbCollector) FindOrCreateGroupByName(name string) *Group {
+    name = SnakeCase(name)
+    println("Adding group:",name)
     group := exporter.Groups[name]
 
     if group == nil {

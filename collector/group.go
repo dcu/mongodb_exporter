@@ -50,7 +50,7 @@ func (group *Group) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (group *Group) GetGauge(name string, description string) prometheus.Gauge {
-    println("Adding gauge", group.Name, name)
+    //println("Adding gauge", group.Name, name)
 
     gauge := group.Gauges[name]
     if gauge == nil {
@@ -67,7 +67,7 @@ func (group *Group) GetGauge(name string, description string) prometheus.Gauge {
 }
 
 func (group *Group) GetCounter(name string, description string) prometheus.Counter {
-    println("Adding counter", group.Name, name)
+    //println("Adding counter", group.Name, name)
     counter := group.Counters[name]
 
     if counter == nil {
@@ -84,7 +84,7 @@ func (group *Group) GetCounter(name string, description string) prometheus.Count
 }
 
 func (group *Group) GetSummary(name string, description string) prometheus.Summary {
-    println("Adding summary", group.Name, name)
+    //println("Adding summary", group.Name, name)
     summary := group.Summaries[name]
 
     if summary == nil {
@@ -103,24 +103,24 @@ func (group *Group) GetSummary(name string, description string) prometheus.Summa
 func (group *Group) trackField(field reflect.StructField, fieldValue reflect.Value, ch chan<-prometheus.Metric) {
     valueToSet := getValueToSet(fieldValue)
     collectorType := field.Tag.Get("type")
-    name := field.Tag.Get("bson")
+    name := SnakeCase(field.Tag.Get("bson"))
 
     var collector prometheus.Collector
     switch(collectorType) {
         case "counter": {
-            println("Set", name, valueToSet)
+            //println("Set", name, valueToSet)
             counter := group.GetCounter(name, "FIXME")
             counter.Set(valueToSet)
             collector = counter
         }
         case "gauge": {
-            println("Set", name, valueToSet)
+            //println("Set", name, valueToSet)
             gauge := group.GetGauge(name, "FIXME")
             gauge.Set(valueToSet)
             collector = gauge
         }
         case "summary": {
-            println("Set", name, valueToSet)
+            //println("Set", name, valueToSet)
             summary := group.GetGauge(name, "FIXME")
             summary.Set(valueToSet)
             collector = summary

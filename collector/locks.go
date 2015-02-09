@@ -1,9 +1,10 @@
 package collector
 
 import(
-    //"github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus"
 )
 
+type LockStatsMap map[string]LockStats
 
 //Lock
 type ReadWriteLockTimes struct {
@@ -18,4 +19,23 @@ type LockStats struct {
     TimeAcquiringMicros ReadWriteLockTimes  `bson:"timeAcquiringMicros"`
 }
 
+func (locks LockStatsMap) Collect(groupName string, exporter *MongodbCollector, ch chan<-prometheus.Metric) {
+    for key, locks := range locks {
+        if key == "." {
+            key = "dot"
+        }
+
+        timeLockedGroup := exporter.FindOrCreateGroupByName(key+"_locks_time_locked")
+        timeLockedGroup.Collect(locks.TimeLockedMicros, "Read", ch)
+        timeLockedGroup.Collect(locks.TimeLockedMicros, "Write", ch)
+        timeLockedGroup.Collect(locks.TimeLockedMicros, "ReadLower", ch)
+        timeLockedGroup.Collect(locks.TimeLockedMicros, "WriteLower", ch)
+
+        timeAcquiringGroup := exporter.FindOrCreateGroupByName(key+"_locks_time_acquiring")
+        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "Read", ch)
+        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "Write", ch)
+        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "ReadLower", ch)
+        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "WriteLower", ch)
+    }
+}
 

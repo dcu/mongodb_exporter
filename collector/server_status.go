@@ -30,7 +30,7 @@ type ServerStatus struct {
 
     IndexCounter       *IndexCounterStats     `bson:"indexCounters" group:"index_counters" type:"group"`
 
-    Locks              map[string]LockStats   `bson:"locks,omitempty" group:"locks" type:"group"`
+    Locks              LockStatsMap   `bson:"locks,omitempty" group:"locks" type:"group"`
 
     Network            *NetworkStats          `bson:"network" group:"network" type:"group"`
 
@@ -57,6 +57,7 @@ func (status *ServerStatus) Collect(groupName string, exporter *MongodbCollector
     status.Opcounters.Collect("op_counters", exporter, ch)
     status.OpcountersRepl.Collect("op_counters_repl", exporter, ch)
     status.Mem.Collect("memory", exporter, ch)
+    status.Locks.Collect("locks", exporter, ch)
 }
 
 func GetServerStatus() *ServerStatus {
