@@ -2,15 +2,16 @@ package collector
 
 import(
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/dcu/mongodb_exporter/shared"
 )
 
 type MongodbCollector struct {
-    Groups map[string]*Group
+    Groups map[string]*shared.Group
 }
 
 func NewMongodbCollector() *MongodbCollector {
     exporter := &MongodbCollector{
-        Groups: make(map[string]*Group),
+        Groups: make(map[string]*shared.Group),
     }
 
     exporter.collectServerStatus(nil)
@@ -18,13 +19,13 @@ func NewMongodbCollector() *MongodbCollector {
     return exporter
 }
 
-func (exporter *MongodbCollector) FindOrCreateGroupByName(name string) *Group {
-    name = SnakeCase(name)
+func (exporter *MongodbCollector) FindOrCreateGroupByName(name string) *shared.Group {
+    name = shared.SnakeCase(name)
     println("Adding group:",name)
     group := exporter.Groups[name]
 
     if group == nil {
-        group = NewGroup(name)
+        group = shared.NewGroup(name)
         exporter.Groups[name] = group
     }
 

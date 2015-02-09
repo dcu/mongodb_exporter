@@ -1,4 +1,4 @@
-package collector
+package shared
 
 import(
     "github.com/prometheus/client_golang/prometheus"
