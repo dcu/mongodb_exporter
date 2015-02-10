@@ -175,53 +175,53 @@ locks_time_acquiring_micros:
 network:
   bytes_in:
     help: "The value of the bytesIn field reflects the amount of network traffic, in bytes, received by this database. Use this value to ensure that network traffic sent to the mongod process is consistent with expectations and overall inter-application traffic"
-    type: gauge
+    type: counter
   bytes_out:
     help: "The value of the bytesOut field reflects the amount of network traffic, in bytes, sent from this database. Use this value to ensure that network traffic sent by the mongod process is consistent with expectations and overall inter-application traffic"
-    type: gauge
+    type: counter
   num_requests:
     help: "The numRequests field is a counter of the total number of distinct requests that the server has received. Use this value to provide context for the bytesIn and bytesOut values to ensure that MongoDB’s network utilization is consistent with expectations and application use"
-    type: gauge
+    type: counter
 
 op_counters:
   insert:
     help: "insert provides a counter of the total number of insert operations received since the mongod instance last started."
-    type: gauge
+    type: counter
   query:
     help: "query provides a counter of the total number of queries received since the mongod instance last started"
-    type: gauge
+    type: counter
   update:
     help: "update provides a counter of the total number of update operations recieved since the mongod instance last started"
-    type: gauge
+    type: counter
   delete:
     help: "delete provides a counter of the total number of delete operations since the mongod instance last started"
-    type: gauge
+    type: counter
   getmore:
     help: "getmore provides a counter of the total number of “getmore” operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
-    type: gauge
+    type: counter
   command:
     help: "command provides a counter of the total number of commands issued to the database since the mongod instance last started."
-    type: gauge
+    type: counter
 
 op_counters_repl:
   insert:
     help: "insert provides a counter of the total number of replicated insert operations since the mongod instance last started"
-    type: gauge
+    type: counter
   query:
     help: "query provides a counter of the total number of replicated queries since the mongod instance last started"
-    type: gauge
+    type: counter
   update:
     help: "update provides a counter of the total number of replicated update operations since the mongod instance last started"
-    type: gauge
+    type: counter
   delete:
     help: "delete provides a counter of the total number of replicated delete operations since the mongod instance last started"
-    type: gauge
+    type: counter
   getmore:
     help: "getmore provides a counter of the total number of “getmore” operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
-    type: gauge
+    type: counter
   command:
     help: "command provides a counter of the total number of replicated commands issued to the database since the mongod instance last started"
-    type: gauge
+    type: counter
 
 memory:
   bits:
