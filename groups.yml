@@ -1,6 +1,6 @@
 instance:
   uptime:
-    help: The value of the uptime field corresponds to the number of seconds that the mongos or mongod process has been active.
+    help: "The value of the uptime field corresponds to the number of seconds that the mongos or mongod process has been active."
     type: counter
   uptime_estimate:
     help: "uptimeEstimate provides the uptime as calculated from MongoDB's internal course-grained time keeping system."
@@ -56,187 +56,191 @@ connections:
 
 durability:
   commits:
-    help: "FIXME"
+    help: "The commits provides the number of transactions written to the journal during the last journal group commit interval."
     type: gauge
   journaled_mb:
-    help: "FIXME"
+    help: "The journaledMB provides the amount of data in megabytes (MB) written to journal during the last journal group commit interval"
     type: gauge
   write_to_data_files_mb:
-    help: "FIXME"
+    help: "The writeToDataFilesMB provides the amount of data in megabytes (MB) written from journal to the data files during the last journal group commit interval"
     type: gauge
   compression:
-    help: "FIXME"
+    help: "The compression represents the compression ratio of the data written to the journal:
+( journaled_size_of_data / uncompressed_size_of_data )"
     type: gauge
   commits_in_write_lock:
-    help: "FIXME"
+    help: "The commitsInWriteLock provides a count of the commits that occurred while a write lock was held. Commits in a write lock indicate a MongoDB node under a heavy write load and call for further diagnosis"
     type: gauge
   early_commits:
-    help: "FIXME"
+    help: "The earlyCommits value reflects the number of times MongoDB requested a commit before the scheduled journal group commit interval. Use this value to ensure that your journal group commit interval is not too long for your deployment"
     type: summary
 
 durability_time_ms:
   dt:
-    help: "FIXME"
+    help: "The dt value provides, in milliseconds, the amount of time over which MongoDB collected the timeMSdata. Use this field to provide context to the other timeMS field values"
     type: summary
   prep_log_buffer:
-    help: "FIXME"
+    help: "The prepLogBuffer value provides, in milliseconds, the amount of time spent preparing to write to the journal. Smaller values indicate better journal performance"
     type: summary
   write_to_journal:
-    help: "FIXME"
+    help: "The writeToJournal value provides, in milliseconds, the amount of time spent actually writing to the journal. File system speeds and device interfaces can affect performance"
     type: summary
   write_to_data_files:
-    help: "FIXME"
+    help: "The writeToDataFiles value provides, in milliseconds, the amount of time spent writing to data files after journaling. File system speeds and device interfaces can affect performance"
     type: summary
   remap_private_view:
-    help: "FIXME"
+    help: "The remapPrivateView value provides, in milliseconds, the amount of time spent remapping copy-on-write memory mapped views. Smaller values indicate better journal performance"
     type: summary
 
 extra_info:
   page_faults:
-    help: "FIXME"
+    help: "The page_faults Reports the total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data which isn’t available in active memory. The page_faults counter may increase dramatically during moments of poor performance and may correlate with limited memory environments and larger data sets. Limited and sporadic page faults do not necessarily indicate an issue"
     type: gauge
   heap_usage_bytes:
-    help: "FIXME"
+    help: "The heap_usage_bytes field is only available on Unix/Linux systems, and reports the total size in bytes of heap space used by the database process"
     type: gauge
 
 global_lock:
   total_time:
-    help: "FIXME"
+    help: "The value of totalTime represents the time, in microseconds, since the database last started and creation of the globalLock. This is roughly equivalent to total server uptime"
     type: counter
   lock_time:
-    help: "FIXME"
+    help: "The value of lockTime represents the time, in microseconds, since the database last started, that the globalLock has been held"
     type: counter
   ratio:
-    help: "FIXME"
+    help: "The value of ratio displays the relationship between lockTime and totalTime. Low values indicate that operations have held the globalLock frequently for shorter periods of time. High values indicate that operations have held globalLock infrequently for longer periods of time"
     type: gauge
 
 global_lock_current_queue:
   total:
-    help: "FIXME"
+    help: "The value of total provides a combined total of operations queued waiting for the lock. A consistently small queue, particularly of shorter operations should cause no concern. Also, consider this value in light of the size of queue waiting for the read lock (e.g. readers) and write lock (e.g. writers) individually"
     type: gauge
   readers:
-    help: "FIXME"
+    help: "The value of readers is the number of operations that are currently queued and waiting for the read lock. A consistently small read-queue, particularly of shorter operations should cause no concern"
     type: gauge
   writers:
-    help: "FIXME"
+    help: "The value of writers is the number of operations that are currently queued and waiting for the write lock. A consistently small write-queue, particularly of shorter operations is no cause for concern"
     type: gauge
 
 global_lock_client:
   total:
-    help: "FIXME"
+    help: "The value of total is the total number of active client connections to the database. This combines clients that are performing read operations (e.g. readers) and clients that are performing write operations (e.g. writers)"
     type: gauge
   readers:
-    help: "FIXME"
+    help: "The value of readers contains a count of the active client connections performing read operations"
     type: gauge
   writers:
-    help: "FIXME"
+    help: "The value of writers contains a count of active client connections performing write operations"
     type: gauge
 
 index_counters:
   accesses:
-    help: "FIXME"
+    help: "accesses reports the number of times that operations have accessed indexes. This value is the combination of the hits and misses. Higher values indicate that your database has indexes and that queries are taking advantage of these indexes. If this number does not grow over time, this might indicate that your indexes do not effectively support your use"
     type: counter
   hits:
-    help: "FIXME"
+    help: "The hits value reflects the number of times that an index has been accessed and mongod is able to return the index from memory. A higher value indicates effective index use. hits values that represent a greater proportion of the accesses value, tend to indicate more effective index configuration"
     type: counter
   misses:
-    help: "FIXME"
+    help: "The misses value represents the number of times that an operation attempted to access an index that was not in memory. These “misses,” do not indicate a failed query or operation, but rather an inefficient use of the index. Lower values in this field indicate better index use and likely overall performance as well"
     type: counter
   resets:
-    help: "FIXME"
+    help: "The resets value reflects the number of times that the index counters have been reset since the database last restarted. Typically this value is 0, but use this value to provide context for the data specified by other indexCounters values"
     type: gauge
   miss_ratio:
-    help: "FIXME"
+    help: "The missRatio value is the ratio of hits to misses. This value is typically 0 or approaching 0"
     type: gauge
 
 locks_time_locked_micros:
   global_r:
-    help: "FIXME"
+    help: "The R field reports the amount of time in microseconds that any database has held the global read lock"
     type: counter
   local_r:
-    help: "FIXME"
+    help: "The r field reports the amount of time in microseconds that any database has held the local read lock"
     type: counter
   global_w:
-    help: "FIXME"
+    help: "The W field reports the amount of time in microseconds that any database has held the global write lock"
     type: counter
   local_w:
-    help: "FIXME"
+    help: "The w field reports the amount of time in microseconds that any database has held the local write lock"
     type: counter
 
 locks_time_acquiring_micros:
   global_w:
-    help: "FIXME"
+    help: "The W field reports the amount of time in microseconds that any database has spent waiting for the global write lock"
     type: counter
   global_r:
-    help: "FIXME"
+    help: "The R field reports the amount of time in microseconds that any database has spent waiting for the global read lock"
     type: counter
 
 network:
   bytes_in:
-    help: "FIXME"
+    help: "The value of the bytesIn field reflects the amount of network traffic, in bytes, received by this database. Use this value to ensure that network traffic sent to the mongod process is consistent with expectations and overall inter-application traffic"
     type: gauge
   bytes_out:
-    help: "FIXME"
+    help: "The value of the bytesOut field reflects the amount of network traffic, in bytes, sent from this database. Use this value to ensure that network traffic sent by the mongod process is consistent with expectations and overall inter-application traffic"
     type: gauge
   num_requests:
-    help: "FIXME"
+    help: "The numRequests field is a counter of the total number of distinct requests that the server has received. Use this value to provide context for the bytesIn and bytesOut values to ensure that MongoDB’s network utilization is consistent with expectations and application use"
     type: gauge
 
 op_counters:
   insert:
-    help: "FIXME"
+    help: "insert provides a counter of the total number of insert operations received since the mongod instance last started."
     type: gauge
   query:
-    help: "FIXME"
+    help: "query provides a counter of the total number of queries received since the mongod instance last started"
     type: gauge
   update:
-    help: "FIXME"
+    help: "update provides a counter of the total number of update operations recieved since the mongod instance last started"
     type: gauge
   delete:
-    help: "FIXME"
+    help: "delete provides a counter of the total number of delete operations since the mongod instance last started"
     type: gauge
   getmore:
-    help: "FIXME"
+    help: "getmore provides a counter of the total number of “getmore” operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
     type: gauge
   command:
-    help: "FIXME"
+    help: "command provides a counter of the total number of commands issued to the database since the mongod instance last started."
     type: gauge
 
 op_counters_repl:
   insert:
-    help: "FIXME"
+    help: "insert provides a counter of the total number of replicated insert operations since the mongod instance last started"
     type: gauge
   query:
-    help: "FIXME"
+    help: "query provides a counter of the total number of replicated queries since the mongod instance last started"
     type: gauge
   update:
-    help: "FIXME"
+    help: "update provides a counter of the total number of replicated update operations since the mongod instance last started"
     type: gauge
   delete:
-    help: "FIXME"
+    help: "delete provides a counter of the total number of replicated delete operations since the mongod instance last started"
     type: gauge
   getmore:
-    help: "FIXME"
+    help: "getmore provides a counter of the total number of “getmore” operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
     type: gauge
   command:
-    help: "FIXME"
+    help: "command provides a counter of the total number of replicated commands issued to the database since the mongod instance last started"
     type: gauge
 
 memory:
   bits:
-    help: "FIXME"
+    help: "The value of bits is either 64 or 32, depending on which target architecture specified during the mongod compilation process. In most instances this is 64, and this value does not change over time"
     type: counter
   resident:
-    help: "FIXME"
+    help: "The value of resident is roughly equivalent to the amount of RAM, in megabytes (MB), currently used by the database process. In normal use this value tends to grow. In dedicated database servers this number tends to approach the total amount of system memory"
     type: counter
   virtual:
-    help: "FIXME"
+    help: "virtual displays the quantity, in megabytes (MB), of virtual memory used by the mongod process. With journaling enabled, the value of virtual is at least twice the value of mapped. If virtual value is significantly larger than mapped (e.g. 3 or more times), this may indicate a memory leak"
     type: gauge
   mapped:
-    help: "FIXME"
+    help: "The value of mapped provides the amount of mapped memory, in megabytes (MB), by the database. Because MongoDB uses memory-mapped files, this value is likely to be to be roughly equivalent to the total size of your database or databases"
     type: gauge
   mapped_with_journal:
-    help: "FIXME"
+    help: "mappedWithJournal provides the amount of mapped memory, in megabytes (MB), including the memory used for journaling. This value will always be twice the value of mapped. This field is only included if journaling is enabled"
     type: counter
 
+metrics_cursor_timedOut:
+  help: "FIXME"
+  type: gauge
 
