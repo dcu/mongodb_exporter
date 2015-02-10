@@ -11,6 +11,10 @@ func main() {
     prometheus.MustRegister(mongodbCollector)
 
     http.Handle("/metrics", prometheus.Handler())
-    http.ListenAndServe(":9001", nil)
+    err := http.ListenAndServe(":9001", nil)
+
+    if err != nil {
+        panic(err)
+    }
 }
 

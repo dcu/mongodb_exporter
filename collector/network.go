@@ -2,6 +2,7 @@ package collector
 
 import(
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/dcu/mongodb_exporter/shared"
 )
 
 //Network
@@ -11,8 +12,8 @@ type NetworkStats struct {
     NumRequests         float64 `bson:"numRequests" type:"gauge"`
 }
 
-func (networkStats *NetworkStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName(groupName)
+func (networkStats *NetworkStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+    group := shared.FindOrCreateGroup(groupName)
     group.Collect(networkStats, "BytesIn", ch)
     group.Collect(networkStats, "BytesOut", ch)
     group.Collect(networkStats, "NumRequests", ch)

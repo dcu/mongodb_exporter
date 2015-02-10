@@ -2,6 +2,7 @@ package collector
 
 import(
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/dcu/mongodb_exporter/shared"
 )
 
 
@@ -11,8 +12,8 @@ type ExtraInfo struct {
     PageFaults float64 `bson:"page_faults" type:"gauge"`
 }
 
-func (extraInfo *ExtraInfo) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName(groupName)
+func (extraInfo *ExtraInfo) Collect(groupName string, ch chan<- prometheus.Metric) {
+    group := shared.FindOrCreateGroup(groupName)
     group.Collect(extraInfo, "HeapUsageBytes", ch)
     group.Collect(extraInfo, "PageFaults", ch)
 }

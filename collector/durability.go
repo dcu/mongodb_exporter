@@ -2,6 +2,7 @@ package collector
 
 import(
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/dcu/mongodb_exporter/shared"
 )
 
 
@@ -13,8 +14,8 @@ type DurTiming struct {
     WriteToDataFiles   float64 `bson:"writeToDataFiles" type:"summary"`
     RemapPrivateView   float64 `bson:"remapPrivateView" type:"summary"`
 }
-func (durTiming *DurTiming) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName(groupName)
+func (durTiming *DurTiming) Collect(groupName string, ch chan<- prometheus.Metric) {
+    group := shared.FindOrCreateGroup(groupName)
     group.Collect(durTiming, "Dt", ch)
     group.Collect(durTiming, "PrepLogBuffer", ch)
     group.Collect(durTiming, "WriteToJournal", ch)
@@ -32,8 +33,8 @@ type DurStats struct {
     TimeMs             DurTiming `bson:"timeMs"`
 }
 
-func (durStats *DurStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName(groupName)
+func (durStats *DurStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+    group := shared.FindOrCreateGroup(groupName)
     group.Collect(durStats, "Commits", ch)
     group.Collect(durStats, "JournaledMB", ch)
     group.Collect(durStats, "WriteToDataFilesMB", ch)
@@ -41,7 +42,7 @@ func (durStats *DurStats) Collect(groupName string, exporter *MongodbCollector, 
     group.Collect(durStats, "CommitsInWriteLock", ch)
     group.Collect(durStats, "EarlyCommits", ch)
 
-    durStats.TimeMs.Collect(groupName+"_time_ms", exporter, ch)
+    durStats.TimeMs.Collect(groupName+"_time_ms", ch)
 }
 
 

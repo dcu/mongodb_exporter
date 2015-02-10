@@ -6,22 +6,31 @@ import(
     "time"
 )
 
+var(
+    Groups = make(map[string]*Group)
+)
+
 type Group struct {
     Name      string
-    Groups    map[string]*Group
     Counters  map[string]prometheus.Counter
     Gauges    map[string]prometheus.Gauge
     Summaries map[string]prometheus.Summary
 }
 
-func NewGroup(name string) (*Group) {
-    group := &Group{
-        Name: name,
-        Counters: make(map[string]prometheus.Counter),
-        Gauges: make(map[string]prometheus.Gauge),
-        Summaries: make(map[string]prometheus.Summary),
-        Groups: make(map[string]*Group),
+func FindOrCreateGroup(name string) (*Group) {
+    name = SnakeCase(name)
+    group := Groups[name]
+
+    if group == nil {
+        group = &Group{
+            Name: name,
+            Counters: make(map[string]prometheus.Counter),
+            Gauges: make(map[string]prometheus.Gauge),
+            Summaries: make(map[string]prometheus.Summary),
+        }
+        Groups[name] = group
     }
+
     return group
 }
 

@@ -6,34 +6,17 @@ import(
 )
 
 type MongodbCollector struct {
-    Groups map[string]*shared.Group
 }
 
 func NewMongodbCollector() *MongodbCollector {
-    exporter := &MongodbCollector{
-        Groups: make(map[string]*shared.Group),
-    }
-
+    exporter := &MongodbCollector{}
     exporter.collectServerStatus(nil)
 
     return exporter
 }
 
-func (exporter *MongodbCollector) FindOrCreateGroupByName(name string) *shared.Group {
-    name = shared.SnakeCase(name)
-    println("Adding group:",name)
-    group := exporter.Groups[name]
-
-    if group == nil {
-        group = shared.NewGroup(name)
-        exporter.Groups[name] = group
-    }
-
-    return group
-}
-
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
-    for _, group := range exporter.Groups {
+    for _, group := range shared.Groups {
         group.Describe(ch)
     }
 }
@@ -45,6 +28,6 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 
 func (exporter *MongodbCollector) collectServerStatus(ch chan<-prometheus.Metric) {
     serverStatus := GetServerStatus()
-    serverStatus.Collect("instance", exporter, ch)
+    serverStatus.Collect("instance", ch)
 }
 

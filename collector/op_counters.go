@@ -2,6 +2,7 @@ package collector
 
 import(
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/dcu/mongodb_exporter/shared"
 )
 
 //Opcount and OpcountersRepl
@@ -14,8 +15,8 @@ type OpcountersStats struct {
     Command float64 `bson:"command" type:"gauge"`
 }
 
-func (opCounters *OpcountersStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName(groupName)
+func (opCounters *OpcountersStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+    group := shared.FindOrCreateGroup(groupName)
     group.Collect(opCounters, "Insert", ch)
     group.Collect(opCounters, "Query", ch)
     group.Collect(opCounters, "Update", ch)

@@ -2,6 +2,7 @@ package collector
 
 import(
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/dcu/mongodb_exporter/shared"
 )
 
 
@@ -12,8 +13,8 @@ type ConnectionStats struct {
     TotalCreated float64 `bson:"totalCreated" type:"counter"`
 }
 
-func (connectionStats *ConnectionStats) Collect(groupName string, exporter *MongodbCollector, ch chan<- prometheus.Metric) {
-    group := exporter.FindOrCreateGroupByName(groupName)
+func (connectionStats *ConnectionStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+    group := shared.FindOrCreateGroup(groupName)
     group.Collect(connectionStats, "Current", ch)
     group.Collect(connectionStats, "Available", ch)
     group.Collect(connectionStats, "TotalCreated", ch)
