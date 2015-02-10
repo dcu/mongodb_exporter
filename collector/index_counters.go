@@ -16,9 +16,9 @@ type IndexCounterStats struct {
 }
 func (connectionStats *IndexCounterStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(connectionStats, "Accesses", ch)
-    group.Collect(connectionStats, "Hits", ch)
-    group.Collect(connectionStats, "Misses", ch)
-    group.Collect(connectionStats, "Resets", ch)
-    group.Collect(connectionStats, "MissRatio", ch)
+    group.Collect("accesses", connectionStats.Accesses, ch)
+    group.Collect("hits", connectionStats.Hits, ch)
+    group.Collect("misses", connectionStats.Misses, ch)
+    group.Collect("resets", connectionStats.Resets, ch)
+    group.Collect("miss_ratio", connectionStats.MissRatio, ch)
 }

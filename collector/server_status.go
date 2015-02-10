@@ -39,9 +39,9 @@ type ServerStatus struct {
 func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
 
-    group.Collect(status, "Uptime", ch)
-    group.Collect(status, "UptimeEstimate", ch)
-    group.Collect(status, "LocalTime", ch)
+    group.Collect("uptime", status.Uptime, ch)
+    group.Collect("uptime_estimate", status.Uptime, ch)
+    group.Collect("local_time", float64(status.LocalTime.Unix()), ch)
 
     status.Asserts.Collect("asserts", ch)
     status.Dur.Collect("durability", ch)

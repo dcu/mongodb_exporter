@@ -1,0 +1,242 @@
+instance:
+  uptime:
+    help: The value of the uptime field corresponds to the number of seconds that the mongos or mongod process has been active.
+    type: counter
+  uptime_estimate:
+    help: "uptimeEstimate provides the uptime as calculated from MongoDB's internal course-grained time keeping system."
+    type: counter
+  local_time:
+    help: "The localTime value is the current time, according to the server, in UTC specified in an ISODate format."
+    type: counter
+
+asserts:
+  regular:
+    help: "The regular counter tracks the number of regular assertions raised since the server process started. Check the log file for more information about these messages."
+    type: counter
+  warning:
+    help: "The warning counter tracks the number of warnings raised since the server process started. Check the log file for more information about these warnings."
+    type: counter
+  msg:
+    help: "The msg counter tracks the number of message assertions raised since the server process started. Check the log file for more information about these messages."
+    type: counter
+  user:
+    help: "The user counter reports the number of “user asserts” that have occurred since the last time the server process started. These are errors that user may generate, such as out of disk space or duplicate key. You can prevent these assertions by fixing a problem with your application or deployment. Check the MongoDB log for more information."
+    type: counter
+  rollovers:
+    help: "The rollovers counter displays the number of times that the rollover counters have rolled over since the last time the server process started. The counters will rollover to zero after 230 assertions. Use this value to provide context to the other values in the asserts data structure."
+    type: counter
+
+background_flushing:
+  flushes:
+    help: "flushes is a counter that collects the number of times the database has flushed all writes to disk. This value will grow as database runs for longer periods of time"
+    type: counter
+  total_ms:
+    help: "The total_ms value provides the total number of milliseconds (ms) that the mongod processes have spent writing (i.e. flushing) data to disk. Because this is an absolute value, consider the value offlushes and average_ms to provide better context for this datum"
+    type: counter
+  average_ms:
+    help: "The average_ms value describes the relationship between the number of flushes and the total amount of time that the database has spent writing data to disk. The larger flushes is, the more likely this value is likely to represent a \"normal,\" time; however, abnormal data can skew this value"
+    type: gauge
+  last_ms:
+    help: "The value of the last_ms field is the amount of time, in milliseconds, that the last flush operation took to complete. Use this value to verify that the current performance of the server and is in line with the historical data provided by average_ms and total_ms"
+    type: gauge
+  last_finished:
+    help: "The last_finished field provides a timestamp of the last completed flush operation in the ISODateformat. If this value is more than a few minutes old relative to your server’s current time and accounting for differences in time zone, restarting the database may result in some data loss"
+    type: gauge
+
+connections:
+  current:
+    help: "The value of current corresponds to the number of connections to the database server from clients. This number includes the current shell session. Consider the value of available to add more context to this datum"
+    type: gauge
+  available:
+    help: "available provides a count of the number of unused available incoming connections the database can provide. Consider this value in combination with the value of current to understand the connection load on the database, and the UNIX ulimit Settings document for more information about system thresholds on available connections"
+    type: gauge
+  total_created:
+    help: "totalCreated provides a count of all incoming connections created to the server. This number includes connections that have since closed"
+    type: counter
+
+durability:
+  commits:
+    help: "FIXME"
+    type: gauge
+  journaled_mb:
+    help: "FIXME"
+    type: gauge
+  write_to_data_files_mb:
+    help: "FIXME"
+    type: gauge
+  compression:
+    help: "FIXME"
+    type: gauge
+  commits_in_write_lock:
+    help: "FIXME"
+    type: gauge
+  early_commits:
+    help: "FIXME"
+    type: summary
+
+durability_time_ms:
+  dt:
+    help: "FIXME"
+    type: summary
+  prep_log_buffer:
+    help: "FIXME"
+    type: summary
+  write_to_journal:
+    help: "FIXME"
+    type: summary
+  write_to_data_files:
+    help: "FIXME"
+    type: summary
+  remap_private_view:
+    help: "FIXME"
+    type: summary
+
+extra_info:
+  page_faults:
+    help: "FIXME"
+    type: gauge
+  heap_usage_bytes:
+    help: "FIXME"
+    type: gauge
+
+global_lock:
+  total_time:
+    help: "FIXME"
+    type: counter
+  lock_time:
+    help: "FIXME"
+    type: counter
+  ratio:
+    help: "FIXME"
+    type: gauge
+
+global_lock_current_queue:
+  total:
+    help: "FIXME"
+    type: gauge
+  readers:
+    help: "FIXME"
+    type: gauge
+  writers:
+    help: "FIXME"
+    type: gauge
+
+global_lock_client:
+  total:
+    help: "FIXME"
+    type: gauge
+  readers:
+    help: "FIXME"
+    type: gauge
+  writers:
+    help: "FIXME"
+    type: gauge
+
+index_counters:
+  accesses:
+    help: "FIXME"
+    type: counter
+  hits:
+    help: "FIXME"
+    type: counter
+  misses:
+    help: "FIXME"
+    type: counter
+  resets:
+    help: "FIXME"
+    type: gauge
+  miss_ratio:
+    help: "FIXME"
+    type: gauge
+
+locks_time_locked_micros:
+  global_r:
+    help: "FIXME"
+    type: counter
+  local_r:
+    help: "FIXME"
+    type: counter
+  global_w:
+    help: "FIXME"
+    type: counter
+  local_w:
+    help: "FIXME"
+    type: counter
+
+locks_time_acquiring_micros:
+  global_w:
+    help: "FIXME"
+    type: counter
+  global_r:
+    help: "FIXME"
+    type: counter
+
+network:
+  bytes_in:
+    help: "FIXME"
+    type: gauge
+  bytes_out:
+    help: "FIXME"
+    type: gauge
+  num_requests:
+    help: "FIXME"
+    type: gauge
+
+op_counters:
+  insert:
+    help: "FIXME"
+    type: gauge
+  query:
+    help: "FIXME"
+    type: gauge
+  update:
+    help: "FIXME"
+    type: gauge
+  delete:
+    help: "FIXME"
+    type: gauge
+  getmore:
+    help: "FIXME"
+    type: gauge
+  command:
+    help: "FIXME"
+    type: gauge
+
+op_counters_repl:
+  insert:
+    help: "FIXME"
+    type: gauge
+  query:
+    help: "FIXME"
+    type: gauge
+  update:
+    help: "FIXME"
+    type: gauge
+  delete:
+    help: "FIXME"
+    type: gauge
+  getmore:
+    help: "FIXME"
+    type: gauge
+  command:
+    help: "FIXME"
+    type: gauge
+
+memory:
+  bits:
+    help: "FIXME"
+    type: counter
+  resident:
+    help: "FIXME"
+    type: counter
+  virtual:
+    help: "FIXME"
+    type: gauge
+  mapped:
+    help: "FIXME"
+    type: gauge
+  mapped_with_journal:
+    help: "FIXME"
+    type: counter
+
+

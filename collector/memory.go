@@ -16,11 +16,11 @@ type MemStats struct {
 
 func (memStats *MemStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(memStats, "Bits", ch)
-    group.Collect(memStats, "Resident", ch)
-    group.Collect(memStats, "Virtual", ch)
-    group.Collect(memStats, "Mapped", ch)
-    group.Collect(memStats, "MappedWithJournal", ch)
+    group.Collect("bits", memStats.Bits, ch)
+    group.Collect("resident", memStats.Resident, ch)
+    group.Collect("virtual", memStats.Virtual, ch)
+    group.Collect("mapped", memStats.Mapped, ch)
+    group.Collect("mapped_with_journal", memStats.MappedWithJournal, ch)
 }
 
 

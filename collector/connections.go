@@ -15,9 +15,8 @@ type ConnectionStats struct {
 
 func (connectionStats *ConnectionStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(connectionStats, "Current", ch)
-    group.Collect(connectionStats, "Available", ch)
-    group.Collect(connectionStats, "TotalCreated", ch)
+    group.Collect("current", connectionStats.Current, ch)
+    group.Collect("available", connectionStats.Available, ch)
+    group.Collect("total_created", connectionStats.TotalCreated, ch)
 }
-
 

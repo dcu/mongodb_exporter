@@ -27,16 +27,17 @@ func (locks LockStatsMap) Collect(groupName string, ch chan<-prometheus.Metric) 
         }
 
         timeLockedGroup := shared.FindOrCreateGroup(key+"_locks_time_locked")
-        timeLockedGroup.Collect(locks.TimeLockedMicros, "Read", ch)
-        timeLockedGroup.Collect(locks.TimeLockedMicros, "Write", ch)
-        timeLockedGroup.Collect(locks.TimeLockedMicros, "ReadLower", ch)
-        timeLockedGroup.Collect(locks.TimeLockedMicros, "WriteLower", ch)
+        timeLockedGroup.DescName = "locks_time_locked_micros"
+
+        timeLockedGroup.Collect("global_r", locks.TimeLockedMicros.Read, ch)
+        timeLockedGroup.Collect("global_w", locks.TimeLockedMicros.Write, ch)
+        timeLockedGroup.Collect("local_r", locks.TimeLockedMicros.ReadLower, ch)
+        timeLockedGroup.Collect("local_w", locks.TimeLockedMicros.WriteLower, ch)
 
         timeAcquiringGroup := shared.FindOrCreateGroup(key+"_locks_time_acquiring")
-        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "Read", ch)
-        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "Write", ch)
-        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "ReadLower", ch)
-        timeAcquiringGroup.Collect(locks.TimeLockedMicros, "WriteLower", ch)
+        timeAcquiringGroup.DescName = "locks_time_acquiring_micros"
+        timeAcquiringGroup.Collect("global_r", locks.TimeLockedMicros.Read, ch)
+        timeAcquiringGroup.Collect("global_w", locks.TimeLockedMicros.Write, ch)
     }
 }
 

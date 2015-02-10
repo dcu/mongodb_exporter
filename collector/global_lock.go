@@ -14,9 +14,9 @@ type ClientStats struct {
 }
 func (clientStats *ClientStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(clientStats, "Total", ch)
-    group.Collect(clientStats, "Readers", ch)
-    group.Collect(clientStats, "Writers", ch)
+    group.Collect("total", clientStats.Total, ch)
+    group.Collect("readers", clientStats.Readers, ch)
+    group.Collect("writers", clientStats.Writers, ch)
 }
 
 type QueueStats struct {
@@ -26,9 +26,9 @@ type QueueStats struct {
 }
 func (queueStats *QueueStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(queueStats, "Total", ch)
-    group.Collect(queueStats, "Readers", ch)
-    group.Collect(queueStats, "Writers", ch)
+    group.Collect("total", queueStats.Total, ch)
+    group.Collect("readers", queueStats.Readers, ch)
+    group.Collect("writers", queueStats.Writers, ch)
 }
 
 type GlobalLockStats struct {
@@ -40,11 +40,11 @@ type GlobalLockStats struct {
 }
 func (globalLock *GlobalLockStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(globalLock, "TotalTime", ch)
-    group.Collect(globalLock, "LockTime", ch)
-    group.Collect(globalLock, "Ratio", ch)
+    group.Collect("total_time", globalLock.TotalTime, ch)
+    group.Collect("lock_time", globalLock.LockTime, ch)
+    group.Collect("ratio", globalLock.Ratio, ch)
 
-    globalLock.CurrentQueue.Collect(groupName+"_queue", ch)
+    globalLock.CurrentQueue.Collect(groupName+"_current_queue", ch)
     globalLock.ActiveClients.Collect(groupName+"_client", ch)
 }
 

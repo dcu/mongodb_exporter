@@ -18,11 +18,11 @@ type FlushStats struct {
 
 func (flushStats *FlushStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(flushStats, "Flushes", ch)
-    group.Collect(flushStats, "TotalMs", ch)
-    group.Collect(flushStats, "AverageMs", ch)
-    group.Collect(flushStats, "LastMs", ch)
-    group.Collect(flushStats, "LastFinished", ch)
+    group.Collect("flushes", flushStats.Flushes, ch)
+    group.Collect("total_ms", flushStats.TotalMs, ch)
+    group.Collect("average_ms", flushStats.AverageMs, ch)
+    group.Collect("last_ms", flushStats.LastMs, ch)
+    group.Collect("last_finished", float64(flushStats.LastFinished.Unix()), ch)
 }
 
 

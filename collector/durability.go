@@ -16,11 +16,11 @@ type DurTiming struct {
 }
 func (durTiming *DurTiming) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(durTiming, "Dt", ch)
-    group.Collect(durTiming, "PrepLogBuffer", ch)
-    group.Collect(durTiming, "WriteToJournal", ch)
-    group.Collect(durTiming, "WriteToDataFiles", ch)
-    group.Collect(durTiming, "RemapPrivateView", ch)
+    group.Collect("dt", durTiming.Dt, ch)
+    group.Collect("prep_log_buffer", durTiming.PrepLogBuffer, ch)
+    group.Collect("write_to_journal", durTiming.WriteToJournal, ch)
+    group.Collect("write_to_data_files", durTiming.WriteToDataFiles, ch)
+    group.Collect("remap_private_view", durTiming.RemapPrivateView, ch)
 }
 
 type DurStats struct {
@@ -35,12 +35,12 @@ type DurStats struct {
 
 func (durStats *DurStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(durStats, "Commits", ch)
-    group.Collect(durStats, "JournaledMB", ch)
-    group.Collect(durStats, "WriteToDataFilesMB", ch)
-    group.Collect(durStats, "Compression", ch)
-    group.Collect(durStats, "CommitsInWriteLock", ch)
-    group.Collect(durStats, "EarlyCommits", ch)
+    group.Collect("commits", durStats.Commits, ch)
+    group.Collect("journaled_mb", durStats.JournaledMB, ch)
+    group.Collect("write_to_data_files_mb", durStats.WriteToDataFilesMB, ch)
+    group.Collect("compression", durStats.Compression, ch)
+    group.Collect("commits_in_write_lock", durStats.CommitsInWriteLock, ch)
+    group.Collect("early_commits", durStats.EarlyCommits, ch)
 
     durStats.TimeMs.Collect(groupName+"_time_ms", ch)
 }

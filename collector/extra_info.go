@@ -14,7 +14,7 @@ type ExtraInfo struct {
 
 func (extraInfo *ExtraInfo) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
-    group.Collect(extraInfo, "HeapUsageBytes", ch)
-    group.Collect(extraInfo, "PageFaults", ch)
+    group.Collect("heap_usage_bytes", extraInfo.HeapUsageBytes, ch)
+    group.Collect("page_faults", extraInfo.PageFaults, ch)
 }
 

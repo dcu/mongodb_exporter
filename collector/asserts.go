@@ -16,10 +16,10 @@ type AssertsStats struct {
 func (asserts *AssertsStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
 
-    group.Collect(asserts, "Regular", ch)
-    group.Collect(asserts, "Warning", ch)
-    group.Collect(asserts, "Msg", ch)
-    group.Collect(asserts, "User", ch)
-    group.Collect(asserts, "Rollovers", ch)
+    group.Collect("regular", asserts.Regular, ch)
+    group.Collect("warning", asserts.Warning, ch)
+    group.Collect("msg", asserts.Msg, ch)
+    group.Collect("user", asserts.User, ch)
+    group.Collect("rollovers", asserts.Rollovers, ch)
 }
 

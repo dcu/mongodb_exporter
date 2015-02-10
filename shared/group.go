@@ -2,8 +2,6 @@ package shared
 
 import(
     "github.com/prometheus/client_golang/prometheus"
-    "reflect"
-    "time"
 )
 
 var(
@@ -12,6 +10,7 @@ var(
 
 type Group struct {
     Name      string
+    DescName  string
     Counters  map[string]prometheus.Counter
     Gauges    map[string]prometheus.Gauge
     Summaries map[string]prometheus.Summary
@@ -24,6 +23,7 @@ func FindOrCreateGroup(name string) (*Group) {
     if group == nil {
         group = &Group{
             Name: name,
+            DescName: name,
             Counters: make(map[string]prometheus.Counter),
             Gauges: make(map[string]prometheus.Gauge),
             Summaries: make(map[string]prometheus.Summary),
@@ -34,16 +34,9 @@ func FindOrCreateGroup(name string) (*Group) {
     return group
 }
 
-func (group *Group) Collect(object interface{}, fieldName string, ch chan<-prometheus.Metric) {
-    value := reflect.Indirect(reflect.ValueOf(object))
-
-    field, ok := value.Type().FieldByName(fieldName)
-    fieldValue := value.FieldByName(fieldName)
-    if !ok {
-        panic("Field "+fieldName+" not found on group "+group.Name)
-    }
-
-    group.trackField(field, fieldValue, ch)
+func (group *Group) Collect(fieldName string, value float64, ch chan<-prometheus.Metric) {
+    fieldDesc := GroupField(group.DescName, fieldName)
+    group.trackField(fieldName, fieldDesc, value, ch)
 }
 
 func (group *Group) Describe(ch chan<- *prometheus.Desc) {
@@ -109,29 +102,27 @@ func (group *Group) GetSummary(name string, description string) prometheus.Summa
     return summary
 }
 
-func (group *Group) trackField(field reflect.StructField, fieldValue reflect.Value, ch chan<-prometheus.Metric) {
-    valueToSet := getValueToSet(fieldValue)
-    collectorType := field.Tag.Get("type")
-    name := SnakeCase(field.Tag.Get("bson"))
+func (group *Group) trackField(fieldName string, fieldDesc *FieldDesc, value float64, ch chan<-prometheus.Metric) {
+    collectorType := fieldDesc.Type
 
     var collector prometheus.Collector
     switch(collectorType) {
         case "counter": {
             //println("Set", name, valueToSet)
-            counter := group.GetCounter(name, "FIXME")
-            counter.Set(valueToSet)
+            counter := group.GetCounter(fieldName, fieldDesc.Help)
+            counter.Set(value)
             collector = counter
         }
         case "gauge": {
             //println("Set", name, valueToSet)
-            gauge := group.GetGauge(name, "FIXME")
-            gauge.Set(valueToSet)
+            gauge := group.GetGauge(fieldName, fieldDesc.Help)
+            gauge.Set(value)
             collector = gauge
         }
         case "summary": {
             //println("Set", name, valueToSet)
-            summary := group.GetGauge(name, "FIXME")
-            summary.Set(valueToSet)
+            summary := group.GetGauge(fieldName, fieldDesc.Help)
+            summary.Set(value)
             collector = summary
         }
     }
@@ -139,27 +130,5 @@ func (group *Group) trackField(field reflect.StructField, fieldValue reflect.Val
     if ch != nil && collector != nil {
         collector.Collect(ch)
     }
-}
-
-func getValueToSet(fieldValue reflect.Value) float64 {
-    var valueToSet float64
-    if fieldValue.Kind() == reflect.Struct {
-        valueToSet = getTimeFromFieldValue(fieldValue)
-    } else {
-        valueToSet = fieldValue.Float()
-    }
-
-    return valueToSet
-}
-
-func getTimeFromFieldValue(fieldValue reflect.Value) float64 {
-    time, ok := fieldValue.Interface().(time.Time)
-
-    var t float64
-    if ok {
-        t = float64(time.Unix())
-    }
-
-    return t
 }
 

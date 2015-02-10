@@ -5,6 +5,6 @@ import(
 )
 
 type Collectable interface {
-    Collect(groupName string, cch chan<-prometheus.Metric)
+    Collect(groupName string, ch chan<-prometheus.Metric)
 }
 
