@@ -5,11 +5,18 @@ import(
     "github.com/dcu/mongodb_exporter/shared"
 )
 
-type MongodbCollector struct {
+type MongodbCollectorOpts struct {
+    URI string
 }
 
-func NewMongodbCollector() *MongodbCollector {
-    exporter := &MongodbCollector{}
+type MongodbCollector struct {
+    Opts MongodbCollectorOpts
+}
+
+func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
+    exporter := &MongodbCollector{
+        Opts: opts,
+    }
     exporter.collectServerStatus(nil)
 
     return exporter
@@ -27,7 +34,7 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (exporter *MongodbCollector) collectServerStatus(ch chan<-prometheus.Metric) {
-    serverStatus := GetServerStatus()
+    serverStatus := GetServerStatus(exporter.Opts.URI)
     serverStatus.Collect("instance", ch)
 }
 

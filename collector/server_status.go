@@ -59,9 +59,9 @@ func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metri
     status.Metrics.Collect("metrics", ch)
 }
 
-func GetServerStatus() *ServerStatus {
+func GetServerStatus(uri string) *ServerStatus {
     result := &ServerStatus{}
-    session, err := mgo.Dial("localhost")
+    session, err := mgo.Dial(uri)
     if err != nil {
         panic(err)
     }
