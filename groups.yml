@@ -240,7 +240,168 @@ memory:
     help: "mappedWithJournal provides the amount of mapped memory, in megabytes (MB), including the memory used for journaling. This value will always be twice the value of mapped. This field is only included if journaling is enabled"
     type: counter
 
-metrics_cursor_timedOut:
-  help: "FIXME"
-  type: gauge
+metrics_cursor_timed_out:
+  help: "timedOut provides the total number of cursors that have timed out since the server process started. If this number is large or growing at a regular rate, this may indicate an application error"
+  type: counter
+
+metrics_cursor_open:
+  no_timeout:
+    help: "noTimeout provides the number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity"
+    type: gauge
+
+  pinned:
+    help: "serverStatus.metrics.cursor.open.pinned provides the number of \"pinned\" open cursors"
+    type: gauge
+
+  total:
+    help: "total provides the number of cursors that MongoDB is maintaining for clients. Because MongoDB exhausts unused cursors, typically this value small or zero. However, if there is a queue, stale tailable cursors, or a large number of operations this value may rise"
+    type: gauge
+
+metrics_document:
+  deleted:
+    help: "deleted reports the total number of documents deleted"
+    type: counter
+
+  inserted:
+    help: "inserted reports the total number of documents inserted"
+    type: counter
+
+  returned:
+    help: "returned reports the total number of documents returned by queries"
+    type: counter
+
+  updated:
+    help: "updated reports the total number of documents updated"
+    type: counter
+
+metrics_get_last_error:
+  wtime_num:
+    help: "num reports the total number of getLastError operations with a specified write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)"
+    type: gauge
+
+  wtime_total_millis:
+    help: "total_millis reports the total amount of time in milliseconds that the mongod has spent performing getLastError operations with write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)"
+    type: counter
+
+  wtimeouts:
+    help: "wtimeouts reports the number of times that write concern operations have timed out as a result of the wtimeout threshold to getLastError."
+    type: counter
+
+metrics_operation:
+  fastmod:
+    help: "fastmod reports the number of update operations that neither cause documents to grow nor require updates to the index. For example, this counter would record an update operation that use the $inc operator to increment the value of a field that is not indexed"
+    type: counter
+
+  idhack:
+    help: "idhack reports the number of queries that contain the _id field. For these queries, MongoDB will use default index on the _id field and skip all query plan analysis"
+    type: counter
+
+  scan_and_order:
+    help: "scanAndOrder reports the total number of queries that return sorted numbers that cannot perform the sort operation using an index"
+    type: counter
+
+metrics_query_executor:
+  scanned:
+    help: "scanned reports the total number of index items scanned during queries and query-plan evaluation. This counter is the same as nscanned in the output of explain()."
+    type: counter
+
+  scanned_objects:
+    help: "record is a document that reports data related to record allocation in the on-disk memory files"
+    type: counter
+
+metrics_record:
+  moves:
+    help: "moves reports the total number of times documents move within the on-disk representation of the MongoDB data set. Documents move as a result of operations that increase the size of the document beyond their allocated record size"
+    type: counter
+
+metrics_repl_apply_batches:
+  num:
+    help: "num reports the total number of batches applied across all databases"
+    type: counter
+  total_millis:
+    help: "total_millis reports the total amount of time the mongod has spent applying operations from the oplog"
+    type: counter
+
+metrics_repl_apply:
+  ops:
+    help: "ops reports the total number of oplog operations applied"
+    type: counter
+
+metrics_repl_buffer:
+  count:
+    help: "count reports the current number of operations in the oplog buffer"
+    type: gauge
+  max_size_bytes:
+    help: "maxSizeBytes reports the maximum size of the buffer. This value is a constant setting in the mongod, and is not configurable"
+    type: counter
+  size_bytes:
+    help: "sizeBytes reports the current size of the contents of the oplog buffer"
+    type: gauge
+
+metrics_repl_network_getmores:
+  num:
+    help: "num reports the total number of getmore operations, which are operations that request an additional set of operations from the replication sync source."
+    type: counter
+  total_millis:
+    help: "total_millis reports the total amount of time required to collect data from getmore operations"
+    type: counter
+
+metrics_repl_network:
+  bytes:
+    help: "bytes reports the total amount of data read from the replication sync source"
+    type: counter
+  ops:
+    help: "ops reports the total number of operations read from the replication source."
+    type: counter
+  readers_created:
+    help: "readersCreated reports the total number of oplog query processes created. MongoDB will create a new oplog query any time an error occurs in the connection, including a timeout, or a network operation. Furthermore, readersCreated will increment every time MongoDB selects a new source fore replication."
+    type: counter
+
+metrics_repl_oplog_insert:
+  num:
+    help: "num reports the total number of items inserted into the oplog."
+    type: counter
+  total_millis:
+    help: "total_millis reports the total amount of time spent for the mongod to insert data into the oplog."
+    type: counter
+
+metrics_repl_oplog:
+  insert_bytes:
+    help: "insertBytes the total size of documents inserted into the oplog."
+    type: counter
+
+metrics_repl_preload_docs:
+  num:
+    help: "num reports the total number of documents loaded during the pre-fetch stage of replication"
+    type: counter
+  total_millis:
+    help: "total_millis reports the total amount of time spent loading documents as part of the pre-fetch stage of replication"
+    type: counter
+
+metrics_repl_preload_indexes:
+  num:
+    help: "num reports the total number of index entries loaded by members before updating documents as part of the pre-fetch stage of replication"
+    type: counter
+  total_millis:
+    help: "total_millis reports the total amount of time spent loading index entries as part of the pre-fetch stage of replication"
+    type: counter
+
+metrics_storage_freelist_search:
+  bucket_exhausted:
+    help: "bucketExhausted reports the number of times that mongod has checked the free list without finding a suitably large record allocation"
+    type: counter
+  requests:
+    help: "requests reports the number of times mongod has searched for available record allocations"
+    type: counter
+  scanned:
+    help: "scanned reports the number of available record allocations mongod has searched"
+    type: counter
+
+metrics_ttl:
+  deleted_documents:
+    help: "deletedDocuments reports the total number of documents deleted from collections with a ttl index."
+    type: counter
+  passes:
+    help: "passes reports the number of times the background process removes documents from collections with a ttl index"
+    type: counter
 
