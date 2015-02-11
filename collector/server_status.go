@@ -34,6 +34,7 @@ type ServerStatus struct {
     Opcounters         *OpcountersStats       `bson:"opcounters" group:"op_counters" type:"group"`
     OpcountersRepl     *OpcountersStats       `bson:"opcountersRepl" group:"op_counters_repl" type:"group"`
     Mem                *MemStats              `bson:"mem" group:"memory" type:"group"`
+    Metrics            *MetricsStats          `bson:"metrics" group:"metrics" type:"group"`
 }
 
 func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -55,6 +56,7 @@ func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metri
     status.OpcountersRepl.Collect("op_counters_repl", ch)
     status.Mem.Collect("memory", ch)
     status.Locks.Collect("locks", ch)
+    status.Metrics.Collect("metrics", ch)
 }
 
 func GetServerStatus() *ServerStatus {

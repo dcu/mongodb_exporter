@@ -274,15 +274,16 @@ metrics_document:
     help: "updated reports the total number of documents updated"
     type: counter
 
-metrics_get_last_error:
-  wtime_num:
+metrics_get_last_error_wtime:
+  num:
     help: "num reports the total number of getLastError operations with a specified write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)"
     type: gauge
 
-  wtime_total_millis:
+  total_millis:
     help: "total_millis reports the total amount of time in milliseconds that the mongod has spent performing getLastError operations with write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)"
     type: counter
 
+metrics_get_last_error:
   wtimeouts:
     help: "wtimeouts reports the number of times that write concern operations have timed out as a result of the wtimeout threshold to getLastError."
     type: counter
@@ -386,14 +387,14 @@ metrics_repl_preload_indexes:
     help: "total_millis reports the total amount of time spent loading index entries as part of the pre-fetch stage of replication"
     type: counter
 
-metrics_storage_freelist_search:
-  bucket_exhausted:
+metrics_storage:
+  freelist_search_bucket_exhausted:
     help: "bucketExhausted reports the number of times that mongod has checked the free list without finding a suitably large record allocation"
     type: counter
-  requests:
+  freelist_search_requests:
     help: "requests reports the number of times mongod has searched for available record allocations"
     type: counter
-  scanned:
+  freelist_search_scanned:
     help: "scanned reports the number of available record allocations mongod has searched"
     type: counter
 

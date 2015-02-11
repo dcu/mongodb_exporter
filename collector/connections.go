@@ -5,7 +5,6 @@ import(
     "github.com/dcu/mongodb_exporter/shared"
 )
 
-
 // Connection
 type ConnectionStats struct {
     Current float64 `bson:"current" type:"gauge"`
