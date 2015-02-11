@@ -7,12 +7,12 @@ import(
 
 //Opcount and OpcountersRepl
 type OpcountersStats struct {
-    Insert  float64 `bson:"insert" type:"gauge"`
-    Query   float64 `bson:"query" type:"gauge"`
-    Update  float64 `bson:"update" type:"gauge"`
-    Delete  float64 `bson:"delete" type:"gauge"`
-    GetMore float64 `bson:"getmore" type:"gauge"`
-    Command float64 `bson:"command" type:"gauge"`
+    Insert  float64 `bson:"insert"`
+    Query   float64 `bson:"query"`
+    Update  float64 `bson:"update"`
+    Delete  float64 `bson:"delete"`
+    GetMore float64 `bson:"getmore"`
+    Command float64 `bson:"command"`
 }
 
 func (opCounters *OpcountersStats) Collect(groupName string, ch chan<- prometheus.Metric) {

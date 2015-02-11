@@ -9,11 +9,11 @@ import(
 
 // Flush
 type FlushStats struct {
-    Flushes float64 `bson:"flushes" type:"counter"`
-    TotalMs float64 `bson:"total_ms" type:"counter"`
-    AverageMs float64 `bson:"average_ms" type:"gauge"`
-    LastMs float64 `bson:"last_ms" type:"gauge"`
-    LastFinished time.Time `bson:"last_finished" type:"gauge"`
+    Flushes float64 `bson:"flushes"`
+    TotalMs float64 `bson:"total_ms"`
+    AverageMs float64 `bson:"average_ms"`
+    LastMs float64 `bson:"last_ms"`
+    LastFinished time.Time `bson:"last_finished"`
 }
 
 func (flushStats *FlushStats) Collect(groupName string, ch chan<- prometheus.Metric) {

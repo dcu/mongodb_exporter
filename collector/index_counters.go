@@ -8,11 +8,11 @@ import(
 
 //IndexCounter
 type IndexCounterStats struct {
-    Accesses float64 `bson:"accesses type:"counter"`
-    Hits float64 `bson:"hits" type:"counter"`
-    Misses float64 `bson:"misses" type:"counter"`
-    Resets float64 `bson:"resets" type:"gauge"`
-    MissRatio float64 `bson:"missRatio" type:"gauge"`
+    Accesses float64 `bson:"accesses`
+    Hits float64 `bson:"hits"`
+    Misses float64 `bson:"misses"`
+    Resets float64 `bson:"resets"`
+    MissRatio float64 `bson:"missRatio"`
 }
 func (connectionStats *IndexCounterStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)

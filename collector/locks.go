@@ -9,10 +9,10 @@ type LockStatsMap map[string]LockStats
 
 //Lock
 type ReadWriteLockTimes struct {
-    Read                  float64 `bson:"R" type:"counter"`
-    Write                 float64 `bson:"W" type:"counter"`
-    ReadLower             float64 `bson:"r" type:"counter"`
-    WriteLower            float64 `bson:"w" type:"counter"`
+    Read                  float64 `bson:"R"`
+    Write                 float64 `bson:"W"`
+    ReadLower             float64 `bson:"r"`
+    WriteLower            float64 `bson:"w"`
 }
 
 type LockStats struct {

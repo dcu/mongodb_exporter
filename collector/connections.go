@@ -7,9 +7,9 @@ import(
 
 // Connection
 type ConnectionStats struct {
-    Current float64 `bson:"current" type:"gauge"`
-    Available float64 `bson:"available" type:"gauge"`
-    TotalCreated float64 `bson:"totalCreated" type:"counter"`
+    Current float64 `bson:"current"`
+    Available float64 `bson:"available"`
+    TotalCreated float64 `bson:"totalCreated"`
 }
 
 func (connectionStats *ConnectionStats) Collect(groupName string, ch chan<- prometheus.Metric) {

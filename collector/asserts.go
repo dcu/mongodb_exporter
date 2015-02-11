@@ -6,11 +6,11 @@ import(
 )
 
 type AssertsStats struct {
-    Regular float64 `bson:"regular" type:"counter"`
-    Warning float64 `bson:"warning" type:"counter"`
-    Msg float64 `bson:"msg" type:"counter"`
-    User float64 `bson:"user" type:"counter"`
-    Rollovers float64 `bson:"rollovers" type:"counter"`
+    Regular float64 `bson:"regular"`
+    Warning float64 `bson:"warning"`
+    Msg float64 `bson:"msg"`
+    User float64 `bson:"user"`
+    Rollovers float64 `bson:"rollovers"`
 }
 
 func (asserts *AssertsStats) Collect(groupName string, ch chan<- prometheus.Metric) {

@@ -7,9 +7,9 @@ import(
 
 //Network
 type NetworkStats struct {
-    BytesIn             float64 `bson:"bytesIn" type:"gauge"`
-    BytesOut            float64 `bson:"bytesOut" type:"gauge"`
-    NumRequests         float64 `bson:"numRequests" type:"gauge"`
+    BytesIn             float64 `bson:"bytesIn"`
+    BytesOut            float64 `bson:"bytesOut"`
+    NumRequests         float64 `bson:"numRequests"`
 }
 
 func (networkStats *NetworkStats) Collect(groupName string, ch chan<- prometheus.Metric) {

@@ -9,32 +9,32 @@ import(
 )
 
 type ServerStatus struct {
-    Uptime             float64                `bson:"uptime" group:"instance" type:"counter"`
-    UptimeEstimate     float64                `bson:"uptimeEstimate" group:"instance" type:"counter"`
-    LocalTime          time.Time              `bson:"localTime" group:"instance" type:"counter"`
+    Uptime             float64                `bson:"uptime"`
+    UptimeEstimate     float64                `bson:"uptimeEstimate"`
+    LocalTime          time.Time              `bson:"localTime"`
 
-    Asserts            *AssertsStats          `bson:"asserts" group:"asserts" type:"group"`
+    Asserts            *AssertsStats          `bson:"asserts"`
 
-    Dur                *DurStats              `bson:"dur" group:"durability" type:"group"`
+    Dur                *DurStats              `bson:"dur"`
 
-    BackgroundFlushing *FlushStats            `bson:"backgroundFlushing" group:"background_flushing" type:"group"`
+    BackgroundFlushing *FlushStats            `bson:"backgroundFlushing"`
 
-    Connections        *ConnectionStats       `bson:"connections" group:"connections" type:"group"`
+    Connections        *ConnectionStats       `bson:"connections"`
 
-    ExtraInfo          *ExtraInfo             `bson:"extra_info" group:"extra_info" type:"group"`
+    ExtraInfo          *ExtraInfo             `bson:"extra_info"`
 
-    GlobalLock         *GlobalLockStats       `bson:"globalLock" group:"global_lock" type:"group"`
+    GlobalLock         *GlobalLockStats       `bson:"globalLock"`
 
-    IndexCounter       *IndexCounterStats     `bson:"indexCounters" group:"index_counters" type:"group"`
+    IndexCounter       *IndexCounterStats     `bson:"indexCounters"`
 
-    Locks              LockStatsMap   `bson:"locks,omitempty" group:"locks" type:"group"`
+    Locks              LockStatsMap   `bson:"locks,omitempty"`
 
-    Network            *NetworkStats          `bson:"network" group:"network" type:"group"`
+    Network            *NetworkStats          `bson:"network"`
 
-    Opcounters         *OpcountersStats       `bson:"opcounters" group:"op_counters" type:"group"`
-    OpcountersRepl     *OpcountersStats       `bson:"opcountersRepl" group:"op_counters_repl" type:"group"`
-    Mem                *MemStats              `bson:"mem" group:"memory" type:"group"`
-    Metrics            *MetricsStats          `bson:"metrics" group:"metrics" type:"group"`
+    Opcounters         *OpcountersStats       `bson:"opcounters"`
+    OpcountersRepl     *OpcountersStats       `bson:"opcountersRepl"`
+    Mem                *MemStats              `bson:"mem"`
+    Metrics            *MetricsStats          `bson:"metrics"`
 }
 
 func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metric) {

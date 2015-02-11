@@ -7,10 +7,10 @@ import(
 
 // Metrics
 type DocumentStats struct {
-    Deleted float64 `bson:"deleted" type:"gauge"`
-    Inserted float64 `bson:"inserted" type:"gauge"`
-    Returned float64 `bson:"returned" type:"gauge"`
-    Updated float64 `bson:"updated" type:"gauge"`
+    Deleted float64 `bson:"deleted"`
+    Inserted float64 `bson:"inserted"`
+    Returned float64 `bson:"returned"`
+    Updated float64 `bson:"updated"`
 }
 
 func (documentStats *DocumentStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -23,8 +23,8 @@ func (documentStats *DocumentStats) Collect(groupName string, ch chan<- promethe
 }
 
 type BenchmarkStats struct {
-    Num float64 `bson:"num" type:"counter"`
-    TotalMillis float64 `bson:"totalMillis" type:"counter"`
+    Num float64 `bson:"num"`
+    TotalMillis float64 `bson:"totalMillis"`
 }
 
 func (benchmarkStats *BenchmarkStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -35,8 +35,8 @@ func (benchmarkStats *BenchmarkStats) Collect(groupName string, ch chan<- promet
 }
 
 type GetLastErrorStats struct {
-    Wtimeouts float64 `bson:"wtimeouts" type:"counter"`
-    Wtime *BenchmarkStats `bson:"wtime" type:"counter"`
+    Wtimeouts float64 `bson:"wtimeouts"`
+    Wtime *BenchmarkStats `bson:"wtime"`
 }
 
 func (getLastErrorStats *GetLastErrorStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -47,9 +47,9 @@ func (getLastErrorStats *GetLastErrorStats) Collect(groupName string, ch chan<- 
 }
 
 type OperationStats struct {
-    Fastmod float64 `bson:"fastmod" type:"counter"`
-    Idhack float64 `bson:"idhack" type:"counter"`
-    ScanAndOrder float64 `bson:"scanAndOrder" type:"counter"`
+    Fastmod float64 `bson:"fastmod"`
+    Idhack float64 `bson:"idhack"`
+    ScanAndOrder float64 `bson:"scanAndOrder"`
 }
 
 func (operationStats *OperationStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -60,8 +60,8 @@ func (operationStats *OperationStats) Collect(groupName string, ch chan<- promet
 }
 
 type QueryExecutorStats struct {
-    Scanned float64 `bson:"scanned" type:"counter"`
-    ScannedObjects float64 `bson:"scannedObjects" type:"counter"`
+    Scanned float64 `bson:"scanned"`
+    ScannedObjects float64 `bson:"scannedObjects"`
 }
 
 func (queryExecutorStats *QueryExecutorStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -71,7 +71,7 @@ func (queryExecutorStats *QueryExecutorStats) Collect(groupName string, ch chan<
 }
 
 type RecordStats struct {
-    Moves float64 `bson:"moves" type:"counter"`
+    Moves float64 `bson:"moves"`
 }
 
 func (recordStats *RecordStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -81,7 +81,7 @@ func (recordStats *RecordStats) Collect(groupName string, ch chan<- prometheus.M
 
 type ApplyStats struct {
     Batches *BenchmarkStats `bson:"batches"`
-    Ops float64 `bson:"ops" type:"counter"`
+    Ops float64 `bson:"ops"`
 }
 
 func (applyStats *ApplyStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -92,9 +92,9 @@ func (applyStats *ApplyStats) Collect(groupName string, ch chan<- prometheus.Met
 }
 
 type BufferStats struct {
-    Count float64 `bson:"count" type:"counter"`
-    MaxSizeBytes float64 `bson:"maxSizeBytes" type:"counter"`
-    SizeBytes float64 `bson:"sizeBytes" type:"counter"`
+    Count float64 `bson:"count"`
+    MaxSizeBytes float64 `bson:"maxSizeBytes"`
+    SizeBytes float64 `bson:"sizeBytes"`
 }
 
 func (bufferStats *BufferStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -105,8 +105,8 @@ func (bufferStats *BufferStats) Collect(groupName string, ch chan<- prometheus.M
 }
 
 type MetricsNetworkStats struct {
-    Bytes float64 `bson:"bytes" type:"counter"`
-    Ops float64 `bson:"ops" type:"counter"`
+    Bytes float64 `bson:"bytes"`
+    Ops float64 `bson:"ops"`
     GetMores *BenchmarkStats `bson:"getmores"`
     ReadersCreated float64 `bson:"readersCreated"`
 }
@@ -121,9 +121,9 @@ func (metricsNetworkStats *MetricsNetworkStats) Collect(groupName string, ch cha
 }
 
 type ReplStats struct {
-    Apply *ApplyStats `bson:"apply" group:"document"`
-    Buffer *BufferStats `bson:"buffer" group:"document"`
-    Network *MetricsNetworkStats `bson:"network" group:"document"`
+    Apply *ApplyStats `bson:"apply"`
+    Buffer *BufferStats `bson:"buffer"`
+    Network *MetricsNetworkStats `bson:"network"`
 }
 
 func (replStats *ReplStats) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -157,13 +157,13 @@ func (storageStats *StorageStats) Collect(groupName string, ch chan<- prometheus
 }
 
 type MetricsStats struct {
-    Document *DocumentStats `bson:"document" group:"document"`
-    GetLastError *GetLastErrorStats `bson:"getLastError" group:"document"`
-    Operation *OperationStats `bson:"operation" group:"document"`
-    QueryExecutor *QueryExecutorStats `bson:"queryExecutor" group:"document"`
-    Record *RecordStats `bson:"record" group:"document"`
-    Repl *ReplStats `bson:"repl" group:"document"`
-    Storage *StorageStats `bson:"storage" group:"document"`
+    Document *DocumentStats `bson:"document"`
+    GetLastError *GetLastErrorStats `bson:"getLastError"`
+    Operation *OperationStats `bson:"operation"`
+    QueryExecutor *QueryExecutorStats `bson:"queryExecutor"`
+    Record *RecordStats `bson:"record"`
+    Repl *ReplStats `bson:"repl"`
+    Storage *StorageStats `bson:"storage"`
 }
 
 func (metricsStats *MetricsStats) Collect(groupName string, ch chan<- prometheus.Metric) {

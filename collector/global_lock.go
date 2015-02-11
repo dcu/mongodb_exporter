@@ -8,9 +8,9 @@ import(
 
 // GlobalLock
 type ClientStats struct {
-    Total float64 `bson:"total" type:"gauge"`
-    Readers float64 `bson:"readers" type:"gauge"`
-    Writers float64 `bson:"writers" type:"gauge"`
+    Total float64 `bson:"total"`
+    Readers float64 `bson:"readers"`
+    Writers float64 `bson:"writers"`
 }
 func (clientStats *ClientStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
@@ -20,9 +20,9 @@ func (clientStats *ClientStats) Collect(groupName string, ch chan<- prometheus.M
 }
 
 type QueueStats struct {
-    Total float64 `bson:"total" type:"gauge"`
-    Readers float64 `bson:"readers" type:"gauge"`
-    Writers float64 `bson:"writers" type:"gauge"`
+    Total float64 `bson:"total"`
+    Readers float64 `bson:"readers"`
+    Writers float64 `bson:"writers"`
 }
 func (queueStats *QueueStats) Collect(groupName string, ch chan<- prometheus.Metric) {
     group := shared.FindOrCreateGroup(groupName)
@@ -32,9 +32,9 @@ func (queueStats *QueueStats) Collect(groupName string, ch chan<- prometheus.Met
 }
 
 type GlobalLockStats struct {
-    TotalTime float64 `bson:"totalTime" type:"counter"`
-    LockTime float64 `bson:"lockTime" type:"counter"`
-    Ratio float64 `bson:"ratio" type:"gauge"`
+    TotalTime float64 `bson:"totalTime"`
+    LockTime float64 `bson:"lockTime"`
+    Ratio float64 `bson:"ratio"`
     CurrentQueue *QueueStats `bson:"currentQueue"`
     ActiveClients *ClientStats `bson:"activeClients"`
 }
