@@ -76,7 +76,7 @@ func groups_yml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "groups.yml", size: 23434, mode: os.FileMode(420), modTime: time.Unix(1423624932, 0)}
+	info := bindata_file_info{name: "groups.yml", size: 23434, mode: os.FileMode(420), modTime: time.Unix(1423625052, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
