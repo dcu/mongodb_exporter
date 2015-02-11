@@ -44,19 +44,28 @@ func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metri
     group.Collect("uptime_estimate", status.Uptime, ch)
     group.Collect("local_time", float64(status.LocalTime.Unix()), ch)
 
-    status.Asserts.Collect("asserts", ch)
-    status.Dur.Collect("durability", ch)
-    status.BackgroundFlushing.Collect("background_flushing", ch)
-    status.Connections.Collect("connections", ch)
-    status.ExtraInfo.Collect("extra_info", ch)
-    status.GlobalLock.Collect("global_lock", ch)
-    status.IndexCounter.Collect("index_counters", ch)
-    status.Network.Collect("network", ch)
-    status.Opcounters.Collect("op_counters", ch)
-    status.OpcountersRepl.Collect("op_counters_repl", ch)
-    status.Mem.Collect("memory", ch)
-    status.Locks.Collect("locks", ch)
-    status.Metrics.Collect("metrics", ch)
+    collectData(status.Asserts, "asserts", ch)
+    collectData(status.Dur, "durability", ch)
+    collectData(status.BackgroundFlushing, "background_flushing", ch)
+    collectData(status.Connections, "connections", ch)
+    collectData(status.ExtraInfo, "extra_info", ch)
+    collectData(status.GlobalLock, "global_lock", ch)
+    collectData(status.IndexCounter, "index_counters", ch)
+    collectData(status.Network, "network", ch)
+    collectData(status.Opcounters, "op_counters", ch)
+    collectData(status.OpcountersRepl, "op_counters_repl", ch)
+    collectData(status.Mem, "memory", ch)
+    collectData(status.Locks, "locks", ch)
+    collectData(status.Metrics, "metrics", ch)
+}
+
+func collectData(collectable shared.Collectable, groupName string, ch chan<-prometheus.Metric) {
+    if !shared.EnabledGroups[groupName] {
+        // disabled group
+        return
+    }
+
+    collectable.Collect(groupName, ch)
 }
 
 func GetServerStatus(uri string) *ServerStatus {
