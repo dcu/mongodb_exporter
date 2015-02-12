@@ -2,6 +2,7 @@
 
 MongoDB exporter for prometheus.io, written in go.
 
+![screenshot](https://raw.githubusercontent.com/dcu/mongodb_exporter/321189c90831d5ad5a8c6fb04925a335b37f51b8/screenshots/mongodb-dashboard-1.png)
 
 ## Installing
 
