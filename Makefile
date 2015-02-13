@@ -10,3 +10,7 @@ deps:
 
 build: deps bindata
 	go build mongodb_exporter.go
+
+test:
+	go test github.com/dcu/mongodb_exporter/... -v -cover
+

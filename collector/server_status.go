@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
+	"github.com/golang/glog"
 )
 
 type ServerStatus struct {
@@ -78,14 +79,15 @@ func GetServerStatus(uri string) *ServerStatus {
 	session.SetMode(mgo.Eventual, true)
 	session.SetSocketTimeout(0)
 	defer func() {
-		println("Closing connection to database.")
+		glog.Info("Closing connection to database.")
 		session.Close()
 	}()
 
 	err = session.DB("admin").Run(bson.D{{"serverStatus", 1}, {"recordStats", 0}}, result)
 	if err != nil {
-		println("Failed to get server status.")
+		glog.Error("Failed to get server status.")
 	}
 
 	return result
 }
+
