@@ -124,21 +124,23 @@ type ReplStats struct {
 	Apply   *ApplyStats          `bson:"apply"`
 	Buffer  *BufferStats         `bson:"buffer"`
 	Network *MetricsNetworkStats `bson:"network"`
+	PreloadStats *PreloadStats   `bson:"preload"`
 }
 
 func (replStats *ReplStats) Collect(groupName string, ch chan<- prometheus.Metric) {
 	replStats.Apply.Collect(groupName+"_apply", ch)
 	replStats.Buffer.Collect(groupName+"_buffer", ch)
 	replStats.Network.Collect(groupName+"_network", ch)
+	replStats.PreloadStats.Collect(groupName+"_preload", ch)
 }
 
 type PreloadStats struct {
-	Doc     *BenchmarkStats `bson:"doc"`
+	Docs     *BenchmarkStats `bson:"docs"`
 	Indexes *BenchmarkStats `bson:"indexes"`
 }
 
 func (preloadStats *PreloadStats) Collect(groupName string, ch chan<- prometheus.Metric) {
-	preloadStats.Doc.Collect(groupName+"_doc", ch)
+	preloadStats.Docs.Collect(groupName+"_docs", ch)
 	preloadStats.Indexes.Collect(groupName+"_indexes", ch)
 }
 

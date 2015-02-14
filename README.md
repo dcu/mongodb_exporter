@@ -35,16 +35,13 @@ op_counters_repl | The op_counters_repl group, similar to the op_counters data s
 memory | The memory group holds information regarding the target system architecture of mongod and current memory use
 locks | The locks group containsdata that provides a granular report on MongoDB database-level lock use
 metrics | The metrics group holds a number of statistics that reflect the current use and state of a running mongod instance.
+cursors | The cursors group contains data regarding cursor state and use. This group is disabled by default because it is deprecated in mongodb >= 2.6.
 
 For more information see [the official documentation.](http://docs.mongodb.org/manual/reference/command/serverStatus/)
 
 
 ## Roadmap
 
-- Add tests
-- Add logs
-- Collect the cursors section: http://docs.mongodb.org/manual/reference/command/serverStatus/#cursors when it's available (mongodb <= 2.4)
-- Collecta data from http://docs.mongodb.org/manual/reference/command/replSetGetStatus/
-
+- Collect data from http://docs.mongodb.org/manual/reference/command/replSetGetStatus/
 
 

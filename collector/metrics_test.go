@@ -22,6 +22,10 @@ func Test_MetricsCollectData(t *testing.T) {
 			Network: &MetricsNetworkStats{
 				GetMores: &BenchmarkStats{},
 			},
+			PreloadStats: &PreloadStats{
+				Docs: &BenchmarkStats{},
+				Indexes: &BenchmarkStats{},
+			},
 		},
 		Storage: &StorageStats{},
 	}

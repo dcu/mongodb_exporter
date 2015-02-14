@@ -37,7 +37,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 
 func (exporter *MongodbCollector) collectServerStatus(ch chan<- prometheus.Metric) *ServerStatus {
 	serverStatus := GetServerStatus(exporter.Opts.URI)
-	serverStatus.Collect("instance", ch)
+
+	if serverStatus != nil {
+		serverStatus.Collect("instance", ch)
+	}
 
 	return serverStatus
 }
+

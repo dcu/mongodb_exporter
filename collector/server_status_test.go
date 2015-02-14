@@ -7,11 +7,12 @@ import(
 )
 
 func Test_ServerStatusCollectData(t *testing.T) {
-	stats := &ServerStatus{
-	}
+	data := LoadFixture("server_status.bson")
+	serverStatus := &ServerStatus{}
+	loadServerStatusFromBson(data, serverStatus)
 
 	groupName := "instance"
-	stats.Collect(groupName, nil)
+	serverStatus.Collect(groupName, nil)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

@@ -36,6 +36,8 @@ type ServerStatus struct {
 	OpcountersRepl *OpcountersStats `bson:"opcountersRepl"`
 	Mem            *MemStats        `bson:"mem"`
 	Metrics        *MetricsStats    `bson:"metrics"`
+
+	Cursors        *Cursors         `bson:"cursors"`
 }
 
 func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metric) {
@@ -58,6 +60,7 @@ func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metri
 	collectData(status.Mem, "memory", ch)
 	collectData(status.Locks, "locks", ch)
 	collectData(status.Metrics, "metrics", ch)
+	collectData(status.Cursors, "cursors", ch)
 }
 
 func collectData(collectable shared.Collectable, groupName string, ch chan<- prometheus.Metric) {
@@ -73,7 +76,8 @@ func GetServerStatus(uri string) *ServerStatus {
 	result := &ServerStatus{}
 	session, err := mgo.Dial(uri)
 	if err != nil {
-		panic(err)
+		glog.Errorf("Cannot connect to server using url: %s", uri)
+		return nil
 	}
 
 	session.SetMode(mgo.Eventual, true)
@@ -86,6 +90,7 @@ func GetServerStatus(uri string) *ServerStatus {
 	err = session.DB("admin").Run(bson.D{{"serverStatus", 1}, {"recordStats", 0}}, result)
 	if err != nil {
 		glog.Error("Failed to get server status.")
+		return nil
 	}
 
 	return result

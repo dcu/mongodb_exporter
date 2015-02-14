@@ -1,3 +1,9 @@
+test:
+	go test github.com/dcu/mongodb_exporter/collector -cover -coverprofile=collector_coverage.out -short
+	go tool cover -func=collector_coverage.out
+	go test github.com/dcu/mongodb_exporter/shared -cover -coverprofile=shared_coverage.out -short
+	go tool cover -func=shared_coverage.out
+	@rm *.out
 
 bindata:
 	go-bindata -pkg=shared -o=shared/assets.go groups.yml
@@ -11,6 +17,4 @@ deps:
 build: deps bindata
 	go build mongodb_exporter.go
 
-test:
-	go test github.com/dcu/mongodb_exporter/... -cover
 

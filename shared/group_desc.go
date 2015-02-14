@@ -19,9 +19,9 @@ var (
 )
 
 func LoadGroupsDesc() {
-	dat, errx := Asset("groups.yml")
-	if errx != nil {
-		panic(errx)
+	dat, err := Asset("groups.yml")
+	if err != nil {
+		panic(err)
 	}
 	yaml.Unmarshal(dat, GroupsDesc)
 }

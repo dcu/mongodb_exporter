@@ -124,8 +124,8 @@ func (group *Group) trackField(fieldName string, fieldDesc *FieldDesc, value flo
 	case "summary":
 		{
 			//println("Set", name, valueToSet)
-			summary := group.GetGauge(fieldName, fieldDesc.Help)
-			summary.Set(value)
+			summary := group.GetSummary(fieldName, fieldDesc.Help)
+			summary.Observe(value)
 			collector = summary
 		}
 	}

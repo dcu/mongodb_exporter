@@ -20,7 +20,7 @@ asserts:
     help: "The msg counter tracks the number of message assertions raised since the server process started. Check the log file for more information about these messages."
     type: counter
   user:
-    help: "The user counter reports the number of “user asserts” that have occurred since the last time the server process started. These are errors that user may generate, such as out of disk space or duplicate key. You can prevent these assertions by fixing a problem with your application or deployment. Check the MongoDB log for more information."
+    help: "The user counter reports the number of \"user asserts\" that have occurred since the last time the server process started. These are errors that user may generate, such as out of disk space or duplicate key. You can prevent these assertions by fixing a problem with your application or deployment. Check the MongoDB log for more information."
     type: counter
   rollovers:
     help: "The rollovers counter displays the number of times that the rollover counters have rolled over since the last time the server process started. The counters will rollover to zero after 230 assertions. Use this value to provide context to the other values in the asserts data structure."
@@ -141,7 +141,7 @@ index_counters:
     help: "The hits value reflects the number of times that an index has been accessed and mongod is able to return the index from memory. A higher value indicates effective index use. hits values that represent a greater proportion of the accesses value, tend to indicate more effective index configuration"
     type: counter
   misses:
-    help: "The misses value represents the number of times that an operation attempted to access an index that was not in memory. These “misses,” do not indicate a failed query or operation, but rather an inefficient use of the index. Lower values in this field indicate better index use and likely overall performance as well"
+    help: "The misses value represents the number of times that an operation attempted to access an index that was not in memory. These \"misses,\" do not indicate a failed query or operation, but rather an inefficient use of the index. Lower values in this field indicate better index use and likely overall performance as well"
     type: counter
   resets:
     help: "The resets value reflects the number of times that the index counters have been reset since the database last restarted. Typically this value is 0, but use this value to provide context for the data specified by other indexCounters values"
@@ -172,6 +172,24 @@ locks_time_acquiring_micros:
     help: "The R field reports the amount of time in microseconds that any database has spent waiting for the global read lock"
     type: counter
 
+cursors:
+  total_open:
+    help: "totalOpen provides the number of cursors that MongoDB is maintaining for clients. Because MongoDB exhausts unused cursors, typically this value small or zero. However, if there is a queue, stale tailable cursor, or a large number of operations, this value may rise."
+    type: gauge
+
+  timed_out:
+    help: "timedOut provides a counter of the total number of cursors that have timed out since the server process started. If this number is large or growing at a regular rate, this may indicate an application error."
+    type: counter
+
+  total_no_timeout:
+    help: "totalNoTimeout provides the number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity."
+    type: gauge
+
+  pinned:
+    help: "serverStatus.cursors.pinned provides the number of \"pinned\" open cursors."
+    type: gauge
+
+
 network:
   bytes_in:
     help: "The value of the bytesIn field reflects the amount of network traffic, in bytes, received by this database. Use this value to ensure that network traffic sent to the mongod process is consistent with expectations and overall inter-application traffic"
@@ -197,7 +215,7 @@ op_counters:
     help: "delete provides a counter of the total number of delete operations since the mongod instance last started"
     type: counter
   getmore:
-    help: "getmore provides a counter of the total number of “getmore” operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
+    help: "getmore provides a counter of the total number of \"getmore\" operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
     type: counter
   command:
     help: "command provides a counter of the total number of commands issued to the database since the mongod instance last started."
@@ -217,7 +235,7 @@ op_counters_repl:
     help: "delete provides a counter of the total number of replicated delete operations since the mongod instance last started"
     type: counter
   getmore:
-    help: "getmore provides a counter of the total number of “getmore” operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
+    help: "getmore provides a counter of the total number of \"getmore\" operations since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process"
     type: counter
   command:
     help: "command provides a counter of the total number of replicated commands issued to the database since the mongod instance last started"
