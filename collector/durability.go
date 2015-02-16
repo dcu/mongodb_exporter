@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Dur
@@ -14,13 +13,13 @@ type DurTiming struct {
 	RemapPrivateView float64 `bson:"remapPrivateView"`
 }
 
-func (durTiming *DurTiming) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (durTiming *DurTiming) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("dt", durTiming.Dt, ch)
-	group.Collect("prep_log_buffer", durTiming.PrepLogBuffer, ch)
-	group.Collect("write_to_journal", durTiming.WriteToJournal, ch)
-	group.Collect("write_to_data_files", durTiming.WriteToDataFiles, ch)
-	group.Collect("remap_private_view", durTiming.RemapPrivateView, ch)
+	group.Export("dt", durTiming.Dt)
+	group.Export("prep_log_buffer", durTiming.PrepLogBuffer)
+	group.Export("write_to_journal", durTiming.WriteToJournal)
+	group.Export("write_to_data_files", durTiming.WriteToDataFiles)
+	group.Export("remap_private_view", durTiming.RemapPrivateView)
 }
 
 type DurStats struct {
@@ -33,14 +32,17 @@ type DurStats struct {
 	TimeMs             DurTiming `bson:"timeMs"`
 }
 
-func (durStats *DurStats) Collect(groupName string, ch chan<- prometheus.Metric) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("commits", durStats.Commits, ch)
-	group.Collect("journaled_mb", durStats.JournaledMB, ch)
-	group.Collect("write_to_data_files_mb", durStats.WriteToDataFilesMB, ch)
-	group.Collect("compression", durStats.Compression, ch)
-	group.Collect("commits_in_write_lock", durStats.CommitsInWriteLock, ch)
-	group.Collect("early_commits", durStats.EarlyCommits, ch)
+func (durStats *DurStats) Export(groupName string) {
+	group := shared.FindOrCreateGroup(groupName+"_commits")
+	group.Export("written", durStats.Commits)
+	group.Export("in_write_lock", durStats.CommitsInWriteLock)
 
-	durStats.TimeMs.Collect(groupName+"_time_ms", ch)
+	group = shared.FindOrCreateGroup(groupName)
+	group.Export("journaled_megabytes", durStats.JournaledMB)
+	group.Export("write_to_data_files_megabytes", durStats.WriteToDataFilesMB)
+	group.Export("compression", durStats.Compression)
+	group.Export("early_commits", durStats.EarlyCommits)
+
+	durStats.TimeMs.Export(groupName+"_time_milliseconds")
+
 }

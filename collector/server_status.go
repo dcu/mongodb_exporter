@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
@@ -40,36 +39,36 @@ type ServerStatus struct {
 	Cursors        *Cursors         `bson:"cursors"`
 }
 
-func (status *ServerStatus) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (status *ServerStatus) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("uptime", status.Uptime, ch)
-	group.Collect("uptime_estimate", status.Uptime, ch)
-	group.Collect("local_time", float64(status.LocalTime.Unix()), ch)
+	group.Export("uptime_seconds", status.Uptime)
+	group.Export("uptime_estimate_seconds", status.Uptime)
+	group.Export("local_time", float64(status.LocalTime.Unix()))
 
-	collectData(status.Asserts, "asserts", ch)
-	collectData(status.Dur, "durability", ch)
-	collectData(status.BackgroundFlushing, "background_flushing", ch)
-	collectData(status.Connections, "connections", ch)
-	collectData(status.ExtraInfo, "extra_info", ch)
-	collectData(status.GlobalLock, "global_lock", ch)
-	collectData(status.IndexCounter, "index_counters", ch)
-	collectData(status.Network, "network", ch)
-	collectData(status.Opcounters, "op_counters", ch)
-	collectData(status.OpcountersRepl, "op_counters_repl", ch)
-	collectData(status.Mem, "memory", ch)
-	collectData(status.Locks, "locks", ch)
-	collectData(status.Metrics, "metrics", ch)
-	collectData(status.Cursors, "cursors", ch)
+	exportData(status.Asserts, "asserts_total")
+	exportData(status.Dur, "durability")
+	exportData(status.BackgroundFlushing, "background_flushing")
+	exportData(status.Connections, "connections")
+	exportData(status.ExtraInfo, "extra_info")
+	exportData(status.GlobalLock, "global_lock")
+	exportData(status.IndexCounter, "index_counters")
+	exportData(status.Network, "network")
+	exportData(status.Opcounters, "op_counters")
+	exportData(status.OpcountersRepl, "op_counters_repl")
+	exportData(status.Mem, "memory")
+	exportData(status.Locks, "locks")
+	exportData(status.Metrics, "metrics")
+	exportData(status.Cursors, "cursors")
 }
 
-func collectData(collectable shared.Collectable, groupName string, ch chan<- prometheus.Metric) {
+func exportData(exportable shared.Exportable, groupName string) {
 	if !shared.EnabledGroups[groupName] {
 		// disabled group
 		return
 	}
 
-	collectable.Collect(groupName, ch)
+	exportable.Export(groupName)
 }
 
 func GetServerStatus(uri string) *ServerStatus {

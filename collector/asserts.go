@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 type AssertsStats struct {
@@ -13,12 +12,13 @@ type AssertsStats struct {
 	Rollovers float64 `bson:"rollovers"`
 }
 
-func (asserts *AssertsStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (asserts *AssertsStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("regular", asserts.Regular, ch)
-	group.Collect("warning", asserts.Warning, ch)
-	group.Collect("msg", asserts.Msg, ch)
-	group.Collect("user", asserts.User, ch)
-	group.Collect("rollovers", asserts.Rollovers, ch)
+	group.Export("regular", asserts.Regular)
+	group.Export("warning", asserts.Warning)
+	group.Export("msg", asserts.Msg)
+	group.Export("user", asserts.User)
+	group.Export("rollovers", asserts.Rollovers)
 }
+

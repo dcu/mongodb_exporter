@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 	"time"
 )
 
@@ -15,11 +14,11 @@ type FlushStats struct {
 	LastFinished time.Time `bson:"last_finished"`
 }
 
-func (flushStats *FlushStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (flushStats *FlushStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("flushes", flushStats.Flushes, ch)
-	group.Collect("total_ms", flushStats.TotalMs, ch)
-	group.Collect("average_ms", flushStats.AverageMs, ch)
-	group.Collect("last_ms", flushStats.LastMs, ch)
-	group.Collect("last_finished", float64(flushStats.LastFinished.Unix()), ch)
+	group.Export("flushes_total", flushStats.Flushes)
+	group.Export("total_milliseconds", flushStats.TotalMs)
+	group.Export("average_milliseconds", flushStats.AverageMs)
+	group.Export("last_milliseconds", flushStats.LastMs)
+	group.Export("last_finished_time", float64(flushStats.LastFinished.Unix()))
 }

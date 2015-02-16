@@ -12,7 +12,10 @@ func Test_NetworkCollectData(t *testing.T) {
 	groupName := "network"
 	stats.Collect(groupName, nil)
 
-	if shared.Groups[groupName] == nil {
+	if shared.Groups[groupName+"_bytes"] == nil {
+		t.Error("Group not created")
+	}
+	if shared.Groups[groupName+"_total"] == nil {
 		t.Error("Group not created")
 	}
 }

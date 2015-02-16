@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 //IndexCounter
@@ -14,11 +13,13 @@ type IndexCounterStats struct {
 	MissRatio float64 `bson:"missRatio"`
 }
 
-func (connectionStats *IndexCounterStats) Collect(groupName string, ch chan<- prometheus.Metric) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("accesses", connectionStats.Accesses, ch)
-	group.Collect("hits", connectionStats.Hits, ch)
-	group.Collect("misses", connectionStats.Misses, ch)
-	group.Collect("resets", connectionStats.Resets, ch)
-	group.Collect("miss_ratio", connectionStats.MissRatio, ch)
+func (indexCountersStats *IndexCounterStats) Export(groupName string) {
+	group := shared.FindOrCreateGroup(groupName+"_total")
+	group.Export("accesses", indexCountersStats.Accesses)
+	group.Export("hits", indexCountersStats.Hits)
+	group.Export("misses", indexCountersStats.Misses)
+	group.Export("resets", indexCountersStats.Resets)
+
+	group = shared.FindOrCreateGroup(groupName)
+	group.Export("miss_ratio", indexCountersStats.MissRatio)
 }

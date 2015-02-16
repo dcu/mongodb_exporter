@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 type LockStatsMap map[string]LockStats
@@ -20,23 +19,25 @@ type LockStats struct {
 	TimeAcquiringMicros ReadWriteLockTimes `bson:"timeAcquiringMicros"`
 }
 
-func (locks LockStatsMap) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (locks LockStatsMap) Export(groupName string) {
 	for key, locks := range locks {
 		if key == "." {
 			key = "dot"
 		}
 
-		timeLockedGroup := shared.FindOrCreateGroup(key + "_locks_time_locked")
-		timeLockedGroup.DescName = "locks_time_locked_micros"
+		timeLockedGroup := shared.FindOrCreateGroup(key + "_locks_time_locked_microseconds_global")
+		timeLockedGroup.DescName = "locks_time_locked_global_microseconds_total"
+		timeLockedGroup.Export("read", locks.TimeLockedMicros.Read)
+		timeLockedGroup.Export("write", locks.TimeLockedMicros.Write)
 
-		timeLockedGroup.Collect("global_r", locks.TimeLockedMicros.Read, ch)
-		timeLockedGroup.Collect("global_w", locks.TimeLockedMicros.Write, ch)
-		timeLockedGroup.Collect("local_r", locks.TimeLockedMicros.ReadLower, ch)
-		timeLockedGroup.Collect("local_w", locks.TimeLockedMicros.WriteLower, ch)
+		timeLockedGroup = shared.FindOrCreateGroup(key + "_locks_time_locked_microseconds_local")
+		timeLockedGroup.DescName = "locks_time_locked_local_microseconds_total"
+		timeLockedGroup.Export("read", locks.TimeLockedMicros.ReadLower)
+		timeLockedGroup.Export("write", locks.TimeLockedMicros.WriteLower)
 
-		timeAcquiringGroup := shared.FindOrCreateGroup(key + "_locks_time_acquiring")
-		timeAcquiringGroup.DescName = "locks_time_acquiring_micros"
-		timeAcquiringGroup.Collect("global_r", locks.TimeLockedMicros.Read, ch)
-		timeAcquiringGroup.Collect("global_w", locks.TimeLockedMicros.Write, ch)
+		timeAcquiringGroup := shared.FindOrCreateGroup(key + "_locks_time_acquiring_microseconds_global")
+		timeAcquiringGroup.DescName = "locks_time_acquiring_global_microseconds_total"
+		timeAcquiringGroup.Export("read", locks.TimeLockedMicros.Read)
+		timeAcquiringGroup.Export("write", locks.TimeLockedMicros.Write)
 	}
 }

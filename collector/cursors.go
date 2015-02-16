@@ -2,7 +2,6 @@ package collector
 
 import(
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 type Cursors struct {
@@ -12,12 +11,12 @@ type Cursors struct {
 	Pinned float64 `bson:"pinned"`
 }
 
-func (cursors *Cursors) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (cursors *Cursors) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("total_open", cursors.TotalOpen, ch)
-	group.Collect("timed_out", cursors.TimeOut, ch)
-	group.Collect("total_no_timeout", cursors.TotalNoTimeout, ch)
-	group.Collect("pinned", cursors.Pinned, ch)
+	group.Export("total_open", cursors.TotalOpen)
+	group.Export("timed_out", cursors.TimeOut)
+	group.Export("total_no_timeout", cursors.TotalNoTimeout)
+	group.Export("pinned", cursors.Pinned)
 }
 

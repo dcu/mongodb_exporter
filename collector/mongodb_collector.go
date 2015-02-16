@@ -39,7 +39,8 @@ func (exporter *MongodbCollector) collectServerStatus(ch chan<- prometheus.Metri
 	serverStatus := GetServerStatus(exporter.Opts.URI)
 
 	if serverStatus != nil {
-		serverStatus.Collect("instance", ch)
+		serverStatus.Export("instance")
+		shared.CollectAllGroups(ch)
 	}
 
 	return serverStatus

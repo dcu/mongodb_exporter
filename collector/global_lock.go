@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // GlobalLock
@@ -12,11 +11,10 @@ type ClientStats struct {
 	Writers float64 `bson:"writers"`
 }
 
-func (clientStats *ClientStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (clientStats *ClientStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("total", clientStats.Total, ch)
-	group.Collect("readers", clientStats.Readers, ch)
-	group.Collect("writers", clientStats.Writers, ch)
+	group.Export("reader", clientStats.Readers)
+	group.Export("writer", clientStats.Writers)
 }
 
 type QueueStats struct {
@@ -25,11 +23,10 @@ type QueueStats struct {
 	Writers float64 `bson:"writers"`
 }
 
-func (queueStats *QueueStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (queueStats *QueueStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("total", queueStats.Total, ch)
-	group.Collect("readers", queueStats.Readers, ch)
-	group.Collect("writers", queueStats.Writers, ch)
+	group.Export("reader", queueStats.Readers)
+	group.Export("writer", queueStats.Writers)
 }
 
 type GlobalLockStats struct {
@@ -40,12 +37,11 @@ type GlobalLockStats struct {
 	ActiveClients *ClientStats `bson:"activeClients"`
 }
 
-func (globalLock *GlobalLockStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (globalLock *GlobalLockStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("total_time", globalLock.TotalTime, ch)
-	group.Collect("lock_time", globalLock.LockTime, ch)
-	group.Collect("ratio", globalLock.Ratio, ch)
+	group.Export("lock_total", globalLock.LockTime)
+	group.Export("ratio", globalLock.Ratio)
 
-	globalLock.CurrentQueue.Collect(groupName+"_current_queue", ch)
-	globalLock.ActiveClients.Collect(groupName+"_client", ch)
+	globalLock.CurrentQueue.Export(groupName+"_current_queue")
+	globalLock.ActiveClients.Export(groupName+"_client")
 }

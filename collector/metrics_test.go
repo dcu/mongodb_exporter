@@ -51,7 +51,7 @@ func Test_MetricsCollectData(t *testing.T) {
 	if shared.Groups[groupName+"_repl_apply"] == nil {
 		t.Error("Group not created")
 	}
-	if shared.Groups[groupName+"_storage"] == nil {
+	if shared.Groups[groupName+"_storage_freelist_search"] == nil {
 		t.Error("Group not created")
 	}
 }

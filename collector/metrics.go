@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Metrics
@@ -13,13 +12,13 @@ type DocumentStats struct {
 	Updated  float64 `bson:"updated"`
 }
 
-func (documentStats *DocumentStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (documentStats *DocumentStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("deleted", documentStats.Deleted, ch)
-	group.Collect("inserted", documentStats.Inserted, ch)
-	group.Collect("returned", documentStats.Returned, ch)
-	group.Collect("updated", documentStats.Updated, ch)
+	group.Export("deleted", documentStats.Deleted)
+	group.Export("inserted", documentStats.Inserted)
+	group.Export("returned", documentStats.Returned)
+	group.Export("updated", documentStats.Updated)
 }
 
 type BenchmarkStats struct {
@@ -27,11 +26,11 @@ type BenchmarkStats struct {
 	TotalMillis float64 `bson:"totalMillis"`
 }
 
-func (benchmarkStats *BenchmarkStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (benchmarkStats *BenchmarkStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("num", benchmarkStats.Num, ch)
-	group.Collect("total_millis", benchmarkStats.TotalMillis, ch)
+	group.Export("num_total", benchmarkStats.Num)
+	group.Export("total_milliseconds", benchmarkStats.TotalMillis)
 }
 
 type GetLastErrorStats struct {
@@ -39,11 +38,11 @@ type GetLastErrorStats struct {
 	Wtime     *BenchmarkStats `bson:"wtime"`
 }
 
-func (getLastErrorStats *GetLastErrorStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (getLastErrorStats *GetLastErrorStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("wtimeouts", getLastErrorStats.Wtimeouts, ch)
-	getLastErrorStats.Wtime.Collect(groupName+"_wtime", ch)
+	group.Export("wtimeouts_total", getLastErrorStats.Wtimeouts)
+	getLastErrorStats.Wtime.Export(groupName+"_wtime")
 }
 
 type OperationStats struct {
@@ -52,11 +51,11 @@ type OperationStats struct {
 	ScanAndOrder float64 `bson:"scanAndOrder"`
 }
 
-func (operationStats *OperationStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (operationStats *OperationStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("fastmod", operationStats.Fastmod, ch)
-	group.Collect("idhack", operationStats.Idhack, ch)
-	group.Collect("scan_and_order", operationStats.ScanAndOrder, ch)
+	group.Export("fastmod", operationStats.Fastmod)
+	group.Export("idhack", operationStats.Idhack)
+	group.Export("scan_and_order", operationStats.ScanAndOrder)
 }
 
 type QueryExecutorStats struct {
@@ -64,19 +63,19 @@ type QueryExecutorStats struct {
 	ScannedObjects float64 `bson:"scannedObjects"`
 }
 
-func (queryExecutorStats *QueryExecutorStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (queryExecutorStats *QueryExecutorStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("scanned", queryExecutorStats.Scanned, ch)
-	group.Collect("scanned_objects", queryExecutorStats.ScannedObjects, ch)
+	group.Export("scanned", queryExecutorStats.Scanned)
+	group.Export("scanned_objects", queryExecutorStats.ScannedObjects)
 }
 
 type RecordStats struct {
 	Moves float64 `bson:"moves"`
 }
 
-func (recordStats *RecordStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (recordStats *RecordStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("moves", recordStats.Moves, ch)
+	group.Export("moves_total", recordStats.Moves)
 }
 
 type ApplyStats struct {
@@ -84,11 +83,11 @@ type ApplyStats struct {
 	Ops     float64         `bson:"ops"`
 }
 
-func (applyStats *ApplyStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (applyStats *ApplyStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("ops", applyStats.Ops, ch)
+	group.Export("ops_total", applyStats.Ops)
 
-	applyStats.Batches.Collect(groupName+"_batches", ch)
+	applyStats.Batches.Export(groupName+"_batches")
 }
 
 type BufferStats struct {
@@ -97,11 +96,11 @@ type BufferStats struct {
 	SizeBytes    float64 `bson:"sizeBytes"`
 }
 
-func (bufferStats *BufferStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (bufferStats *BufferStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("count", bufferStats.Count, ch)
-	group.Collect("max_size_bytes", bufferStats.MaxSizeBytes, ch)
-	group.Collect("size_bytes", bufferStats.SizeBytes, ch)
+	group.Export("count", bufferStats.Count)
+	group.Export("max_size_bytes", bufferStats.MaxSizeBytes)
+	group.Export("size_bytes", bufferStats.SizeBytes)
 }
 
 type MetricsNetworkStats struct {
@@ -111,13 +110,13 @@ type MetricsNetworkStats struct {
 	ReadersCreated float64         `bson:"readersCreated"`
 }
 
-func (metricsNetworkStats *MetricsNetworkStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (metricsNetworkStats *MetricsNetworkStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("bytes", metricsNetworkStats.Bytes, ch)
-	group.Collect("ops", metricsNetworkStats.Ops, ch)
-	group.Collect("readers_created", metricsNetworkStats.ReadersCreated, ch)
+	group.Export("bytes_total", metricsNetworkStats.Bytes)
+	group.Export("ops_total", metricsNetworkStats.Ops)
+	group.Export("readers_created_total", metricsNetworkStats.ReadersCreated)
 
-	metricsNetworkStats.GetMores.Collect(groupName+"_getmores", ch)
+	metricsNetworkStats.GetMores.Export(groupName+"_getmores")
 }
 
 type ReplStats struct {
@@ -127,11 +126,11 @@ type ReplStats struct {
 	PreloadStats *PreloadStats   `bson:"preload"`
 }
 
-func (replStats *ReplStats) Collect(groupName string, ch chan<- prometheus.Metric) {
-	replStats.Apply.Collect(groupName+"_apply", ch)
-	replStats.Buffer.Collect(groupName+"_buffer", ch)
-	replStats.Network.Collect(groupName+"_network", ch)
-	replStats.PreloadStats.Collect(groupName+"_preload", ch)
+func (replStats *ReplStats) Export(groupName string) {
+	replStats.Apply.Export(groupName+"_apply")
+	replStats.Buffer.Export(groupName+"_buffer")
+	replStats.Network.Export(groupName+"_network")
+	replStats.PreloadStats.Export(groupName+"_preload")
 }
 
 type PreloadStats struct {
@@ -139,9 +138,9 @@ type PreloadStats struct {
 	Indexes *BenchmarkStats `bson:"indexes"`
 }
 
-func (preloadStats *PreloadStats) Collect(groupName string, ch chan<- prometheus.Metric) {
-	preloadStats.Docs.Collect(groupName+"_docs", ch)
-	preloadStats.Indexes.Collect(groupName+"_indexes", ch)
+func (preloadStats *PreloadStats) Export(groupName string) {
+	preloadStats.Docs.Export(groupName+"_docs")
+	preloadStats.Indexes.Export(groupName+"_indexes")
 }
 
 type StorageStats struct {
@@ -150,12 +149,12 @@ type StorageStats struct {
 	Scanned         float64 `bson:"freelist.search.scanned"`
 }
 
-func (storageStats *StorageStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (storageStats *StorageStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
-	group.Collect("freelist_search_bucket_exhausted", storageStats.BucketExhausted, ch)
-	group.Collect("freelist_search_requests", storageStats.Requests, ch)
-	group.Collect("freelist_search_scanned", storageStats.Scanned, ch)
+	group.Export("bucket_exhausted", storageStats.BucketExhausted)
+	group.Export("requests", storageStats.Requests)
+	group.Export("scanned", storageStats.Scanned)
 }
 
 type MetricsStats struct {
@@ -168,12 +167,12 @@ type MetricsStats struct {
 	Storage       *StorageStats       `bson:"storage"`
 }
 
-func (metricsStats *MetricsStats) Collect(groupName string, ch chan<- prometheus.Metric) {
-	metricsStats.Document.Collect(groupName+"_document", ch)
-	metricsStats.GetLastError.Collect(groupName+"_get_last_error", ch)
-	metricsStats.Operation.Collect(groupName+"_operation", ch)
-	metricsStats.QueryExecutor.Collect(groupName+"_query_executor", ch)
-	metricsStats.Record.Collect(groupName+"_record", ch)
-	metricsStats.Repl.Collect(groupName+"_repl", ch)
-	metricsStats.Storage.Collect(groupName+"_storage", ch)
+func (metricsStats *MetricsStats) Export(groupName string) {
+	metricsStats.Document.Export(groupName+"_document_total")
+	metricsStats.GetLastError.Export(groupName+"_get_last_error")
+	metricsStats.Operation.Export(groupName+"_operation_total")
+	metricsStats.QueryExecutor.Export(groupName+"_query_executor_total")
+	metricsStats.Record.Export(groupName+"_record")
+	metricsStats.Repl.Export(groupName+"_repl")
+	metricsStats.Storage.Export(groupName+"_storage_freelist_search_total")
 }

@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 //Mem
@@ -14,11 +13,10 @@ type MemStats struct {
 	MappedWithJournal float64 `bson:"mappedWithJournal"`
 }
 
-func (memStats *MemStats) Collect(groupName string, ch chan<- prometheus.Metric) {
+func (memStats *MemStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
-	group.Collect("bits", memStats.Bits, ch)
-	group.Collect("resident", memStats.Resident, ch)
-	group.Collect("virtual", memStats.Virtual, ch)
-	group.Collect("mapped", memStats.Mapped, ch)
-	group.Collect("mapped_with_journal", memStats.MappedWithJournal, ch)
+	group.Export("resident", memStats.Resident)
+	group.Export("virtual", memStats.Virtual)
+	group.Export("mapped", memStats.Mapped)
+	group.Export("mapped_with_journal", memStats.MappedWithJournal)
 }

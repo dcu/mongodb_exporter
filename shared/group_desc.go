@@ -7,6 +7,7 @@ import (
 
 type FieldDesc struct {
 	Type string
+	Label string
 	Help string
 }
 
