@@ -46,7 +46,7 @@ func (status *ServerStatus) Export(groupName string) {
 	group.Export("uptime_estimate_seconds", status.Uptime)
 	group.Export("local_time", float64(status.LocalTime.Unix()))
 
-	exportData(status.Asserts, "asserts_total")
+	exportData(status.Asserts, "asserts")
 	exportData(status.Dur, "durability")
 	exportData(status.BackgroundFlushing, "background_flushing")
 	exportData(status.Connections, "connections")
@@ -65,6 +65,7 @@ func (status *ServerStatus) Export(groupName string) {
 func exportData(exportable shared.Exportable, groupName string) {
 	if !shared.EnabledGroups[groupName] {
 		// disabled group
+		glog.Infof("Group is not enabled: %s", groupName)
 		return
 	}
 

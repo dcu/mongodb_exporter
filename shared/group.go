@@ -54,8 +54,13 @@ func (group *Group) Export(fieldName string, value float64) {
 	if groupType == "metrics" {
 		group.trackField(fieldName, value)
 	} else {
-		group.trackFieldsVec(fields, fieldName, value)
+		group.trackFieldsVec(fields, []string{fieldName}, value)
 	}
+}
+
+func (group *Group) ExportWithLabels(labels []string, value float64) {
+	fields := GroupFields(group.DescName)
+	group.trackFieldsVec(fields, labels, value)
 }
 
 func (group *Group) Collect(ch chan<- prometheus.Metric) {
@@ -227,33 +232,38 @@ func (group *Group) trackField(fieldName string, value float64) {
 	}
 }
 
-func (group *Group) trackFieldsVec(fields GroupFieldsMap, fieldName string, value float64) {
+func (group *Group) trackFieldsVec(fields GroupFieldsMap, labels []string, value float64) {
 	metadata := fields["metadata"]
 
-	if fields[fieldName] == nil {
-		panic("Label not declared in groups.yml file: "+group.Name + "."+fieldName)
-	}
-
-	glog.Infof("Setting %s(%s)=%f (%s=%s)", group.Name, metadata.Type, value, metadata.Label, fieldName)
+	group.validateLabels(fields, labels)
+	glog.Infof("Setting %s(%s)=%f (%s=%v)", group.Name, metadata.Type, value, metadata.Labels, labels)
 	switch metadata.Type {
 	case "counter_vec":
 		{
-			vector := group.getCounterVec(group.Name, metadata.Help, []string{metadata.Label})
-			vector.WithLabelValues(fieldName).Set(value)
+			vector := group.getCounterVec(group.Name, metadata.Help, metadata.Labels)
+			vector.WithLabelValues(labels...).Set(value)
 		}
 	case "gauge_vec":
 		{
-			vector := group.getGaugeVec(group.Name, metadata.Help, []string{metadata.Label})
-			vector.WithLabelValues(fieldName).Set(value)
+			vector := group.getGaugeVec(group.Name, metadata.Help, metadata.Labels)
+			vector.WithLabelValues(labels...).Set(value)
 		}
 	case "summary_vec":
 		{
-			vector := group.getSummaryVec(group.Name, metadata.Help, []string{metadata.Label})
-			vector.WithLabelValues(fieldName).Observe(value)
+			vector := group.getSummaryVec(group.Name, metadata.Help, metadata.Labels)
+			vector.WithLabelValues(labels...).Observe(value)
 		}
 	default:
 		{
 			panic("Unknown metadata type: " + metadata.Type)
 		}
 	}
+}
+
+func (group *Group) validateLabels(fields GroupFieldsMap, labels []string) {
+	//for _, label := range labels {
+		//if fields[label] == nil {
+			//panic("Label not declared in groups.yml file: "+group.Name + "."+label)
+		//}
+	//}
 }

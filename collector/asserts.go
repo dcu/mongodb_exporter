@@ -13,7 +13,7 @@ type AssertsStats struct {
 }
 
 func (asserts *AssertsStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
+	group := shared.FindOrCreateGroup(groupName+"_total")
 
 	group.Export("regular", asserts.Regular)
 	group.Export("warning", asserts.Warning)

@@ -25,19 +25,19 @@ func (locks LockStatsMap) Export(groupName string) {
 			key = "dot"
 		}
 
-		timeLockedGroup := shared.FindOrCreateGroup(key + "_locks_time_locked_microseconds_global")
+		timeLockedGroup := shared.FindOrCreateGroup("locks_time_locked_microseconds_global")
 		timeLockedGroup.DescName = "locks_time_locked_global_microseconds_total"
-		timeLockedGroup.Export("read", locks.TimeLockedMicros.Read)
-		timeLockedGroup.Export("write", locks.TimeLockedMicros.Write)
+		timeLockedGroup.ExportWithLabels([]string{"read", key}, locks.TimeLockedMicros.Read)
+		timeLockedGroup.ExportWithLabels([]string{"write", key}, locks.TimeLockedMicros.Write)
 
-		timeLockedGroup = shared.FindOrCreateGroup(key + "_locks_time_locked_microseconds_local")
+		timeLockedGroup = shared.FindOrCreateGroup("locks_time_locked_microseconds_local")
 		timeLockedGroup.DescName = "locks_time_locked_local_microseconds_total"
-		timeLockedGroup.Export("read", locks.TimeLockedMicros.ReadLower)
-		timeLockedGroup.Export("write", locks.TimeLockedMicros.WriteLower)
+		timeLockedGroup.ExportWithLabels([]string{"read", key}, locks.TimeLockedMicros.ReadLower)
+		timeLockedGroup.ExportWithLabels([]string{"write", key}, locks.TimeLockedMicros.WriteLower)
 
-		timeAcquiringGroup := shared.FindOrCreateGroup(key + "_locks_time_acquiring_microseconds_global")
+		timeAcquiringGroup := shared.FindOrCreateGroup("locks_time_acquiring_microseconds_global")
 		timeAcquiringGroup.DescName = "locks_time_acquiring_global_microseconds_total"
-		timeAcquiringGroup.Export("read", locks.TimeLockedMicros.Read)
-		timeAcquiringGroup.Export("write", locks.TimeLockedMicros.Write)
+		timeAcquiringGroup.ExportWithLabels([]string{"read", key}, locks.TimeLockedMicros.Read)
+		timeAcquiringGroup.ExportWithLabels([]string{"write", key}, locks.TimeLockedMicros.Write)
 	}
 }

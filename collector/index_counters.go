@@ -23,3 +23,4 @@ func (indexCountersStats *IndexCounterStats) Export(groupName string) {
 	group = shared.FindOrCreateGroup(groupName)
 	group.Export("miss_ratio", indexCountersStats.MissRatio)
 }
+
