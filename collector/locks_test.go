@@ -14,12 +14,12 @@ func Test_LocksCollectData(t *testing.T) {
 	}
 
 	groupName := "locks"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
-	if shared.Groups["dot_locks_time_locked_global"] == nil {
+	if shared.Groups["locks_time_locked_microseconds_global"] == nil {
 		t.Error("Group not created")
 	}
-	if shared.Groups["dot_locks_time_acquiring_global"] == nil {
+	if shared.Groups["locks_time_acquiring_microseconds_global"] == nil {
 		t.Error("Group not created")
 	}
 }

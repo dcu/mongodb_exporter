@@ -31,18 +31,18 @@ func Test_MetricsCollectData(t *testing.T) {
 	}
 
 	groupName := "metrics"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
-	if shared.Groups[groupName+"_document"] == nil {
+	if shared.Groups[groupName+"_document_total"] == nil {
 		t.Error("Group not created")
 	}
 	if shared.Groups[groupName+"_get_last_error"] == nil {
 		t.Error("Group not created")
 	}
-	if shared.Groups[groupName+"_operation"] == nil {
+	if shared.Groups[groupName+"_operation_total"] == nil {
 		t.Error("Group not created")
 	}
-	if shared.Groups[groupName+"_query_executor"] == nil {
+	if shared.Groups[groupName+"_query_executor_total"] == nil {
 		t.Error("Group not created")
 	}
 	if shared.Groups[groupName+"_record"] == nil {
@@ -51,7 +51,7 @@ func Test_MetricsCollectData(t *testing.T) {
 	if shared.Groups[groupName+"_repl_apply"] == nil {
 		t.Error("Group not created")
 	}
-	if shared.Groups[groupName+"_storage_freelist_search"] == nil {
+	if shared.Groups[groupName+"_storage_freelist_search_total"] == nil {
 		t.Error("Group not created")
 	}
 }

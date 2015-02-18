@@ -14,9 +14,9 @@ func Test_AssertsCollectData(t *testing.T) {
 		Rollovers: 5,
 	}
 
-	asserts.Collect("asserts", nil)
+	asserts.Export("asserts")
 
-	if shared.Groups["asserts"] == nil {
+	if shared.Groups["asserts_total"] == nil {
 		t.Error("Asserts group was not loaded.")
 	}
 }

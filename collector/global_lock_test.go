@@ -12,7 +12,7 @@ func Test_GlobalLockCollectData(t *testing.T) {
 	}
 
 	groupName := "global_lock"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

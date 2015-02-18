@@ -10,7 +10,7 @@ func Test_IndexCountersCollectData(t *testing.T) {
 	}
 
 	groupName := "index_counters"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

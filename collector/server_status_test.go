@@ -12,7 +12,7 @@ func Test_ServerStatusCollectData(t *testing.T) {
 	loadServerStatusFromBson(data, serverStatus)
 
 	groupName := "instance"
-	serverStatus.Collect(groupName, nil)
+	serverStatus.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

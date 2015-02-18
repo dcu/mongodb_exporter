@@ -10,9 +10,9 @@ func Test_OpCountersCollectData(t *testing.T) {
 	}
 
 	groupName := "op_counters"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
-	if shared.Groups[groupName] == nil {
+	if shared.Groups[groupName+"_total"] == nil {
 		t.Error("Group not created")
 	}
 }

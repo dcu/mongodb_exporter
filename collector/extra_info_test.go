@@ -10,7 +10,7 @@ func Test_ExtraInfoCollectData(t *testing.T) {
 	}
 
 	groupName := "extra_info"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

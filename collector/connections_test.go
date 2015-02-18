@@ -13,7 +13,7 @@ func Test_ConnectionsCollectData(t *testing.T) {
 	}
 
 	groupName := "connections"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

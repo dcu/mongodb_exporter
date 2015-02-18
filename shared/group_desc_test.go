@@ -28,7 +28,7 @@ func Test_ParseEnabledGroups(t *testing.T) {
 func Test_GroupField(t *testing.T) {
 	LoadGroupsDesc()
 
-	field := GroupField("instance", "uptime")
+	field := GroupField("instance", "uptime_seconds")
 
 	if field.Type != "counter" {
 		t.Error("field was not loaded.")

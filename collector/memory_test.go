@@ -10,7 +10,7 @@ func Test_MemoryCollectData(t *testing.T) {
 	}
 
 	groupName := "memory"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

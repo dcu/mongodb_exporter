@@ -14,7 +14,7 @@ func Test_BackgroundFlushingCollectData(t *testing.T) {
 	}
 
 	groupName := "background_flushing"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")

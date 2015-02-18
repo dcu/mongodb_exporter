@@ -11,7 +11,7 @@ func Test_DurabilityCollectData(t *testing.T) {
 	}
 
 	groupName := "durability"
-	stats.Collect(groupName, nil)
+	stats.Export(groupName)
 
 	if shared.Groups[groupName] == nil {
 		t.Error("Group not created")
