@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/dcu/mongodb_exporter/collector"
 	"github.com/dcu/mongodb_exporter/shared"
 	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
-	//"github.com/golang/glog"
 )
 
 var (
@@ -55,6 +55,7 @@ func prometheusHandler() http.Handler {
 }
 
 func startWebServer() {
+	fmt.Printf("Listening on %s\n", *listenAddressFlag)
 	handler := prometheusHandler()
 
 	http.Handle(*metricsPathFlag, handler)
