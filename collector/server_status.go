@@ -57,7 +57,9 @@ func (status *ServerStatus) Export(groupName string) {
 	exportData(status.ExtraInfo, "extra_info")
 	exportData(status.GlobalLock, "global_lock")
 
-	exportData(status.IndexCounter, "index_counters")
+	if status.IndexCounter != nil {
+		exportData(status.IndexCounter, "index_counters")
+	}
 	exportData(status.Network, "network")
 	exportData(status.Opcounters, "op_counters")
 	exportData(status.OpcountersRepl, "op_counters_repl")
