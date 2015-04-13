@@ -1,14 +1,14 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_LocksCollectData(t *testing.T) {
 	stats := &LockStatsMap{
 		".": LockStats{
-			TimeLockedMicros: ReadWriteLockTimes{},
+			TimeLockedMicros:    ReadWriteLockTimes{},
 			TimeAcquiringMicros: ReadWriteLockTimes{},
 		},
 	}
@@ -23,4 +23,3 @@ func Test_LocksCollectData(t *testing.T) {
 		t.Error("Group not created")
 	}
 }
-

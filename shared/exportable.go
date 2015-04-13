@@ -1,7 +1,6 @@
 package shared
 
-import (
-)
+import ()
 
 type Exportable interface {
 	Export(groupName string)

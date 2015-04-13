@@ -41,7 +41,7 @@ func FindOrCreateGroup(name string) *Group {
 	return group
 }
 
-func CollectAllGroups(ch chan<-prometheus.Metric) {
+func CollectAllGroups(ch chan<- prometheus.Metric) {
 	for _, group := range Groups {
 		group.Collect(ch)
 	}
@@ -262,8 +262,8 @@ func (group *Group) trackFieldsVec(fields GroupFieldsMap, labels []string, value
 
 func (group *Group) validateLabels(fields GroupFieldsMap, labels []string) {
 	//for _, label := range labels {
-		//if fields[label] == nil {
-			//panic("Label not declared in groups.yml file: "+group.Name + "."+label)
-		//}
+	//if fields[label] == nil {
+	//panic("Label not declared in groups.yml file: "+group.Name + "."+label)
+	//}
 	//}
 }

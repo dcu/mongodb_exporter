@@ -2,8 +2,8 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type MongodbCollectorOpts struct {
@@ -45,4 +45,3 @@ func (exporter *MongodbCollector) collectServerStatus(ch chan<- prometheus.Metri
 
 	return serverStatus
 }
-

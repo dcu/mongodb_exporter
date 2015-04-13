@@ -1,16 +1,16 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_AssertsCollectData(t *testing.T) {
 	asserts := &AssertsStats{
-		Regular: 1,
-		Warning: 2,
-		Msg: 3,
-		User: 4,
+		Regular:   1,
+		Warning:   2,
+		Msg:       3,
+		User:      4,
 		Rollovers: 5,
 	}
 
@@ -20,4 +20,3 @@ func Test_AssertsCollectData(t *testing.T) {
 		t.Error("Asserts group was not loaded.")
 	}
 }
-

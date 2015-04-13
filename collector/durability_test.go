@@ -1,8 +1,8 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_DurabilityCollectData(t *testing.T) {
@@ -17,4 +17,3 @@ func Test_DurabilityCollectData(t *testing.T) {
 		t.Error("Group not created")
 	}
 }
-

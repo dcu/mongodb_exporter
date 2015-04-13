@@ -1,16 +1,16 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_BackgroundFlushingCollectData(t *testing.T) {
 	stats := &FlushStats{
-		Flushes: 1,
-		TotalMs: 2,
+		Flushes:   1,
+		TotalMs:   2,
 		AverageMs: 3,
-		LastMs: 4,
+		LastMs:    4,
 	}
 
 	groupName := "background_flushing"
@@ -20,4 +20,3 @@ func Test_BackgroundFlushingCollectData(t *testing.T) {
 		t.Error("Group not created")
 	}
 }
-

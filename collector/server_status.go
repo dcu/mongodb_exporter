@@ -2,10 +2,10 @@ package collector
 
 import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/golang/glog"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
-	"github.com/golang/glog"
 )
 
 type ServerStatus struct {
@@ -36,7 +36,7 @@ type ServerStatus struct {
 	Mem            *MemStats        `bson:"mem"`
 	Metrics        *MetricsStats    `bson:"metrics"`
 
-	Cursors        *Cursors         `bson:"cursors"`
+	Cursors *Cursors `bson:"cursors"`
 }
 
 func (status *ServerStatus) Export(groupName string) {
@@ -47,11 +47,16 @@ func (status *ServerStatus) Export(groupName string) {
 	group.Export("local_time", float64(status.LocalTime.Unix()))
 
 	exportData(status.Asserts, "asserts")
+
 	exportData(status.Dur, "durability")
+
 	exportData(status.BackgroundFlushing, "background_flushing")
+
 	exportData(status.Connections, "connections")
+
 	exportData(status.ExtraInfo, "extra_info")
 	exportData(status.GlobalLock, "global_lock")
+
 	exportData(status.IndexCounter, "index_counters")
 	exportData(status.Network, "network")
 	exportData(status.Opcounters, "op_counters")
@@ -95,4 +100,3 @@ func GetServerStatus(uri string) *ServerStatus {
 
 	return result
 }
-

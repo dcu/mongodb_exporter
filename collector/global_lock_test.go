@@ -1,13 +1,13 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_GlobalLockCollectData(t *testing.T) {
 	stats := &GlobalLockStats{
-		CurrentQueue: &QueueStats{},
+		CurrentQueue:  &QueueStats{},
 		ActiveClients: &ClientStats{},
 	}
 
@@ -18,4 +18,3 @@ func Test_GlobalLockCollectData(t *testing.T) {
 		t.Error("Group not created")
 	}
 }
-

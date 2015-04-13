@@ -1,9 +1,9 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
 	"gopkg.in/mgo.v2/bson"
+	"testing"
 )
 
 func Test_ServerStatusCollectData(t *testing.T) {
@@ -78,11 +78,9 @@ func Test_ParserServerStatus(t *testing.T) {
 	}
 }
 
-
 func loadServerStatusFromBson(data []byte, status *ServerStatus) {
-	err  := bson.Unmarshal(data, status)
+	err := bson.Unmarshal(data, status)
 	if err != nil {
 		panic(err)
 	}
 }
-

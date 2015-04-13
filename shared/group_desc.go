@@ -6,9 +6,9 @@ import (
 )
 
 type FieldDesc struct {
-	Type string
+	Type   string
 	Labels []string
-	Help string
+	Help   string
 }
 
 type GroupFieldsMap map[string]*FieldDesc

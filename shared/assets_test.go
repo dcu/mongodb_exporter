@@ -1,6 +1,6 @@
 package shared
 
-import(
+import (
 	"testing"
 )
 
@@ -26,4 +26,3 @@ func Test_GroupsYml_Info(t *testing.T) {
 		t.Error("Loaded asset is too small.")
 	}
 }
-

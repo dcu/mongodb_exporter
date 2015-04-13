@@ -42,6 +42,6 @@ func (globalLock *GlobalLockStats) Export(groupName string) {
 	group.Export("lock_total", globalLock.LockTime)
 	group.Export("ratio", globalLock.Ratio)
 
-	globalLock.CurrentQueue.Export(groupName+"_current_queue")
-	globalLock.ActiveClients.Export(groupName+"_client")
+	globalLock.CurrentQueue.Export(groupName + "_current_queue")
+	globalLock.ActiveClients.Export(groupName + "_client")
 }

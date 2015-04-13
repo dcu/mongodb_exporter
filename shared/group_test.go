@@ -1,8 +1,8 @@
 package shared
 
-import(
-	"testing"
+import (
 	"github.com/prometheus/client_golang/prometheus"
+	"testing"
 )
 
 func Test_FindOrCreateGroup(t *testing.T) {
@@ -50,4 +50,3 @@ func Test_GetSummary(t *testing.T) {
 	go group.Collect(chCollect)
 	go group.Describe(chDesc)
 }
-

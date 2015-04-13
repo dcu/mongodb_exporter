@@ -1,13 +1,12 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_OpCountersCollectData(t *testing.T) {
-	stats := &OpcountersStats{
-	}
+	stats := &OpcountersStats{}
 
 	groupName := "op_counters"
 	stats.Export(groupName)
@@ -16,4 +15,3 @@ func Test_OpCountersCollectData(t *testing.T) {
 		t.Error("Group not created")
 	}
 }
-

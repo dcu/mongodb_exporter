@@ -12,10 +12,10 @@ type NetworkStats struct {
 }
 
 func (networkStats *NetworkStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName+"_bytes_total")
+	group := shared.FindOrCreateGroup(groupName + "_bytes_total")
 	group.Export("in_bytes", networkStats.BytesIn)
 	group.Export("out_bytes", networkStats.BytesOut)
 
-	group = shared.FindOrCreateGroup(groupName+"_metrics")
+	group = shared.FindOrCreateGroup(groupName + "_metrics")
 	group.Export("num_requests_total", networkStats.NumRequests)
 }

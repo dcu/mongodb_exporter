@@ -15,7 +15,7 @@ type OpcountersStats struct {
 }
 
 func (opCounters *OpcountersStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName+"_total")
+	group := shared.FindOrCreateGroup(groupName + "_total")
 	group.Export("insert", opCounters.Insert)
 	group.Export("query", opCounters.Query)
 	group.Export("update", opCounters.Update)

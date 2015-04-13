@@ -14,7 +14,7 @@ type IndexCounterStats struct {
 }
 
 func (indexCountersStats *IndexCounterStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName+"_total")
+	group := shared.FindOrCreateGroup(groupName + "_total")
 	group.Export("accesses", indexCountersStats.Accesses)
 	group.Export("hits", indexCountersStats.Hits)
 	group.Export("misses", indexCountersStats.Misses)
@@ -23,4 +23,3 @@ func (indexCountersStats *IndexCounterStats) Export(groupName string) {
 	group = shared.FindOrCreateGroup(groupName)
 	group.Export("miss_ratio", indexCountersStats.MissRatio)
 }
-

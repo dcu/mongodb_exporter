@@ -1,8 +1,8 @@
 package collector
 
-import(
-    "testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"testing"
 )
 
 func Test_MetricsCollectData(t *testing.T) {
@@ -11,9 +11,9 @@ func Test_MetricsCollectData(t *testing.T) {
 		GetLastError: &GetLastErrorStats{
 			Wtime: &BenchmarkStats{},
 		},
-		Operation: &OperationStats{},
+		Operation:     &OperationStats{},
 		QueryExecutor: &QueryExecutorStats{},
-		Record: &RecordStats{},
+		Record:        &RecordStats{},
 		Repl: &ReplStats{
 			Apply: &ApplyStats{
 				Batches: &BenchmarkStats{},
@@ -23,7 +23,7 @@ func Test_MetricsCollectData(t *testing.T) {
 				GetMores: &BenchmarkStats{},
 			},
 			PreloadStats: &PreloadStats{
-				Docs: &BenchmarkStats{},
+				Docs:    &BenchmarkStats{},
 				Indexes: &BenchmarkStats{},
 			},
 		},
@@ -55,4 +55,3 @@ func Test_MetricsCollectData(t *testing.T) {
 		t.Error("Group not created")
 	}
 }
-

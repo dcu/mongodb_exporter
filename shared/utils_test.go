@@ -1,6 +1,6 @@
 package shared
 
-import(
+import (
 	"testing"
 )
 
@@ -31,4 +31,3 @@ func Test_ParameterizeString(t *testing.T) {
 		t.Fail()
 	}
 }
-

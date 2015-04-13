@@ -1,9 +1,9 @@
 package collector
 
-import(
-	"testing"
-	"github.com/prometheus/client_golang/prometheus"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
+	"testing"
 )
 
 func Test_CollectServerStatus(t *testing.T) {
@@ -32,8 +32,8 @@ func Test_CollectCollector(t *testing.T) {
 
 func Test_InvalidConnection(t *testing.T) {
 	if testing.Short() {
-        t.Skip("skipping test in short mode.")
-    }
+		t.Skip("skipping test in short mode.")
+	}
 
 	collector := NewMongodbCollector(MongodbCollectorOpts{URI: "s://localhost:123"})
 	serverStatus := collector.collectServerStatus(nil)
@@ -42,4 +42,3 @@ func Test_InvalidConnection(t *testing.T) {
 		t.Fail()
 	}
 }
-

@@ -16,6 +16,6 @@ func (connectionStats *ConnectionStats) Export(groupName string) {
 	group.Export("current", connectionStats.Current)
 	group.Export("available", connectionStats.Available)
 
-	group = shared.FindOrCreateGroup(groupName+"_metrics")
+	group = shared.FindOrCreateGroup(groupName + "_metrics")
 	group.Export("created_total", connectionStats.TotalCreated)
 }

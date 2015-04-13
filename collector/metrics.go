@@ -42,7 +42,7 @@ func (getLastErrorStats *GetLastErrorStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
 	group.Export("wtimeouts_total", getLastErrorStats.Wtimeouts)
-	getLastErrorStats.Wtime.Export(groupName+"_wtime")
+	getLastErrorStats.Wtime.Export(groupName + "_wtime")
 }
 
 type OperationStats struct {
@@ -87,7 +87,7 @@ func (applyStats *ApplyStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 	group.Export("ops_total", applyStats.Ops)
 
-	applyStats.Batches.Export(groupName+"_batches")
+	applyStats.Batches.Export(groupName + "_batches")
 }
 
 type BufferStats struct {
@@ -116,31 +116,31 @@ func (metricsNetworkStats *MetricsNetworkStats) Export(groupName string) {
 	group.Export("ops_total", metricsNetworkStats.Ops)
 	group.Export("readers_created_total", metricsNetworkStats.ReadersCreated)
 
-	metricsNetworkStats.GetMores.Export(groupName+"_getmores")
+	metricsNetworkStats.GetMores.Export(groupName + "_getmores")
 }
 
 type ReplStats struct {
-	Apply   *ApplyStats          `bson:"apply"`
-	Buffer  *BufferStats         `bson:"buffer"`
-	Network *MetricsNetworkStats `bson:"network"`
-	PreloadStats *PreloadStats   `bson:"preload"`
+	Apply        *ApplyStats          `bson:"apply"`
+	Buffer       *BufferStats         `bson:"buffer"`
+	Network      *MetricsNetworkStats `bson:"network"`
+	PreloadStats *PreloadStats        `bson:"preload"`
 }
 
 func (replStats *ReplStats) Export(groupName string) {
-	replStats.Apply.Export(groupName+"_apply")
-	replStats.Buffer.Export(groupName+"_buffer")
-	replStats.Network.Export(groupName+"_network")
-	replStats.PreloadStats.Export(groupName+"_preload")
+	replStats.Apply.Export(groupName + "_apply")
+	replStats.Buffer.Export(groupName + "_buffer")
+	replStats.Network.Export(groupName + "_network")
+	replStats.PreloadStats.Export(groupName + "_preload")
 }
 
 type PreloadStats struct {
-	Docs     *BenchmarkStats `bson:"docs"`
+	Docs    *BenchmarkStats `bson:"docs"`
 	Indexes *BenchmarkStats `bson:"indexes"`
 }
 
 func (preloadStats *PreloadStats) Export(groupName string) {
-	preloadStats.Docs.Export(groupName+"_docs")
-	preloadStats.Indexes.Export(groupName+"_indexes")
+	preloadStats.Docs.Export(groupName + "_docs")
+	preloadStats.Indexes.Export(groupName + "_indexes")
 }
 
 type StorageStats struct {
@@ -168,11 +168,11 @@ type MetricsStats struct {
 }
 
 func (metricsStats *MetricsStats) Export(groupName string) {
-	metricsStats.Document.Export(groupName+"_document_total")
-	metricsStats.GetLastError.Export(groupName+"_get_last_error")
-	metricsStats.Operation.Export(groupName+"_operation_total")
-	metricsStats.QueryExecutor.Export(groupName+"_query_executor_total")
-	metricsStats.Record.Export(groupName+"_record")
-	metricsStats.Repl.Export(groupName+"_repl")
-	metricsStats.Storage.Export(groupName+"_storage_freelist_search_total")
+	metricsStats.Document.Export(groupName + "_document_total")
+	metricsStats.GetLastError.Export(groupName + "_get_last_error")
+	metricsStats.Operation.Export(groupName + "_operation_total")
+	metricsStats.QueryExecutor.Export(groupName + "_query_executor_total")
+	metricsStats.Record.Export(groupName + "_record")
+	metricsStats.Repl.Export(groupName + "_repl")
+	metricsStats.Storage.Export(groupName + "_storage_freelist_search_total")
 }

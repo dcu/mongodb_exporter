@@ -1,13 +1,11 @@
 package collector
 
-
-import(
-	"testing"
+import (
 	"github.com/dcu/mongodb_exporter/shared"
-	"os"
 	"io/ioutil"
+	"os"
+	"testing"
 )
-
 
 func TestMain(m *testing.M) {
 	shared.LoadGroupsDesc()
@@ -15,11 +13,10 @@ func TestMain(m *testing.M) {
 }
 
 func LoadFixture(name string) []byte {
-	data, err := ioutil.ReadFile("fixtures/"+name)
+	data, err := ioutil.ReadFile("fixtures/" + name)
 	if err != nil {
 		panic(err)
 	}
 
 	return data
 }
-

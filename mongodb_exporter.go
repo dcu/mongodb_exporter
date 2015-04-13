@@ -26,7 +26,6 @@ type basicAuthHandler struct {
 	password string
 }
 
-
 func (h *basicAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	user, password, ok := r.BasicAuth()
 	if !ok || password != h.password || user != h.user {

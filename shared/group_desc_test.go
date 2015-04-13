@@ -1,6 +1,6 @@
 package shared
 
-import(
+import (
 	"testing"
 )
 
@@ -34,4 +34,3 @@ func Test_GroupField(t *testing.T) {
 		t.Error("field was not loaded.")
 	}
 }
-

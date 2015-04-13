@@ -33,7 +33,7 @@ type DurStats struct {
 }
 
 func (durStats *DurStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName+"_commits")
+	group := shared.FindOrCreateGroup(groupName + "_commits")
 	group.Export("written", durStats.Commits)
 	group.Export("in_write_lock", durStats.CommitsInWriteLock)
 
@@ -43,6 +43,6 @@ func (durStats *DurStats) Export(groupName string) {
 	group.Export("compression", durStats.Compression)
 	group.Export("early_commits", durStats.EarlyCommits)
 
-	durStats.TimeMs.Export(groupName+"_time_milliseconds")
+	durStats.TimeMs.Export(groupName + "_time_milliseconds")
 
 }
