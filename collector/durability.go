@@ -4,7 +4,7 @@ import (
 	"github.com/dcu/mongodb_exporter/shared"
 )
 
-// Dur
+// DurTiming is the information about durability returned from the server.
 type DurTiming struct {
 	Dt               float64 `bson:"dt"`
 	PrepLogBuffer    float64 `bson:"prepLogBuffer"`
@@ -13,6 +13,7 @@ type DurTiming struct {
 	RemapPrivateView float64 `bson:"remapPrivateView"`
 }
 
+// Export exports the data for the prometheus server.
 func (durTiming *DurTiming) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 	group.Export("dt", durTiming.Dt)
@@ -22,6 +23,7 @@ func (durTiming *DurTiming) Export(groupName string) {
 	group.Export("remap_private_view", durTiming.RemapPrivateView)
 }
 
+// DurStats are the stats related to durability.
 type DurStats struct {
 	Commits            float64   `bson:"commits"`
 	JournaledMB        float64   `bson:"journaledMB"`
@@ -32,6 +34,7 @@ type DurStats struct {
 	TimeMs             DurTiming `bson:"timeMs"`
 }
 
+// Export export the durability stats for the prometheus server.
 func (durStats *DurStats) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName + "_commits")
 	group.Export("written", durStats.Commits)

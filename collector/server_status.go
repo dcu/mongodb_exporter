@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// ServerStatus keeps the data returned by the serverStatus() method.
 type ServerStatus struct {
 	Uptime         float64   `bson:"uptime"`
 	UptimeEstimate float64   `bson:"uptimeEstimate"`
@@ -39,6 +40,7 @@ type ServerStatus struct {
 	Cursors *Cursors `bson:"cursors"`
 }
 
+// Export exports the given groupName to be consumed by prometheus.
 func (status *ServerStatus) Export(groupName string) {
 	group := shared.FindOrCreateGroup(groupName)
 
@@ -46,27 +48,61 @@ func (status *ServerStatus) Export(groupName string) {
 	group.Export("uptime_estimate_seconds", status.Uptime)
 	group.Export("local_time", float64(status.LocalTime.Unix()))
 
-	exportData(status.Asserts, "asserts")
+	if status.Asserts != nil {
+		exportData(status.Asserts, "asserts")
+	}
 
-	exportData(status.Dur, "durability")
+	if status.Dur != nil {
+		exportData(status.Dur, "durability")
+	}
 
-	exportData(status.BackgroundFlushing, "background_flushing")
+	if status.BackgroundFlushing != nil {
+		exportData(status.BackgroundFlushing, "background_flushing")
+	}
 
-	exportData(status.Connections, "connections")
+	if status.Connections != nil {
+		exportData(status.Connections, "connections")
+	}
 
-	exportData(status.ExtraInfo, "extra_info")
-	exportData(status.GlobalLock, "global_lock")
+	if status.ExtraInfo != nil {
+		exportData(status.ExtraInfo, "extra_info")
+	}
+
+	if status.GlobalLock != nil {
+		exportData(status.GlobalLock, "global_lock")
+	}
 
 	if status.IndexCounter != nil {
 		exportData(status.IndexCounter, "index_counters")
 	}
-	exportData(status.Network, "network")
-	exportData(status.Opcounters, "op_counters")
-	exportData(status.OpcountersRepl, "op_counters_repl")
-	exportData(status.Mem, "memory")
-	exportData(status.Locks, "locks")
-	exportData(status.Metrics, "metrics")
-	exportData(status.Cursors, "cursors")
+
+	if status.Network != nil {
+		exportData(status.Network, "network")
+	}
+
+	if status.Opcounters != nil {
+		exportData(status.Opcounters, "op_counters")
+	}
+
+	if status.OpcountersRepl != nil {
+		exportData(status.OpcountersRepl, "op_counters_repl")
+	}
+
+	if status.Mem != nil {
+		exportData(status.Mem, "memory")
+	}
+
+	if status.Locks != nil {
+		exportData(status.Locks, "locks")
+	}
+
+	if status.Metrics != nil {
+		exportData(status.Metrics, "metrics")
+	}
+
+	if status.Cursors != nil {
+		exportData(status.Cursors, "cursors")
+	}
 }
 
 func exportData(exportable shared.Exportable, groupName string) {
@@ -79,6 +115,7 @@ func exportData(exportable shared.Exportable, groupName string) {
 	exportable.Export(groupName)
 }
 
+// GetServerStatus returns the server status info.
 func GetServerStatus(uri string) *ServerStatus {
 	result := &ServerStatus{}
 	session, err := mgo.Dial(uri)
