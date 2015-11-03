@@ -1,4 +1,4 @@
-FROM       alpine:edge
+FROM       alpine:latest
 MAINTAINER David Cuadrado <dacuad@facebook.com>
 EXPOSE     9001
 
