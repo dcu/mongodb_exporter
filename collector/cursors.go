@@ -1,9 +1,18 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
+var (
+	cursorsMetric = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Name:      "cursors",
+		Help:      "The cursors data structure contains data regarding cursor state and use",
+	}, []string{})
+)
+
+// Cursors are the cursor metrics
 type Cursors struct {
 	TotalOpen      float64 `bson:"totalOpen"`
 	TimeOut        float64 `bson:"timedOut"`
@@ -11,11 +20,10 @@ type Cursors struct {
 	Pinned         float64 `bson:"pinned"`
 }
 
-func (cursors *Cursors) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-
-	group.Export("total_open", cursors.TotalOpen)
-	group.Export("timed_out", cursors.TimeOut)
-	group.Export("total_no_timeout", cursors.TotalNoTimeout)
-	group.Export("pinned", cursors.Pinned)
+// Export exports the data to prometheus.
+func (cursors *Cursors) Export() {
+	cursorsMetric.WithLabelValues("total_open").Add(cursors.TotalOpen)
+	cursorsMetric.WithLabelValues("timed_out").Add(cursors.TimeOut)
+	cursorsMetric.WithLabelValues("total_no_timeout").Add(cursors.TotalNoTimeout)
+	cursorsMetric.WithLabelValues("pinned").Add(cursors.Pinned)
 }

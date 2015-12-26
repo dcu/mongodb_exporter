@@ -1,17 +1,32 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-// ExtraInfo
+var (
+	extraInfopageFaultsTotal = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "extra_info",
+		Name:      "page_faults_total",
+		Help:      "The page_faults Reports the total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data which isn’t available in active memory. The page_faults counter may increase dramatically during moments of poor performance and may correlate with limited memory environments and larger data sets. Limited and sporadic page faults do not necessarily indicate an issue",
+	})
+	extraInfoheapUsageBytes = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "extra_info",
+		Name:      "heap_usage_bytes",
+		Help:      "The heap_usage_bytes field is only available on Unix/Linux systems, and reports the total size in bytes of heap space used by the database process",
+	})
+)
+
+// ExtraInfo has extra info metrics
 type ExtraInfo struct {
 	HeapUsageBytes float64 `bson:"heap_usage_bytes"`
 	PageFaults     float64 `bson:"page_faults"`
 }
 
-func (extraInfo *ExtraInfo) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("heap_usage_bytes", extraInfo.HeapUsageBytes)
-	group.Export("page_faults_total", extraInfo.PageFaults)
+// Export exports the metrics to prometheus.
+func (extraInfo *ExtraInfo) Export() {
+	extraInfoheapUsageBytes.Add(extraInfo.HeapUsageBytes)
+	extraInfopageFaultsTotal.Add(extraInfo.PageFaults)
 }

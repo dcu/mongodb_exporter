@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
 	"testing"
 )
 

@@ -1,7 +1,221 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	metricsCursorTimedOutTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_cursor",
+		Name:      "timed_out_total",
+		Help:      "timedOut provides the total number of cursors that have timed out since the server process started. If this number is large or growing at a regular rate, this may indicate an application error",
+	})
+)
+var (
+	metricsCursorOpen = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Name:      "metrics_cursor_open",
+		Help:      "The open is an embedded document that contains data regarding open cursors",
+	}, []string{})
+)
+var (
+	metricsDocumentTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "metrics_document_total",
+		Help:      "The document holds a document of that reflect document access and modification patterns and data use. Compare these values to the data in the opcounters document, which track total number of operations",
+	}, []string{})
+)
+var (
+	metricsGetLastErrorWtimeNumTotal = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_get_last_error_wtime",
+		Name:      "num_total",
+		Help:      "num reports the total number of getLastError operations with a specified write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)",
+	})
+	metricsGetLastErrorWtimeTotalMilliseconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_get_last_error_wtime",
+		Name:      "total_milliseconds",
+		Help:      "total_millis reports the total amount of time in milliseconds that the mongod has spent performing getLastError operations with write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)",
+	})
+)
+var (
+	metricsGetLastErrorWtimeoutsTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_get_last_error",
+		Name:      "wtimeouts_total",
+		Help:      "wtimeouts reports the number of times that write concern operations have timed out as a result of the wtimeout threshold to getLastError.",
+	})
+)
+var (
+	metricsOperationTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "metrics_operation_total",
+		Help:      "operation is a sub-document that holds counters for several types of update and query operations that MongoDB handles using special operation types",
+	}, []string{})
+)
+var (
+	metricsQueryExecutorTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "metrics_query_executor_total",
+		Help:      "queryExecutor is a document that reports data from the query execution system",
+	}, []string{})
+)
+var (
+	metricsRecordMovesTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_record",
+		Name:      "moves_total",
+		Help:      "moves reports the total number of times documents move within the on-disk representation of the MongoDB data set. Documents move as a result of operations that increase the size of the document beyond their allocated record size",
+	})
+)
+var (
+	metricsReplApplyBatchesNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_apply_batches",
+		Name:      "num_total",
+		Help:      "num reports the total number of batches applied across all databases",
+	})
+	metricsReplApplyBatchesTotalMilliseconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_apply_batches",
+		Name:      "total_milliseconds",
+		Help:      "total_millis reports the total amount of time the mongod has spent applying operations from the oplog",
+	})
+)
+var (
+	metricsReplApplyOpsTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_apply",
+		Name:      "ops_total",
+		Help:      "ops reports the total number of oplog operations applied",
+	})
+)
+var (
+	metricsReplBufferCount = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_buffer",
+		Name:      "count",
+		Help:      "count reports the current number of operations in the oplog buffer",
+	})
+	metricsReplBufferMaxSizeBytes = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_buffer",
+		Name:      "max_size_bytes",
+		Help:      "maxSizeBytes reports the maximum size of the buffer. This value is a constant setting in the mongod, and is not configurable",
+	})
+	metricsReplBufferSizeBytes = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_buffer",
+		Name:      "size_bytes",
+		Help:      "sizeBytes reports the current size of the contents of the oplog buffer",
+	})
+)
+var (
+	metricsReplNetworkGetmoresNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_network_getmores",
+		Name:      "num_total",
+		Help:      "num reports the total number of getmore operations, which are operations that request an additional set of operations from the replication sync source.",
+	})
+	metricsReplNetworkGetmoresTotalMilliseconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_network_getmores",
+		Name:      "total_milliseconds",
+		Help:      "total_millis reports the total amount of time required to collect data from getmore operations",
+	})
+)
+var (
+	metricsReplNetworkBytesTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_network",
+		Name:      "bytes_total",
+		Help:      "bytes reports the total amount of data read from the replication sync source",
+	})
+	metricsReplNetworkOpsTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_network",
+		Name:      "ops_total",
+		Help:      "ops reports the total number of operations read from the replication source.",
+	})
+	metricsReplNetworkReadersCreatedTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_network",
+		Name:      "readers_created_total",
+		Help:      "readersCreated reports the total number of oplog query processes created. MongoDB will create a new oplog query any time an error occurs in the connection, including a timeout, or a network operation. Furthermore, readersCreated will increment every time MongoDB selects a new source fore replication.",
+	})
+)
+var (
+	metricsReplOplogInsertNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_oplog_insert",
+		Name:      "num_total",
+		Help:      "num reports the total number of items inserted into the oplog.",
+	})
+	metricsReplOplogInsertTotalMilliseconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_oplog_insert",
+		Name:      "total_milliseconds",
+		Help:      "total_millis reports the total amount of time spent for the mongod to insert data into the oplog.",
+	})
+)
+var (
+	metricsReplOplogInsertBytesTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_oplog",
+		Name:      "insert_bytes_total",
+		Help:      "insertBytes the total size of documents inserted into the oplog.",
+	})
+)
+var (
+	metricsReplPreloadDocsNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_preload_docs",
+		Name:      "num_total",
+		Help:      "num reports the total number of documents loaded during the pre-fetch stage of replication",
+	})
+	metricsReplPreloadDocsTotalMilliseconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_preload_docs",
+		Name:      "total_milliseconds",
+		Help:      "total_millis reports the total amount of time spent loading documents as part of the pre-fetch stage of replication",
+	})
+)
+var (
+	metricsReplPreloadIndexesNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_preload_indexes",
+		Name:      "num_total",
+		Help:      "num reports the total number of index entries loaded by members before updating documents as part of the pre-fetch stage of replication",
+	})
+	metricsReplPreloadIndexesTotalMilliseconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_repl_preload_indexes",
+		Name:      "total_milliseconds",
+		Help:      "total_millis reports the total amount of time spent loading index entries as part of the pre-fetch stage of replication",
+	})
+)
+var (
+	metricsStorageFreelistSearchTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "metrics_storage_freelist_search_total",
+		Help:      "metrics about searching records in the database.",
+	}, []string{})
+)
+var (
+	metricsTTLDeletedDocumentsTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_ttl",
+		Name:      "deleted_documents_total",
+		Help:      "deletedDocuments reports the total number of documents deleted from collections with a ttl index.",
+	})
+	metricsTTLPassesTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "metrics_ttl",
+		Name:      "passes_total",
+		Help:      "passes reports the number of times the background process removes documents from collections with a ttl index",
+	})
 )
 
 // DocumentStats are the stats associated to a document.
@@ -13,27 +227,17 @@ type DocumentStats struct {
 }
 
 // Export exposes the document stats to be consumed by the prometheus server.
-func (documentStats *DocumentStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-
-	group.Export("deleted", documentStats.Deleted)
-	group.Export("inserted", documentStats.Inserted)
-	group.Export("returned", documentStats.Returned)
-	group.Export("updated", documentStats.Updated)
+func (documentStats *DocumentStats) Export() {
+	metricsDocumentTotal.WithLabelValues("deleted").Set(documentStats.Deleted)
+	metricsDocumentTotal.WithLabelValues("inserted").Set(documentStats.Inserted)
+	metricsDocumentTotal.WithLabelValues("returned").Set(documentStats.Returned)
+	metricsDocumentTotal.WithLabelValues("updated").Set(documentStats.Updated)
 }
 
 // BenchmarkStats is bechmark info about an operation.
 type BenchmarkStats struct {
 	Num         float64 `bson:"num"`
 	TotalMillis float64 `bson:"totalMillis"`
-}
-
-// Export exports the benchmark stats.
-func (benchmarkStats *BenchmarkStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-
-	group.Export("num_total", benchmarkStats.Num)
-	group.Export("total_milliseconds", benchmarkStats.TotalMillis)
 }
 
 // GetLastErrorStats are the last error stats.
@@ -43,11 +247,11 @@ type GetLastErrorStats struct {
 }
 
 // Export exposes the get last error stats.
-func (getLastErrorStats *GetLastErrorStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
+func (getLastErrorStats *GetLastErrorStats) Export() {
+	metricsGetLastErrorWtimeNumTotal.Set(getLastErrorStats.Wtime.Num)
+	metricsGetLastErrorWtimeTotalMilliseconds.Set(getLastErrorStats.Wtime.TotalMillis)
 
-	group.Export("wtimeouts_total", getLastErrorStats.Wtimeouts)
-	getLastErrorStats.Wtime.Export(groupName + "_wtime")
+	metricsGetLastErrorWtimeoutsTotal.Set(getLastErrorStats.Wtimeouts)
 }
 
 // OperationStats are the stats for some kind of operations.
@@ -58,11 +262,10 @@ type OperationStats struct {
 }
 
 // Export exports the operation stats.
-func (operationStats *OperationStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("fastmod", operationStats.Fastmod)
-	group.Export("idhack", operationStats.Idhack)
-	group.Export("scan_and_order", operationStats.ScanAndOrder)
+func (operationStats *OperationStats) Export() {
+	metricsOperationTotal.WithLabelValues("fastmod").Set(operationStats.Fastmod)
+	metricsOperationTotal.WithLabelValues("idhack").Set(operationStats.Idhack)
+	metricsOperationTotal.WithLabelValues("scan_and_order").Set(operationStats.ScanAndOrder)
 }
 
 // QueryExecutorStats are the stats associated with a query execution.
@@ -72,10 +275,9 @@ type QueryExecutorStats struct {
 }
 
 // Export exports the query executor stats.
-func (queryExecutorStats *QueryExecutorStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("scanned", queryExecutorStats.Scanned)
-	group.Export("scanned_objects", queryExecutorStats.ScannedObjects)
+func (queryExecutorStats *QueryExecutorStats) Export() {
+	metricsQueryExecutorTotal.WithLabelValues("scanned").Set(queryExecutorStats.Scanned)
+	metricsQueryExecutorTotal.WithLabelValues("scanned_objects").Set(queryExecutorStats.ScannedObjects)
 }
 
 // RecordStats are stats associated with a record.
@@ -84,9 +286,8 @@ type RecordStats struct {
 }
 
 // Export exposes the record stats.
-func (recordStats *RecordStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("moves_total", recordStats.Moves)
+func (recordStats *RecordStats) Export() {
+	metricsRecordMovesTotal.Set(recordStats.Moves)
 }
 
 // ApplyStats are the stats associated with the apply operation.
@@ -96,11 +297,11 @@ type ApplyStats struct {
 }
 
 // Export exports the apply stats
-func (applyStats *ApplyStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("ops_total", applyStats.Ops)
+func (applyStats *ApplyStats) Export() {
+	metricsReplApplyOpsTotal.Set(applyStats.Ops)
 
-	applyStats.Batches.Export(groupName + "_batches")
+	metricsReplApplyBatchesNumTotal.Set(applyStats.Batches.Num)
+	metricsReplApplyBatchesTotalMilliseconds.Set(applyStats.Batches.TotalMillis)
 }
 
 // BufferStats are the stats associated with the buffer
@@ -111,11 +312,10 @@ type BufferStats struct {
 }
 
 // Export exports the buffer stats.
-func (bufferStats *BufferStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("count", bufferStats.Count)
-	group.Export("max_size_bytes", bufferStats.MaxSizeBytes)
-	group.Export("size_bytes", bufferStats.SizeBytes)
+func (bufferStats *BufferStats) Export() {
+	metricsReplBufferCount.Set(bufferStats.Count)
+	metricsReplBufferMaxSizeBytes.Set(bufferStats.MaxSizeBytes)
+	metricsReplBufferSizeBytes.Set(bufferStats.SizeBytes)
 }
 
 // MetricsNetworkStats are the network stats.
@@ -127,13 +327,13 @@ type MetricsNetworkStats struct {
 }
 
 // Export exposes the network stats.
-func (metricsNetworkStats *MetricsNetworkStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("bytes_total", metricsNetworkStats.Bytes)
-	group.Export("ops_total", metricsNetworkStats.Ops)
-	group.Export("readers_created_total", metricsNetworkStats.ReadersCreated)
+func (metricsNetworkStats *MetricsNetworkStats) Export() {
+	metricsReplNetworkBytesTotal.Set(metricsNetworkStats.Bytes)
+	metricsReplNetworkOpsTotal.Set(metricsNetworkStats.Ops)
+	metricsReplNetworkReadersCreatedTotal.Set(metricsNetworkStats.ReadersCreated)
 
-	metricsNetworkStats.GetMores.Export(groupName + "_getmores")
+	metricsReplNetworkGetmoresNumTotal.Set(metricsNetworkStats.GetMores.Num)
+	metricsReplNetworkGetmoresTotalMilliseconds.Set(metricsNetworkStats.GetMores.TotalMillis)
 }
 
 // ReplStats are the stats associated with the replication process.
@@ -145,11 +345,11 @@ type ReplStats struct {
 }
 
 // Export exposes the replication stats.
-func (replStats *ReplStats) Export(groupName string) {
-	replStats.Apply.Export(groupName + "_apply")
-	replStats.Buffer.Export(groupName + "_buffer")
-	replStats.Network.Export(groupName + "_network")
-	replStats.PreloadStats.Export(groupName + "_preload")
+func (replStats *ReplStats) Export() {
+	replStats.Apply.Export()
+	replStats.Buffer.Export()
+	replStats.Network.Export()
+	replStats.PreloadStats.Export()
 }
 
 // PreloadStats are the stats associated with preload operation.
@@ -159,9 +359,12 @@ type PreloadStats struct {
 }
 
 // Export exposes the preload stats.
-func (preloadStats *PreloadStats) Export(groupName string) {
-	preloadStats.Docs.Export(groupName + "_docs")
-	preloadStats.Indexes.Export(groupName + "_indexes")
+func (preloadStats *PreloadStats) Export() {
+	metricsReplPreloadDocsNumTotal.Set(preloadStats.Docs.Num)
+	metricsReplPreloadDocsTotalMilliseconds.Set(preloadStats.Docs.TotalMillis)
+
+	metricsReplPreloadIndexesNumTotal.Set(preloadStats.Indexes.Num)
+	metricsReplPreloadIndexesTotalMilliseconds.Set(preloadStats.Indexes.TotalMillis)
 }
 
 // StorageStats are the stats associated with the storage.
@@ -172,12 +375,10 @@ type StorageStats struct {
 }
 
 // Export exports the storage stats.
-func (storageStats *StorageStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-
-	group.Export("bucket_exhausted", storageStats.BucketExhausted)
-	group.Export("requests", storageStats.Requests)
-	group.Export("scanned", storageStats.Scanned)
+func (storageStats *StorageStats) Export() {
+	metricsStorageFreelistSearchTotal.WithLabelValues("bucket_exhausted").Set(storageStats.BucketExhausted)
+	metricsStorageFreelistSearchTotal.WithLabelValues("requests").Set(storageStats.Requests)
+	metricsStorageFreelistSearchTotal.WithLabelValues("scanned").Set(storageStats.Scanned)
 }
 
 // MetricsStats are all stats associated with metrics of the system
@@ -192,26 +393,26 @@ type MetricsStats struct {
 }
 
 // Export exports the metrics stats.
-func (metricsStats *MetricsStats) Export(groupName string) {
+func (metricsStats *MetricsStats) Export() {
 	if metricsStats.Document != nil {
-		metricsStats.Document.Export(groupName + "_document_total")
+		metricsStats.Document.Export()
 	}
 	if metricsStats.GetLastError != nil {
-		metricsStats.GetLastError.Export(groupName + "_get_last_error")
+		metricsStats.GetLastError.Export()
 	}
 	if metricsStats.Operation != nil {
-		metricsStats.Operation.Export(groupName + "_operation_total")
+		metricsStats.Operation.Export()
 	}
 	if metricsStats.QueryExecutor != nil {
-		metricsStats.QueryExecutor.Export(groupName + "_query_executor_total")
+		metricsStats.QueryExecutor.Export()
 	}
 	if metricsStats.Record != nil {
-		metricsStats.Record.Export(groupName + "_record")
+		metricsStats.Record.Export()
 	}
 	if metricsStats.Repl != nil {
-		metricsStats.Repl.Export(groupName + "_repl")
+		metricsStats.Repl.Export()
 	}
 	if metricsStats.Storage != nil {
-		metricsStats.Storage.Export(groupName + "_storage_freelist_search_total")
+		metricsStats.Storage.Export()
 	}
 }

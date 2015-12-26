@@ -1,10 +1,18 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-//Opcount and OpcountersRepl
+var (
+	opCountersTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "op_counters_total",
+		Help:      "The opcounters data structure provides an overview of database operations by type and makes it possible to analyze the load on the database in more granular manner. These numbers will grow over time and in response to database use. Analyze these values over time to track database utilization",
+	}, []string{})
+)
+
+// OpcountersStats opcounters stats
 type OpcountersStats struct {
 	Insert  float64 `bson:"insert"`
 	Query   float64 `bson:"query"`
@@ -14,12 +22,12 @@ type OpcountersStats struct {
 	Command float64 `bson:"command"`
 }
 
-func (opCounters *OpcountersStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName + "_total")
-	group.Export("insert", opCounters.Insert)
-	group.Export("query", opCounters.Query)
-	group.Export("update", opCounters.Update)
-	group.Export("delete", opCounters.Delete)
-	group.Export("getmore", opCounters.GetMore)
-	group.Export("command", opCounters.Command)
+// Export exports the data to prometheus.
+func (opCounters *OpcountersStats) Export() {
+	opCountersTotal.WithLabelValues("insert").Set(opCounters.Insert)
+	opCountersTotal.WithLabelValues("query").Set(opCounters.Query)
+	opCountersTotal.WithLabelValues("update").Set(opCounters.Update)
+	opCountersTotal.WithLabelValues("delete").Set(opCounters.Delete)
+	opCountersTotal.WithLabelValues("getmore").Set(opCounters.GetMore)
+	opCountersTotal.WithLabelValues("command").Set(opCounters.Command)
 }

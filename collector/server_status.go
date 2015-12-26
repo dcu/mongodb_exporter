@@ -3,9 +3,31 @@ package collector
 import (
 	"github.com/dcu/mongodb_exporter/shared"
 	"github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
+)
+
+var (
+	instanceUptimeSeconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "instance",
+		Name:      "uptime_seconds",
+		Help:      "The value of the uptime field corresponds to the number of seconds that the mongos or mongod process has been active.",
+	})
+	instanceUptimeEstimateSeconds = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "instance",
+		Name:      "uptime_estimate_seconds",
+		Help:      "uptimeEstimate provides the uptime as calculated from MongoDB's internal course-grained time keeping system.",
+	})
+	instanceLocalTime = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "instance",
+		Name:      "local_time",
+		Help:      "The localTime value is the current time, according to the server, in UTC specified in an ISODate format.",
+	})
 )
 
 // ServerStatus keeps the data returned by the serverStatus() method.
@@ -41,78 +63,32 @@ type ServerStatus struct {
 }
 
 // Export exports the given groupName to be consumed by prometheus.
-func (status *ServerStatus) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
+func (status *ServerStatus) Export() {
 
-	group.Export("uptime_seconds", status.Uptime)
-	group.Export("uptime_estimate_seconds", status.Uptime)
-	group.Export("local_time", float64(status.LocalTime.Unix()))
+	instanceUptimeSeconds.Set(status.Uptime)
+	instanceUptimeEstimateSeconds.Set(status.Uptime)
+	instanceLocalTime.Set(float64(status.LocalTime.Unix()))
 
-	if status.Asserts != nil {
-		exportData(status.Asserts, "asserts")
-	}
-
-	if status.Dur != nil {
-		exportData(status.Dur, "durability")
-	}
-
-	if status.BackgroundFlushing != nil {
-		exportData(status.BackgroundFlushing, "background_flushing")
-	}
-
-	if status.Connections != nil {
-		exportData(status.Connections, "connections")
-	}
-
-	if status.ExtraInfo != nil {
-		exportData(status.ExtraInfo, "extra_info")
-	}
-
-	if status.GlobalLock != nil {
-		exportData(status.GlobalLock, "global_lock")
-	}
-
-	if status.IndexCounter != nil {
-		exportData(status.IndexCounter, "index_counters")
-	}
-
-	if status.Network != nil {
-		exportData(status.Network, "network")
-	}
-
-	if status.Opcounters != nil {
-		exportData(status.Opcounters, "op_counters")
-	}
-
-	if status.OpcountersRepl != nil {
-		exportData(status.OpcountersRepl, "op_counters_repl")
-	}
-
-	if status.Mem != nil {
-		exportData(status.Mem, "memory")
-	}
-
-	if status.Locks != nil {
-		exportData(status.Locks, "locks")
-	}
-
-	if status.Metrics != nil {
-		exportData(status.Metrics, "metrics")
-	}
-
-	if status.Cursors != nil {
-		exportData(status.Cursors, "cursors")
-	}
+	exportData(status.Asserts)
+	exportData(status.Dur)
+	exportData(status.BackgroundFlushing)
+	exportData(status.Connections)
+	exportData(status.ExtraInfo)
+	exportData(status.GlobalLock)
+	exportData(status.IndexCounter)
+	exportData(status.Network)
+	exportData(status.Opcounters)
+	exportData(status.OpcountersRepl)
+	exportData(status.Mem)
+	exportData(status.Locks)
+	exportData(status.Metrics)
+	exportData(status.Cursors)
 }
 
-func exportData(exportable shared.Exportable, groupName string) {
-	if !shared.EnabledGroups[groupName] {
-		// disabled group
-		glog.Infof("Group is not enabled: %s", groupName)
-		return
+func exportData(exportable shared.Exportable) {
+	if exportable != nil {
+		exportable.Export()
 	}
-
-	exportable.Export(groupName)
 }
 
 // GetServerStatus returns the server status info.

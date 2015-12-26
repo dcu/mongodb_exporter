@@ -1,21 +1,36 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-//Network
+var (
+	networkBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "network_bytes_total",
+		Help:      "The network data structure contains data regarding MongoDB’s network use",
+	}, []string{})
+)
+var (
+	networkMetricsNumRequestsTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "network_metrics",
+		Name:      "num_requests_total",
+		Help:      "The numRequests field is a counter of the total number of distinct requests that the server has received. Use this value to provide context for the bytesIn and bytesOut values to ensure that MongoDB’s network utilization is consistent with expectations and application use",
+	})
+)
+
+//NetworkStats network stats
 type NetworkStats struct {
 	BytesIn     float64 `bson:"bytesIn"`
 	BytesOut    float64 `bson:"bytesOut"`
 	NumRequests float64 `bson:"numRequests"`
 }
 
-func (networkStats *NetworkStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName + "_bytes_total")
-	group.Export("in_bytes", networkStats.BytesIn)
-	group.Export("out_bytes", networkStats.BytesOut)
+// Export exports the data to prometheus
+func (networkStats *NetworkStats) Export() {
+	networkBytesTotal.WithLabelValues("in_bytes").Set(networkStats.BytesIn)
+	networkBytesTotal.WithLabelValues("out_bytes").Set(networkStats.BytesOut)
 
-	group = shared.FindOrCreateGroup(groupName + "_metrics")
-	group.Export("num_requests_total", networkStats.NumRequests)
+	networkMetricsNumRequestsTotal.Set(networkStats.NumRequests)
 }

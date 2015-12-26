@@ -1,10 +1,18 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-//Mem
+var (
+	memory = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Name:      "memory",
+		Help:      "The mem data structure holds information regarding the target system architecture of mongod and current memory use",
+	}, []string{})
+)
+
+// MemStats tracks the mem stats metrics.
 type MemStats struct {
 	Bits              float64 `bson:"bits"`
 	Resident          float64 `bson:"resident"`
@@ -13,10 +21,10 @@ type MemStats struct {
 	MappedWithJournal float64 `bson:"mappedWithJournal"`
 }
 
-func (memStats *MemStats) Export(groupName string) {
-	group := shared.FindOrCreateGroup(groupName)
-	group.Export("resident", memStats.Resident)
-	group.Export("virtual", memStats.Virtual)
-	group.Export("mapped", memStats.Mapped)
-	group.Export("mapped_with_journal", memStats.MappedWithJournal)
+// Export exports the data to prometheus.
+func (memStats *MemStats) Export() {
+	memory.WithLabelValues("resident").Set(memStats.Resident)
+	memory.WithLabelValues("virtual").Set(memStats.Virtual)
+	memory.WithLabelValues("mapped").Set(memStats.Mapped)
+	memory.WithLabelValues("mapped_with_journal").Set(memStats.MappedWithJournal)
 }
