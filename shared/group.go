@@ -6,9 +6,11 @@ import (
 )
 
 var (
+	// Groups contains all tracked groups
 	Groups = make(map[string]*Group)
 )
 
+// Group is the definition of a group.
 type Group struct {
 	Name        string
 	DescName    string
@@ -20,6 +22,7 @@ type Group struct {
 	SummaryVecs map[string]*prometheus.SummaryVec
 }
 
+// FindOrCreateGroup finds or creates a group given a name
 func FindOrCreateGroup(name string) *Group {
 	name = SnakeCase(name)
 	group := Groups[name]
@@ -41,28 +44,31 @@ func FindOrCreateGroup(name string) *Group {
 	return group
 }
 
+// CollectAllGroups go for each group collecting the metrics.
 func CollectAllGroups(ch chan<- prometheus.Metric) {
 	for _, group := range Groups {
 		group.Collect(ch)
 	}
 }
 
+// Export exports the given field and value to prometheus.
 func (group *Group) Export(fieldName string, value float64) {
-	fields := GroupFields(group.DescName)
-	groupType := fields["metadata"].Type
+	groupDesc := GroupsDesc[group.DescName]
 
-	if groupType == "metrics" {
+	if groupDesc.Type == "metrics" {
 		group.trackField(fieldName, value)
 	} else {
-		group.trackFieldsVec(fields, []string{fieldName}, value)
+		group.trackFieldsVec(groupDesc, []string{fieldName}, value)
 	}
 }
 
+// ExportWithLabels exports the field given a list of labels.
 func (group *Group) ExportWithLabels(labels []string, value float64) {
-	fields := GroupFields(group.DescName)
-	group.trackFieldsVec(fields, labels, value)
+	groupDesc := GroupsDesc[group.DescName]
+	group.trackFieldsVec(groupDesc, labels, value)
 }
 
+// Collect collects the metrics for the given group.
 func (group *Group) Collect(ch chan<- prometheus.Metric) {
 	if ch == nil {
 		return
@@ -90,6 +96,7 @@ func (group *Group) Collect(ch chan<- prometheus.Metric) {
 	}
 }
 
+// Describe describes the group
 func (group *Group) Describe(ch chan<- *prometheus.Desc) {
 	for _, counter := range group.Counters {
 		counter.Describe(ch)
@@ -113,6 +120,7 @@ func (group *Group) Describe(ch chan<- *prometheus.Desc) {
 	}
 }
 
+// GetGauge gets a gauge metric for the given name.
 func (group *Group) GetGauge(name string, description string) prometheus.Gauge {
 	gauge := group.Gauges[name]
 	if gauge == nil {
@@ -143,6 +151,7 @@ func (group *Group) getGaugeVec(name string, description string, labelNames []st
 	return gaugeVec
 }
 
+// GetCounter gets a counter metric for the given name.
 func (group *Group) GetCounter(name string, description string) prometheus.Counter {
 	counter := group.Counters[name]
 
@@ -177,6 +186,7 @@ func (group *Group) getCounterVec(name string, description string, labelNames []
 	return counter
 }
 
+// GetSummary gets a summary metric for the given name.
 func (group *Group) GetSummary(name string, description string) prometheus.Summary {
 	summary := group.Summaries[name]
 
@@ -232,38 +242,27 @@ func (group *Group) trackField(fieldName string, value float64) {
 	}
 }
 
-func (group *Group) trackFieldsVec(fields GroupFieldsMap, labels []string, value float64) {
-	metadata := fields["metadata"]
-
-	group.validateLabels(fields, labels)
-	glog.Infof("Setting %s(%s)=%f (%s=%v)", group.Name, metadata.Type, value, metadata.Labels, labels)
-	switch metadata.Type {
+func (group *Group) trackFieldsVec(groupDesc *GroupDesc, labels []string, value float64) {
+	glog.Infof("Setting %s(%s)=%f (%s=%v)", group.Name, groupDesc.Type, value, groupDesc.Labels, labels)
+	switch groupDesc.Type {
 	case "counter_vec":
 		{
-			vector := group.getCounterVec(group.Name, metadata.Help, metadata.Labels)
+			vector := group.getCounterVec(group.Name, groupDesc.Help, groupDesc.Labels)
 			vector.WithLabelValues(labels...).Set(value)
 		}
 	case "gauge_vec":
 		{
-			vector := group.getGaugeVec(group.Name, metadata.Help, metadata.Labels)
+			vector := group.getGaugeVec(group.Name, groupDesc.Help, groupDesc.Labels)
 			vector.WithLabelValues(labels...).Set(value)
 		}
 	case "summary_vec":
 		{
-			vector := group.getSummaryVec(group.Name, metadata.Help, metadata.Labels)
+			vector := group.getSummaryVec(group.Name, groupDesc.Help, groupDesc.Labels)
 			vector.WithLabelValues(labels...).Observe(value)
 		}
 	default:
 		{
-			panic("Unknown metadata type: " + metadata.Type)
+			panic("Unknown metadata type: " + groupDesc.Type)
 		}
 	}
-}
-
-func (group *Group) validateLabels(fields GroupFieldsMap, labels []string) {
-	//for _, label := range labels {
-	//if fields[label] == nil {
-	//panic("Label not declared in groups.yml file: "+group.Name + "."+label)
-	//}
-	//}
 }
