@@ -26,7 +26,6 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 	exporter := &MongodbCollector{
 		Opts: opts,
 	}
-	exporter.collectServerStatus(nil)
 
 	return exporter
 }
@@ -51,7 +50,7 @@ func (exporter *MongodbCollector) collectServerStatus(ch chan<- prometheus.Metri
 	serverStatus := GetServerStatus(exporter.Opts.URI)
 
 	if serverStatus != nil {
-		serverStatus.Export()
+		serverStatus.Export(ch)
 	}
 
 	return serverStatus

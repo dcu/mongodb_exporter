@@ -28,11 +28,13 @@ type ConnectionStats struct {
 }
 
 // Export exports the data to prometheus.
-func (connectionStats *ConnectionStats) Export() {
+func (connectionStats *ConnectionStats) Export(ch chan<- prometheus.Metric) {
 	connections.WithLabelValues("current").Set(connectionStats.Current)
 	connections.WithLabelValues("available").Set(connectionStats.Available)
+	connections.Collect(ch)
 
 	connectionsMetricsCreatedTotal.Set(connectionStats.TotalCreated)
+	connectionsMetricsCreatedTotal.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

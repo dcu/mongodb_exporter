@@ -227,7 +227,7 @@ type DocumentStats struct {
 }
 
 // Export exposes the document stats to be consumed by the prometheus server.
-func (documentStats *DocumentStats) Export() {
+func (documentStats *DocumentStats) Export(ch chan<- prometheus.Metric) {
 	metricsDocumentTotal.WithLabelValues("deleted").Set(documentStats.Deleted)
 	metricsDocumentTotal.WithLabelValues("inserted").Set(documentStats.Inserted)
 	metricsDocumentTotal.WithLabelValues("returned").Set(documentStats.Returned)
@@ -247,7 +247,7 @@ type GetLastErrorStats struct {
 }
 
 // Export exposes the get last error stats.
-func (getLastErrorStats *GetLastErrorStats) Export() {
+func (getLastErrorStats *GetLastErrorStats) Export(ch chan<- prometheus.Metric) {
 	metricsGetLastErrorWtimeNumTotal.Set(getLastErrorStats.Wtime.Num)
 	metricsGetLastErrorWtimeTotalMilliseconds.Set(getLastErrorStats.Wtime.TotalMillis)
 
@@ -262,7 +262,7 @@ type OperationStats struct {
 }
 
 // Export exports the operation stats.
-func (operationStats *OperationStats) Export() {
+func (operationStats *OperationStats) Export(ch chan<- prometheus.Metric) {
 	metricsOperationTotal.WithLabelValues("fastmod").Set(operationStats.Fastmod)
 	metricsOperationTotal.WithLabelValues("idhack").Set(operationStats.Idhack)
 	metricsOperationTotal.WithLabelValues("scan_and_order").Set(operationStats.ScanAndOrder)
@@ -275,7 +275,7 @@ type QueryExecutorStats struct {
 }
 
 // Export exports the query executor stats.
-func (queryExecutorStats *QueryExecutorStats) Export() {
+func (queryExecutorStats *QueryExecutorStats) Export(ch chan<- prometheus.Metric) {
 	metricsQueryExecutorTotal.WithLabelValues("scanned").Set(queryExecutorStats.Scanned)
 	metricsQueryExecutorTotal.WithLabelValues("scanned_objects").Set(queryExecutorStats.ScannedObjects)
 }
@@ -286,7 +286,7 @@ type RecordStats struct {
 }
 
 // Export exposes the record stats.
-func (recordStats *RecordStats) Export() {
+func (recordStats *RecordStats) Export(ch chan<- prometheus.Metric) {
 	metricsRecordMovesTotal.Set(recordStats.Moves)
 }
 
@@ -297,7 +297,7 @@ type ApplyStats struct {
 }
 
 // Export exports the apply stats
-func (applyStats *ApplyStats) Export() {
+func (applyStats *ApplyStats) Export(ch chan<- prometheus.Metric) {
 	metricsReplApplyOpsTotal.Set(applyStats.Ops)
 
 	metricsReplApplyBatchesNumTotal.Set(applyStats.Batches.Num)
@@ -312,7 +312,7 @@ type BufferStats struct {
 }
 
 // Export exports the buffer stats.
-func (bufferStats *BufferStats) Export() {
+func (bufferStats *BufferStats) Export(ch chan<- prometheus.Metric) {
 	metricsReplBufferCount.Set(bufferStats.Count)
 	metricsReplBufferMaxSizeBytes.Set(bufferStats.MaxSizeBytes)
 	metricsReplBufferSizeBytes.Set(bufferStats.SizeBytes)
@@ -327,7 +327,7 @@ type MetricsNetworkStats struct {
 }
 
 // Export exposes the network stats.
-func (metricsNetworkStats *MetricsNetworkStats) Export() {
+func (metricsNetworkStats *MetricsNetworkStats) Export(ch chan<- prometheus.Metric) {
 	metricsReplNetworkBytesTotal.Set(metricsNetworkStats.Bytes)
 	metricsReplNetworkOpsTotal.Set(metricsNetworkStats.Ops)
 	metricsReplNetworkReadersCreatedTotal.Set(metricsNetworkStats.ReadersCreated)
@@ -345,11 +345,11 @@ type ReplStats struct {
 }
 
 // Export exposes the replication stats.
-func (replStats *ReplStats) Export() {
-	replStats.Apply.Export()
-	replStats.Buffer.Export()
-	replStats.Network.Export()
-	replStats.PreloadStats.Export()
+func (replStats *ReplStats) Export(ch chan<- prometheus.Metric) {
+	replStats.Apply.Export(ch)
+	replStats.Buffer.Export(ch)
+	replStats.Network.Export(ch)
+	replStats.PreloadStats.Export(ch)
 }
 
 // PreloadStats are the stats associated with preload operation.
@@ -359,7 +359,7 @@ type PreloadStats struct {
 }
 
 // Export exposes the preload stats.
-func (preloadStats *PreloadStats) Export() {
+func (preloadStats *PreloadStats) Export(ch chan<- prometheus.Metric) {
 	metricsReplPreloadDocsNumTotal.Set(preloadStats.Docs.Num)
 	metricsReplPreloadDocsTotalMilliseconds.Set(preloadStats.Docs.TotalMillis)
 
@@ -375,7 +375,7 @@ type StorageStats struct {
 }
 
 // Export exports the storage stats.
-func (storageStats *StorageStats) Export() {
+func (storageStats *StorageStats) Export(ch chan<- prometheus.Metric) {
 	metricsStorageFreelistSearchTotal.WithLabelValues("bucket_exhausted").Set(storageStats.BucketExhausted)
 	metricsStorageFreelistSearchTotal.WithLabelValues("requests").Set(storageStats.Requests)
 	metricsStorageFreelistSearchTotal.WithLabelValues("scanned").Set(storageStats.Scanned)
@@ -393,28 +393,59 @@ type MetricsStats struct {
 }
 
 // Export exports the metrics stats.
-func (metricsStats *MetricsStats) Export() {
+func (metricsStats *MetricsStats) Export(ch chan<- prometheus.Metric) {
 	if metricsStats.Document != nil {
-		metricsStats.Document.Export()
+		metricsStats.Document.Export(ch)
 	}
 	if metricsStats.GetLastError != nil {
-		metricsStats.GetLastError.Export()
+		metricsStats.GetLastError.Export(ch)
 	}
 	if metricsStats.Operation != nil {
-		metricsStats.Operation.Export()
+		metricsStats.Operation.Export(ch)
 	}
 	if metricsStats.QueryExecutor != nil {
-		metricsStats.QueryExecutor.Export()
+		metricsStats.QueryExecutor.Export(ch)
 	}
 	if metricsStats.Record != nil {
-		metricsStats.Record.Export()
+		metricsStats.Record.Export(ch)
 	}
 	if metricsStats.Repl != nil {
-		metricsStats.Repl.Export()
+		metricsStats.Repl.Export(ch)
 	}
 	if metricsStats.Storage != nil {
-		metricsStats.Storage.Export()
+		metricsStats.Storage.Export(ch)
 	}
+
+	metricsCursorTimedOutTotal.Collect(ch)
+	metricsCursorOpen.Collect(ch)
+	metricsDocumentTotal.Collect(ch)
+	metricsGetLastErrorWtimeNumTotal.Collect(ch)
+	metricsGetLastErrorWtimeTotalMilliseconds.Collect(ch)
+	metricsGetLastErrorWtimeoutsTotal.Collect(ch)
+	metricsOperationTotal.Collect(ch)
+	metricsQueryExecutorTotal.Collect(ch)
+	metricsRecordMovesTotal.Collect(ch)
+	metricsReplApplyBatchesNumTotal.Collect(ch)
+	metricsReplApplyBatchesTotalMilliseconds.Collect(ch)
+	metricsReplApplyOpsTotal.Collect(ch)
+	metricsReplBufferCount.Collect(ch)
+	metricsReplBufferMaxSizeBytes.Collect(ch)
+	metricsReplBufferSizeBytes.Collect(ch)
+	metricsReplNetworkGetmoresNumTotal.Collect(ch)
+	metricsReplNetworkGetmoresTotalMilliseconds.Collect(ch)
+	metricsReplNetworkBytesTotal.Collect(ch)
+	metricsReplNetworkOpsTotal.Collect(ch)
+	metricsReplNetworkReadersCreatedTotal.Collect(ch)
+	metricsReplOplogInsertNumTotal.Collect(ch)
+	metricsReplOplogInsertTotalMilliseconds.Collect(ch)
+	metricsReplOplogInsertBytesTotal.Collect(ch)
+	metricsReplPreloadDocsNumTotal.Collect(ch)
+	metricsReplPreloadDocsTotalMilliseconds.Collect(ch)
+	metricsReplPreloadIndexesNumTotal.Collect(ch)
+	metricsReplPreloadIndexesTotalMilliseconds.Collect(ch)
+	metricsStorageFreelistSearchTotal.Collect(ch)
+	metricsTTLDeletedDocumentsTotal.Collect(ch)
+	metricsTTLPassesTotal.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

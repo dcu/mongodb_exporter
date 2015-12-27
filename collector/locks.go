@@ -44,7 +44,7 @@ type LockStats struct {
 }
 
 // Export exports the data to prometheus.
-func (locks LockStatsMap) Export() {
+func (locks LockStatsMap) Export(ch chan<- prometheus.Metric) {
 	for key, locks := range locks {
 		if key == "." {
 			key = "dot"
@@ -59,6 +59,10 @@ func (locks LockStatsMap) Export() {
 		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("read", key).Set(locks.TimeAcquiringMicros.ReadLower)
 		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("write", key).Set(locks.TimeAcquiringMicros.WriteLower)
 	}
+
+	locksTimeLockedGlobalMicrosecondsTotal.Collect(ch)
+	locksTimeLockedLocalMicrosecondsTotal.Collect(ch)
+	locksTimeAcquiringGlobalMicrosecondsTotal.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

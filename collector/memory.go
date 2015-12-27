@@ -22,11 +22,12 @@ type MemStats struct {
 }
 
 // Export exports the data to prometheus.
-func (memStats *MemStats) Export() {
+func (memStats *MemStats) Export(ch chan<- prometheus.Metric) {
 	memory.WithLabelValues("resident").Set(memStats.Resident)
 	memory.WithLabelValues("virtual").Set(memStats.Virtual)
 	memory.WithLabelValues("mapped").Set(memStats.Mapped)
 	memory.WithLabelValues("mapped_with_journal").Set(memStats.MappedWithJournal)
+	memory.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

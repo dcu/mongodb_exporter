@@ -58,6 +58,8 @@ func startWebServer() {
 	fmt.Printf("Listening on %s\n", *listenAddressFlag)
 	handler := prometheusHandler()
 
+	registerCollector()
+
 	http.Handle(*metricsPathFlag, handler)
 	err := http.ListenAndServe(*listenAddressFlag, nil)
 
@@ -66,14 +68,16 @@ func startWebServer() {
 	}
 }
 
-func main() {
-	flag.Parse()
-	shared.ParseEnabledGroups(*enabledGroupsFlag)
-
+func registerCollector() {
 	mongodbCollector := collector.NewMongodbCollector(collector.MongodbCollectorOpts{
 		URI: *mongodbURIFlag,
 	})
 	prometheus.MustRegister(mongodbCollector)
+}
+
+func main() {
+	flag.Parse()
+	shared.ParseEnabledGroups(*enabledGroupsFlag)
 
 	startWebServer()
 }

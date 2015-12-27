@@ -31,13 +31,17 @@ type IndexCounterStats struct {
 }
 
 // Export exports the data to prometheus.
-func (indexCountersStats *IndexCounterStats) Export() {
+func (indexCountersStats *IndexCounterStats) Export(ch chan<- prometheus.Metric) {
 	indexCountersTotal.WithLabelValues("accesses").Set(indexCountersStats.Accesses)
 	indexCountersTotal.WithLabelValues("hits").Set(indexCountersStats.Hits)
 	indexCountersTotal.WithLabelValues("misses").Set(indexCountersStats.Misses)
 	indexCountersTotal.WithLabelValues("resets").Set(indexCountersStats.Resets)
 
 	indexCountersMissRatio.Set(indexCountersStats.MissRatio)
+
+	indexCountersTotal.Collect(ch)
+	indexCountersMissRatio.Collect(ch)
+
 }
 
 // Describe describes the metrics for prometheus

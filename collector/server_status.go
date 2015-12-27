@@ -1,11 +1,12 @@
 package collector
 
 import (
+	"time"
+
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"time"
 )
 
 var (
@@ -62,56 +63,52 @@ type ServerStatus struct {
 }
 
 // Export exports the server status to be consumed by prometheus.
-func (status *ServerStatus) Export() {
-
+func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
 	instanceUptimeSeconds.Set(status.Uptime)
 	instanceUptimeEstimateSeconds.Set(status.Uptime)
 	instanceLocalTime.Set(float64(status.LocalTime.Unix()))
 
 	if status.Asserts != nil {
-		status.Asserts.Export()
+		status.Asserts.Export(ch)
 	}
 	if status.Dur != nil {
-		status.Dur.Export()
+		status.Dur.Export(ch)
 	}
 	if status.BackgroundFlushing != nil {
-		status.BackgroundFlushing.Export()
+		status.BackgroundFlushing.Export(ch)
 	}
 	if status.Connections != nil {
-		status.Connections.Export()
-	}
-	if status.Asserts != nil {
-		status.Asserts.Export()
+		status.Connections.Export(ch)
 	}
 	if status.ExtraInfo != nil {
-		status.ExtraInfo.Export()
+		status.ExtraInfo.Export(ch)
 	}
 	if status.GlobalLock != nil {
-		status.GlobalLock.Export()
+		status.GlobalLock.Export(ch)
 	}
 	if status.IndexCounter != nil {
-		status.IndexCounter.Export()
+		status.IndexCounter.Export(ch)
 	}
 	if status.Network != nil {
-		status.Network.Export()
+		status.Network.Export(ch)
 	}
 	if status.Opcounters != nil {
-		status.Opcounters.Export()
+		status.Opcounters.Export(ch)
 	}
 	if status.OpcountersRepl != nil {
-		status.OpcountersRepl.Export()
+		status.OpcountersRepl.Export(ch)
 	}
 	if status.Mem != nil {
-		status.Mem.Export()
+		status.Mem.Export(ch)
 	}
 	if status.Locks != nil {
-		status.Locks.Export()
+		status.Locks.Export(ch)
 	}
 	if status.Metrics != nil {
-		status.Metrics.Export()
+		status.Metrics.Export(ch)
 	}
 	if status.Cursors != nil {
-		status.Cursors.Export()
+		status.Cursors.Export(ch)
 	}
 }
 

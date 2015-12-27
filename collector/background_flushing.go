@@ -1,8 +1,9 @@
 package collector
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -48,12 +49,18 @@ type FlushStats struct {
 }
 
 // Export exports the metrics for prometheus.
-func (flushStats *FlushStats) Export() {
+func (flushStats *FlushStats) Export(ch chan<- prometheus.Metric) {
 	backgroundFlushingflushesTotal.Set(flushStats.Flushes)
 	backgroundFlushingtotalMilliseconds.Set(flushStats.TotalMs)
 	backgroundFlushingaverageMilliseconds.Set(flushStats.AverageMs)
 	backgroundFlushinglastMilliseconds.Set(flushStats.LastMs)
 	backgroundFlushinglastFinishedTime.Set(float64(flushStats.LastFinished.Unix()))
+
+	backgroundFlushingflushesTotal.Collect(ch)
+	backgroundFlushingtotalMilliseconds.Collect(ch)
+	backgroundFlushingaverageMilliseconds.Collect(ch)
+	backgroundFlushinglastMilliseconds.Collect(ch)
+	backgroundFlushinglastFinishedTime.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

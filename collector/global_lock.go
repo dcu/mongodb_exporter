@@ -47,7 +47,7 @@ type ClientStats struct {
 }
 
 // Export exports the metrics to prometheus
-func (clientStats *ClientStats) Export() {
+func (clientStats *ClientStats) Export(ch chan<- prometheus.Metric) {
 	globalLockClient.WithLabelValues("reader").Set(clientStats.Readers)
 	globalLockClient.WithLabelValues("writer").Set(clientStats.Writers)
 }
@@ -60,7 +60,7 @@ type QueueStats struct {
 }
 
 // Export exports the metrics to prometheus
-func (queueStats *QueueStats) Export() {
+func (queueStats *QueueStats) Export(ch chan<- prometheus.Metric) {
 	globalLockCurrentQueue.WithLabelValues("reader").Set(queueStats.Readers)
 	globalLockCurrentQueue.WithLabelValues("writer").Set(queueStats.Writers)
 }
@@ -75,12 +75,17 @@ type GlobalLockStats struct {
 }
 
 // Export exports the metrics to prometheus
-func (globalLock *GlobalLockStats) Export() {
+func (globalLock *GlobalLockStats) Export(ch chan<- prometheus.Metric) {
 	globalLockTotal.Set(globalLock.LockTime)
 	globalLockRatio.Set(globalLock.Ratio)
 
-	globalLock.CurrentQueue.Export()
-	globalLock.ActiveClients.Export()
+	globalLock.CurrentQueue.Export(ch)
+	globalLock.ActiveClients.Export(ch)
+
+	globalLockTotal.Collect(ch)
+	globalLockRatio.Collect(ch)
+	globalLockCurrentQueue.Collect(ch)
+	globalLockClient.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

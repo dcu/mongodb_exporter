@@ -30,13 +30,15 @@ type OpcountersStats struct {
 }
 
 // Export exports the data to prometheus.
-func (opCounters *OpcountersStats) Export() {
+func (opCounters *OpcountersStats) Export(ch chan<- prometheus.Metric) {
 	opCountersTotal.WithLabelValues("insert").Set(opCounters.Insert)
 	opCountersTotal.WithLabelValues("query").Set(opCounters.Query)
 	opCountersTotal.WithLabelValues("update").Set(opCounters.Update)
 	opCountersTotal.WithLabelValues("delete").Set(opCounters.Delete)
 	opCountersTotal.WithLabelValues("getmore").Set(opCounters.GetMore)
 	opCountersTotal.WithLabelValues("command").Set(opCounters.Command)
+
+	opCountersTotal.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus
@@ -55,13 +57,15 @@ type OpcountersReplStats struct {
 }
 
 // Export exports the data to prometheus.
-func (opCounters *OpcountersReplStats) Export() {
+func (opCounters *OpcountersReplStats) Export(ch chan<- prometheus.Metric) {
 	opCountersReplTotal.WithLabelValues("insert").Set(opCounters.Insert)
 	opCountersReplTotal.WithLabelValues("query").Set(opCounters.Query)
 	opCountersReplTotal.WithLabelValues("update").Set(opCounters.Update)
 	opCountersReplTotal.WithLabelValues("delete").Set(opCounters.Delete)
 	opCountersReplTotal.WithLabelValues("getmore").Set(opCounters.GetMore)
 	opCountersReplTotal.WithLabelValues("command").Set(opCounters.Command)
+
+	opCountersReplTotal.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

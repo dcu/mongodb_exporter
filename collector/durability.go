@@ -55,12 +55,13 @@ type DurTiming struct {
 }
 
 // Export exports the data for the prometheus server.
-func (durTiming *DurTiming) Export() {
+func (durTiming *DurTiming) Export(ch chan<- prometheus.Metric) {
 	durabilityTimeMilliseconds.WithLabelValues("dt").Observe(durTiming.Dt)
 	durabilityTimeMilliseconds.WithLabelValues("prep_log_buffer").Observe(durTiming.PrepLogBuffer)
 	durabilityTimeMilliseconds.WithLabelValues("write_to_journal").Observe(durTiming.WriteToJournal)
 	durabilityTimeMilliseconds.WithLabelValues("write_to_data_files").Observe(durTiming.WriteToDataFiles)
 	durabilityTimeMilliseconds.WithLabelValues("remap_private_view").Observe(durTiming.RemapPrivateView)
+	durabilityTimeMilliseconds.Collect(ch)
 }
 
 // DurStats are the stats related to durability.
@@ -75,7 +76,7 @@ type DurStats struct {
 }
 
 // Export export the durability stats for the prometheus server.
-func (durStats *DurStats) Export() {
+func (durStats *DurStats) Export(ch chan<- prometheus.Metric) {
 	durabilityCommits.WithLabelValues("written").Set(durStats.Commits)
 	durabilityCommits.WithLabelValues("in_write_lock").Set(durStats.CommitsInWriteLock)
 
@@ -84,7 +85,18 @@ func (durStats *DurStats) Export() {
 	durabilityCompression.Set(durStats.Compression)
 	durabilityEarlyCommits.Observe(durStats.EarlyCommits)
 
-	durStats.TimeMs.Export()
+	durStats.TimeMs.Export(ch)
+
+	durStats.Collect(ch)
+}
+
+// Collect collects the metrics for prometheus
+func (durStats *DurStats) Collect(ch chan<- prometheus.Metric) {
+	durabilityCommits.Collect(ch)
+	durabilityJournaledMegabytes.Collect(ch)
+	durabilityWriteToDataFilesMegabytes.Collect(ch)
+	durabilityCompression.Collect(ch)
+	durabilityEarlyCommits.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

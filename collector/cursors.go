@@ -21,11 +21,12 @@ type Cursors struct {
 }
 
 // Export exports the data to prometheus.
-func (cursors *Cursors) Export() {
+func (cursors *Cursors) Export(ch chan<- prometheus.Metric) {
 	cursorsGauge.WithLabelValues("total_open").Set(cursors.TotalOpen)
 	cursorsGauge.WithLabelValues("timed_out").Set(cursors.TimeOut)
 	cursorsGauge.WithLabelValues("total_no_timeout").Set(cursors.TotalNoTimeout)
 	cursorsGauge.WithLabelValues("pinned").Set(cursors.Pinned)
+	cursorsGauge.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus

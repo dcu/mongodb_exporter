@@ -26,9 +26,13 @@ type ExtraInfo struct {
 }
 
 // Export exports the metrics to prometheus.
-func (extraInfo *ExtraInfo) Export() {
+func (extraInfo *ExtraInfo) Export(ch chan<- prometheus.Metric) {
 	extraInfoheapUsageBytes.Set(extraInfo.HeapUsageBytes)
 	extraInfopageFaultsTotal.Set(extraInfo.PageFaults)
+
+	extraInfoheapUsageBytes.Collect(ch)
+	extraInfopageFaultsTotal.Collect(ch)
+
 }
 
 // Describe describes the metrics for prometheus
