@@ -9,7 +9,7 @@ var (
 		Namespace: Namespace,
 		Name:      "network_bytes_total",
 		Help:      "The network data structure contains data regarding MongoDB’s network use",
-	}, []string{})
+	}, []string{"state"})
 )
 var (
 	networkMetricsNumRequestsTotal = prometheus.NewCounter(prometheus.CounterOpts{
@@ -33,4 +33,10 @@ func (networkStats *NetworkStats) Export() {
 	networkBytesTotal.WithLabelValues("out_bytes").Set(networkStats.BytesOut)
 
 	networkMetricsNumRequestsTotal.Set(networkStats.NumRequests)
+}
+
+// Describe describes the metrics for prometheus
+func (networkStats *NetworkStats) Describe(ch chan<- *prometheus.Desc) {
+	networkMetricsNumRequestsTotal.Describe(ch)
+	networkBytesTotal.Describe(ch)
 }

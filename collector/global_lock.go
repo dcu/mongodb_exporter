@@ -24,21 +24,19 @@ var (
 		Help:      "The value of lockTime represents the time, in microseconds, since the database last started, that the globalLock has been held",
 	})
 )
-
 var (
 	globalLockCurrentQueue = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "global_lock_current_queue",
 		Help:      "The currentQueue data structure value provides more granular information concerning the number of operations queued because of a lock",
-	}, []string{})
+	}, []string{"type"})
 )
-
 var (
 	globalLockClient = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "global_lock_client",
 		Help:      "The activeClients data structure provides more granular information about the number of connected clients and the operation types (e.g. read or write) performed by these clients",
-	}, []string{})
+	}, []string{"type"})
 )
 
 // ClientStats metrics for client stats
@@ -50,8 +48,8 @@ type ClientStats struct {
 
 // Export exports the metrics to prometheus
 func (clientStats *ClientStats) Export() {
-	globalLockClient.WithLabelValues("reader").Add(clientStats.Readers)
-	globalLockClient.WithLabelValues("writer").Add(clientStats.Writers)
+	globalLockClient.WithLabelValues("reader").Set(clientStats.Readers)
+	globalLockClient.WithLabelValues("writer").Set(clientStats.Writers)
 }
 
 // QueueStats queue stats
@@ -63,8 +61,8 @@ type QueueStats struct {
 
 // Export exports the metrics to prometheus
 func (queueStats *QueueStats) Export() {
-	globalLockCurrentQueue.WithLabelValues("reader").Add(queueStats.Readers)
-	globalLockCurrentQueue.WithLabelValues("writer").Add(queueStats.Writers)
+	globalLockCurrentQueue.WithLabelValues("reader").Set(queueStats.Readers)
+	globalLockCurrentQueue.WithLabelValues("writer").Set(queueStats.Writers)
 }
 
 // GlobalLockStats global lock stats
@@ -83,4 +81,12 @@ func (globalLock *GlobalLockStats) Export() {
 
 	globalLock.CurrentQueue.Export()
 	globalLock.ActiveClients.Export()
+}
+
+// Describe describes the metrics for prometheus
+func (globalLock *GlobalLockStats) Describe(ch chan<- *prometheus.Desc) {
+	globalLockTotal.Describe(ch)
+	globalLockRatio.Describe(ch)
+	globalLockCurrentQueue.Describe(ch)
+	globalLockClient.Describe(ch)
 }

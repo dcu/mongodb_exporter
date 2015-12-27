@@ -9,7 +9,7 @@ var (
 		Namespace: Namespace,
 		Name:      "asserts_total",
 		Help:      "The asserts document reports the number of asserts on the database. While assert errors are typically uncommon, if there are non-zero values for the asserts, you should check the log file for the mongod process for more information. In many cases these errors are trivial, but are worth investigating.",
-	}, []string{})
+	}, []string{"type"})
 )
 
 // AssertsStats has the assets metrics
@@ -21,11 +21,16 @@ type AssertsStats struct {
 	Rollovers float64 `bson:"rollovers"`
 }
 
-// Export exports the metrics for prometheus.
+// Export exports the metrics to prometheus.
 func (asserts *AssertsStats) Export() {
 	assertsTotal.WithLabelValues("regular").Set(asserts.Regular)
 	assertsTotal.WithLabelValues("warning").Set(asserts.Warning)
 	assertsTotal.WithLabelValues("msg").Set(asserts.Msg)
 	assertsTotal.WithLabelValues("user").Set(asserts.User)
 	assertsTotal.WithLabelValues("rollovers").Set(asserts.Rollovers)
+}
+
+// Describe describes the metrics for prometheus
+func (asserts *AssertsStats) Describe(ch chan<- *prometheus.Desc) {
+	assertsTotal.Describe(ch)
 }

@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	cursorsMetric = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	cursorsGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "cursors",
 		Help:      "The cursors data structure contains data regarding cursor state and use",
-	}, []string{})
+	}, []string{"state"})
 )
 
 // Cursors are the cursor metrics
@@ -22,8 +22,13 @@ type Cursors struct {
 
 // Export exports the data to prometheus.
 func (cursors *Cursors) Export() {
-	cursorsMetric.WithLabelValues("total_open").Add(cursors.TotalOpen)
-	cursorsMetric.WithLabelValues("timed_out").Add(cursors.TimeOut)
-	cursorsMetric.WithLabelValues("total_no_timeout").Add(cursors.TotalNoTimeout)
-	cursorsMetric.WithLabelValues("pinned").Add(cursors.Pinned)
+	cursorsGauge.WithLabelValues("total_open").Set(cursors.TotalOpen)
+	cursorsGauge.WithLabelValues("timed_out").Set(cursors.TimeOut)
+	cursorsGauge.WithLabelValues("total_no_timeout").Set(cursors.TotalNoTimeout)
+	cursorsGauge.WithLabelValues("pinned").Set(cursors.Pinned)
+}
+
+// Describe describes the metrics for prometheus
+func (cursors *Cursors) Describe(ch chan<- *prometheus.Desc) {
+	cursorsGauge.Describe(ch)
 }

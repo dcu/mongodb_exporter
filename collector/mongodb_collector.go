@@ -34,6 +34,11 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 // Describe describes all mongodb's metrics.
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	glog.Info("Describing groups")
+	serverStatus := GetServerStatus(exporter.Opts.URI)
+
+	if serverStatus != nil {
+		serverStatus.Describe(ch)
+	}
 }
 
 // Collect collects all mongodb's metrics.

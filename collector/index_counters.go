@@ -18,7 +18,7 @@ var (
 		Namespace: Namespace,
 		Name:      "index_counters_total",
 		Help:      "Total indexes by type",
-	}, []string{})
+	}, []string{"type"})
 )
 
 //IndexCounterStats index counter stats
@@ -38,4 +38,10 @@ func (indexCountersStats *IndexCounterStats) Export() {
 	indexCountersTotal.WithLabelValues("resets").Set(indexCountersStats.Resets)
 
 	indexCountersMissRatio.Set(indexCountersStats.MissRatio)
+}
+
+// Describe describes the metrics for prometheus
+func (indexCountersStats *IndexCounterStats) Describe(ch chan<- *prometheus.Desc) {
+	indexCountersTotal.Describe(ch)
+	indexCountersMissRatio.Describe(ch)
 }

@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
 	"gopkg.in/mgo.v2/bson"
 	"testing"
 )
@@ -11,12 +10,7 @@ func Test_ServerStatusCollectData(t *testing.T) {
 	serverStatus := &ServerStatus{}
 	loadServerStatusFromBson(data, serverStatus)
 
-	groupName := "instance"
-	serverStatus.Export(groupName)
-
-	if shared.Groups[groupName] == nil {
-		t.Error("Group not created")
-	}
+	serverStatus.Export()
 }
 
 func Test_ParserServerStatus(t *testing.T) {

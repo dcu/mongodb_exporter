@@ -55,3 +55,12 @@ func (flushStats *FlushStats) Export() {
 	backgroundFlushinglastMilliseconds.Set(flushStats.LastMs)
 	backgroundFlushinglastFinishedTime.Set(float64(flushStats.LastFinished.Unix()))
 }
+
+// Describe describes the metrics for prometheus
+func (flushStats *FlushStats) Describe(ch chan<- *prometheus.Desc) {
+	backgroundFlushingflushesTotal.Describe(ch)
+	backgroundFlushingtotalMilliseconds.Describe(ch)
+	backgroundFlushingaverageMilliseconds.Describe(ch)
+	backgroundFlushinglastMilliseconds.Describe(ch)
+	backgroundFlushinglastFinishedTime.Describe(ch)
+}

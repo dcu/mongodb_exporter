@@ -17,14 +17,14 @@ var (
 		Namespace: Namespace,
 		Name:      "metrics_cursor_open",
 		Help:      "The open is an embedded document that contains data regarding open cursors",
-	}, []string{})
+	}, []string{"state"})
 )
 var (
 	metricsDocumentTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "metrics_document_total",
 		Help:      "The document holds a document of that reflect document access and modification patterns and data use. Compare these values to the data in the opcounters document, which track total number of operations",
-	}, []string{})
+	}, []string{"state"})
 )
 var (
 	metricsGetLastErrorWtimeNumTotal = prometheus.NewGauge(prometheus.GaugeOpts{
@@ -53,14 +53,14 @@ var (
 		Namespace: Namespace,
 		Name:      "metrics_operation_total",
 		Help:      "operation is a sub-document that holds counters for several types of update and query operations that MongoDB handles using special operation types",
-	}, []string{})
+	}, []string{"type"})
 )
 var (
 	metricsQueryExecutorTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "metrics_query_executor_total",
 		Help:      "queryExecutor is a document that reports data from the query execution system",
-	}, []string{})
+	}, []string{"state"})
 )
 var (
 	metricsRecordMovesTotal = prometheus.NewCounter(prometheus.CounterOpts{
@@ -201,7 +201,7 @@ var (
 		Namespace: Namespace,
 		Name:      "metrics_storage_freelist_search_total",
 		Help:      "metrics about searching records in the database.",
-	}, []string{})
+	}, []string{"type"})
 )
 var (
 	metricsTTLDeletedDocumentsTotal = prometheus.NewCounter(prometheus.CounterOpts{
@@ -415,4 +415,38 @@ func (metricsStats *MetricsStats) Export() {
 	if metricsStats.Storage != nil {
 		metricsStats.Storage.Export()
 	}
+}
+
+// Describe describes the metrics for prometheus
+func (metricsStats *MetricsStats) Describe(ch chan<- *prometheus.Desc) {
+	metricsCursorTimedOutTotal.Describe(ch)
+	metricsCursorOpen.Describe(ch)
+	metricsDocumentTotal.Describe(ch)
+	metricsGetLastErrorWtimeNumTotal.Describe(ch)
+	metricsGetLastErrorWtimeTotalMilliseconds.Describe(ch)
+	metricsGetLastErrorWtimeoutsTotal.Describe(ch)
+	metricsOperationTotal.Describe(ch)
+	metricsQueryExecutorTotal.Describe(ch)
+	metricsRecordMovesTotal.Describe(ch)
+	metricsReplApplyBatchesNumTotal.Describe(ch)
+	metricsReplApplyBatchesTotalMilliseconds.Describe(ch)
+	metricsReplApplyOpsTotal.Describe(ch)
+	metricsReplBufferCount.Describe(ch)
+	metricsReplBufferMaxSizeBytes.Describe(ch)
+	metricsReplBufferSizeBytes.Describe(ch)
+	metricsReplNetworkGetmoresNumTotal.Describe(ch)
+	metricsReplNetworkGetmoresTotalMilliseconds.Describe(ch)
+	metricsReplNetworkBytesTotal.Describe(ch)
+	metricsReplNetworkOpsTotal.Describe(ch)
+	metricsReplNetworkReadersCreatedTotal.Describe(ch)
+	metricsReplOplogInsertNumTotal.Describe(ch)
+	metricsReplOplogInsertTotalMilliseconds.Describe(ch)
+	metricsReplOplogInsertBytesTotal.Describe(ch)
+	metricsReplPreloadDocsNumTotal.Describe(ch)
+	metricsReplPreloadDocsTotalMilliseconds.Describe(ch)
+	metricsReplPreloadIndexesNumTotal.Describe(ch)
+	metricsReplPreloadIndexesTotalMilliseconds.Describe(ch)
+	metricsStorageFreelistSearchTotal.Describe(ch)
+	metricsTTLDeletedDocumentsTotal.Describe(ch)
+	metricsTTLPassesTotal.Describe(ch)
 }

@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
 	"testing"
 )
 
@@ -13,10 +12,5 @@ func Test_BackgroundFlushingCollectData(t *testing.T) {
 		LastMs:    4,
 	}
 
-	groupName := "background_flushing"
-	stats.Export(groupName)
-
-	if shared.Groups[groupName] == nil {
-		t.Error("Group not created")
-	}
+	stats.Export()
 }

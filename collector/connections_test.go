@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
 	"testing"
 )
 
@@ -12,10 +11,5 @@ func Test_ConnectionsCollectData(t *testing.T) {
 		TotalCreated: 3,
 	}
 
-	groupName := "connections"
-	stats.Export(groupName)
-
-	if shared.Groups[groupName] == nil {
-		t.Error("Group not created")
-	}
+	stats.Export()
 }

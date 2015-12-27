@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
@@ -54,40 +53,115 @@ type ServerStatus struct {
 
 	Network *NetworkStats `bson:"network"`
 
-	Opcounters     *OpcountersStats `bson:"opcounters"`
-	OpcountersRepl *OpcountersStats `bson:"opcountersRepl"`
-	Mem            *MemStats        `bson:"mem"`
-	Metrics        *MetricsStats    `bson:"metrics"`
+	Opcounters     *OpcountersStats     `bson:"opcounters"`
+	OpcountersRepl *OpcountersReplStats `bson:"opcountersRepl"`
+	Mem            *MemStats            `bson:"mem"`
+	Metrics        *MetricsStats        `bson:"metrics"`
 
 	Cursors *Cursors `bson:"cursors"`
 }
 
-// Export exports the given groupName to be consumed by prometheus.
+// Export exports the server status to be consumed by prometheus.
 func (status *ServerStatus) Export() {
 
 	instanceUptimeSeconds.Set(status.Uptime)
 	instanceUptimeEstimateSeconds.Set(status.Uptime)
 	instanceLocalTime.Set(float64(status.LocalTime.Unix()))
 
-	exportData(status.Asserts)
-	exportData(status.Dur)
-	exportData(status.BackgroundFlushing)
-	exportData(status.Connections)
-	exportData(status.ExtraInfo)
-	exportData(status.GlobalLock)
-	exportData(status.IndexCounter)
-	exportData(status.Network)
-	exportData(status.Opcounters)
-	exportData(status.OpcountersRepl)
-	exportData(status.Mem)
-	exportData(status.Locks)
-	exportData(status.Metrics)
-	exportData(status.Cursors)
+	if status.Asserts != nil {
+		status.Asserts.Export()
+	}
+	if status.Dur != nil {
+		status.Dur.Export()
+	}
+	if status.BackgroundFlushing != nil {
+		status.BackgroundFlushing.Export()
+	}
+	if status.Connections != nil {
+		status.Connections.Export()
+	}
+	if status.Asserts != nil {
+		status.Asserts.Export()
+	}
+	if status.ExtraInfo != nil {
+		status.ExtraInfo.Export()
+	}
+	if status.GlobalLock != nil {
+		status.GlobalLock.Export()
+	}
+	if status.IndexCounter != nil {
+		status.IndexCounter.Export()
+	}
+	if status.Network != nil {
+		status.Network.Export()
+	}
+	if status.Opcounters != nil {
+		status.Opcounters.Export()
+	}
+	if status.OpcountersRepl != nil {
+		status.OpcountersRepl.Export()
+	}
+	if status.Mem != nil {
+		status.Mem.Export()
+	}
+	if status.Locks != nil {
+		status.Locks.Export()
+	}
+	if status.Metrics != nil {
+		status.Metrics.Export()
+	}
+	if status.Cursors != nil {
+		status.Cursors.Export()
+	}
 }
 
-func exportData(exportable shared.Exportable) {
-	if exportable != nil {
-		exportable.Export()
+// Describe describes the server status for prometheus.
+func (status *ServerStatus) Describe(ch chan<- *prometheus.Desc) {
+	instanceUptimeSeconds.Describe(ch)
+	instanceUptimeEstimateSeconds.Describe(ch)
+	instanceLocalTime.Describe(ch)
+
+	if status.Asserts != nil {
+		status.Asserts.Describe(ch)
+	}
+	if status.Dur != nil {
+		status.Dur.Describe(ch)
+	}
+	if status.BackgroundFlushing != nil {
+		status.BackgroundFlushing.Describe(ch)
+	}
+	if status.Connections != nil {
+		status.Connections.Describe(ch)
+	}
+	if status.ExtraInfo != nil {
+		status.ExtraInfo.Describe(ch)
+	}
+	if status.GlobalLock != nil {
+		status.GlobalLock.Describe(ch)
+	}
+	if status.IndexCounter != nil {
+		status.IndexCounter.Describe(ch)
+	}
+	if status.Network != nil {
+		status.Network.Describe(ch)
+	}
+	if status.Opcounters != nil {
+		status.Opcounters.Describe(ch)
+	}
+	if status.OpcountersRepl != nil {
+		status.OpcountersRepl.Describe(ch)
+	}
+	if status.Mem != nil {
+		status.Mem.Describe(ch)
+	}
+	if status.Locks != nil {
+		status.Locks.Describe(ch)
+	}
+	if status.Metrics != nil {
+		status.Metrics.Describe(ch)
+	}
+	if status.Cursors != nil {
+		status.Cursors.Describe(ch)
 	}
 }
 

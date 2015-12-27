@@ -9,7 +9,7 @@ var (
 		Namespace: Namespace,
 		Name:      "memory",
 		Help:      "The mem data structure holds information regarding the target system architecture of mongod and current memory use",
-	}, []string{})
+	}, []string{"type"})
 )
 
 // MemStats tracks the mem stats metrics.
@@ -27,4 +27,9 @@ func (memStats *MemStats) Export() {
 	memory.WithLabelValues("virtual").Set(memStats.Virtual)
 	memory.WithLabelValues("mapped").Set(memStats.Mapped)
 	memory.WithLabelValues("mapped_with_journal").Set(memStats.MappedWithJournal)
+}
+
+// Describe describes the metrics for prometheus
+func (memStats *MemStats) Describe(ch chan<- *prometheus.Desc) {
+	memory.Describe(ch)
 }

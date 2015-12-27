@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/dcu/mongodb_exporter/shared"
 	"testing"
 )
 
@@ -14,9 +13,5 @@ func Test_AssertsCollectData(t *testing.T) {
 		Rollovers: 5,
 	}
 
-	asserts.Export("asserts")
-
-	if shared.Groups["asserts_total"] == nil {
-		t.Error("Asserts group was not loaded.")
-	}
+	asserts.Export()
 }

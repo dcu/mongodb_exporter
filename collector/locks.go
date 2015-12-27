@@ -9,21 +9,21 @@ var (
 		Namespace: Namespace,
 		Name:      "locks_time_locked_global_microseconds_total",
 		Help:      "amount of time in microseconds that any database has held the global lock",
-	}, []string{})
+	}, []string{"type", "database"})
 )
 var (
 	locksTimeLockedLocalMicrosecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "locks_time_locked_local_microseconds_total",
 		Help:      "amount of time in microseconds that any database has held the local lock",
-	}, []string{})
+	}, []string{"type", "database"})
 )
 var (
 	locksTimeAcquiringGlobalMicrosecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "locks_time_acquiring_global_microseconds_total",
 		Help:      "amount of time in microseconds that any database has spent waiting for the global lock",
-	}, []string{})
+	}, []string{"type", "database"})
 )
 
 // LockStatsMap is a map of lock stats
@@ -59,4 +59,11 @@ func (locks LockStatsMap) Export() {
 		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("read", key).Set(locks.TimeAcquiringMicros.ReadLower)
 		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("write", key).Set(locks.TimeAcquiringMicros.WriteLower)
 	}
+}
+
+// Describe describes the metrics for prometheus
+func (locks LockStatsMap) Describe(ch chan<- *prometheus.Desc) {
+	locksTimeLockedGlobalMicrosecondsTotal.Describe(ch)
+	locksTimeLockedLocalMicrosecondsTotal.Describe(ch)
+	locksTimeAcquiringGlobalMicrosecondsTotal.Describe(ch)
 }
