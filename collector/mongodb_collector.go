@@ -3,6 +3,7 @@ package collector
 import (
 	//"github.com/dcu/mongodb_exporter/shared"
 	"github.com/dcu/mongodb_exporter/collector/mongod"
+	"github.com/dcu/mongodb_exporter/collector/mongos"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -44,10 +45,28 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 // Collect collects all mongodb's metrics.
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 	glog.Info("Collecting Server Status")
-	exporter.collectServerStatus(ch)
+	/**
+	We need to add logic here:
+		if mongos:
+		    collectMongosBalancingData
+			collectMongosServerStatus
+		else if replset
+			collectMongodServerStatus
+			collectElectionInfo
+			collectOpLogInfo
+			collectReplicationData
+		else if mongod:
+			collectMongodServerStatus
+		else if arbiter:
+			pass
+		else:
+			WTF()
+	**/
+	exporter.collectMongodServerStatus(ch)
+	//exporter.collectMongosServerStatus(ch)
 }
 
-func (exporter *MongodbCollector) collectServerStatus(ch chan<- prometheus.Metric) *collector_mongod.ServerStatus {
+func (exporter *MongodbCollector) collectMongodServerStatus(ch chan<- prometheus.Metric) *collector_mongod.ServerStatus {
 	serverStatus := collector_mongod.GetServerStatus(exporter.Opts.URI)
 
 	if serverStatus != nil {
@@ -56,3 +75,14 @@ func (exporter *MongodbCollector) collectServerStatus(ch chan<- prometheus.Metri
 
 	return serverStatus
 }
+
+func (exporter *MongodbCollector) collectMongosServerStatus(ch chan<- prometheus.Metric) *collector_mongos.ServerStatus {
+	serverStatus := collector_mongos.GetServerStatus(exporter.Opts.URI)
+
+	if serverStatus != nil {
+		serverStatus.Export(ch)
+	}
+
+	return serverStatus
+}
+
