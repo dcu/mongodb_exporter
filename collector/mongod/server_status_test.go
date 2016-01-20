@@ -1,4 +1,4 @@
-package collector
+package collector_mongod
 
 import (
 	"gopkg.in/mgo.v2/bson"

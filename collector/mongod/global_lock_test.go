@@ -1,4 +1,4 @@
-package collector
+package collector_mongod
 
 import (
 	"testing"
