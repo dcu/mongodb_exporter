@@ -2,5 +2,5 @@ package collector_mongos
 
 var (
 	// Namespace is the namespace of the metrics
-	Namespace = "mongodb"
+	Namespace = "mongodb_mongos"
 )
