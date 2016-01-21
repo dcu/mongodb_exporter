@@ -42,27 +42,79 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	}
 }
 
+func connectMongo(uri string) *mgo.Session {
+	session, err := mgo.Dial(uri)
+	if err != nil {
+		glog.Errorf("Cannot connect to server using url: %s", uri)
+		return nil
+	}
+
+	session.SetMode(mgo.Eventual, true)
+	session.SetSocketTimeout(0)
+	defer func() {
+		glog.Info("Closing connection to database.")
+		session.Close()
+	}()
+	err = nil 
+	return session, err 
+}
+
+
+// GetNodeType checks if the connected Session is a mongos, standalone, or replset,
+// by looking at the result of calling isMaster.
+func (session *mgo.Session) GetNodeType() (NodeType, error) {
+	masterDoc := struct {
+		SetName interface{} `bson:"setName"`
+		Hosts   interface{} `bson:"hosts"`
+		Msg     string      `bson:"msg"`
+	}{}
+	err = session.Run("isMaster", &masterDoc)
+	if err != nil {
+		return Unknown, err
+	}
+
+	if masterDoc.SetName != nil || masterDoc.Hosts != nil {
+		return "replset", nil
+	} else if masterDoc.Msg == "isdbgrid" {
+		// isdbgrid is always the msg value when calling isMaster on a mongos
+		// see http://docs.mongodb.org/manual/core/sharded-cluster-query-router/
+		return "mongos", nil
+	}
+	return "mongod", nil
+}
+
+func AuthIfIneeded(session *mgo.Session, exporter *MongodbCollector){
+	//Need to add some body here to try the user/pass/authdb opts if present, 
+	//if not should run "ping" command to ensure access is allowed
+}
+
 // Collect collects all mongodb's metrics.
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
-	glog.Info("Collecting Server Status")
-	/**
-	We need to add logic here:
-		if mongos:
-		    collectMongosBalancingData
-			collectMongosServerStatus
-		else if replset
-			collectMongodServerStatus
-			collectElectionInfo
-			collectOpLogInfo
-			collectReplicationData
-		else if mongod:
-			collectMongodServerStatus
-		else if arbiter:
-			pass
-		else:
-			WTF()
-	**/
-	exporter.collectMongodServerStatus(ch)
+    glog.Info("Collecting Server Status")
+    session, err := connectMongo(exporter.Opts.URI)
+    if err != nil:
+		error()
+
+    authIfNeeded(&session,exporter.Opts)
+    nodeType := GetNodeType(session)
+
+    switch nodeType {
+        case 'mongos':
+            collector_mongos.ServerStatus(ch, session)
+        	collector_mongos.BalancingData(ch, session)
+        case 'replset':
+            collector_mongos.ServerStatus(ch, session)
+           	collector_mongos.ElectionInfo(ch, session)
+        	collector_mongos.OpLogInfo(ch, session)
+        	collector_mongos.ReplicationInfo(ch, session)
+        case "mongod":
+            collector_mongod.ServerStatus(ch, session)
+        case "arbiter":
+        		continue
+        default:
+        	error()
+    }
+	//exporter.collectMongodServerStatus(ch)
 	//exporter.collectMongosServerStatus(ch)
 }
 
