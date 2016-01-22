@@ -47,6 +47,7 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	if serverStatus != nil {
 		serverStatus.Describe(ch)
 	}
+	defer session.Close()
 }
 
 func connectMongo(uri string)(*mgo.Session, error) {
@@ -110,14 +111,19 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
     		if serverStatus != nil {
 				serverStatus.Export(ch)
 			}
-			glog.Error(fmt.Printf("We run mongod server status it had %s\n", err))
+			//Need to build BalanceData
+			//Need to build ChangeLogActions
 		case nodeType == "mongod":
-			glog.Info("Mongod stuff isnt setup yet!\n")
+			serverStatus := collector_mongos.GetServerStatus(session)
+    		if serverStatus != nil {
+				serverStatus.Export(ch)
+			}
 		case nodeType == "replset":
 			glog.Info("ReplicaSet stuff isnt setup yet!\n")
 		default:
 			glog.Info("No process for current node type no metrics printing!\n")
     }
+    session.Close()
     /**
     switch nodeType {
     	case 'mongos':
