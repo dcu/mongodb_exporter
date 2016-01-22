@@ -2,10 +2,11 @@ package collector
 
 import (
 	//"github.com/dcu/mongodb_exporter/shared"
-	"github.com/dcu/mongodb_exporter/collector/mongod"
+	_ "github.com/dcu/mongodb_exporter/collector/mongod"
 	"github.com/dcu/mongodb_exporter/collector/mongos"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
+	"gopkg.in/mgo.v2"
 )
 
 var (
@@ -35,18 +36,22 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 // Describe describes all mongodb's metrics.
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	glog.Info("Describing groups")
-	serverStatus := collector_mongod.GetServerStatus(exporter.Opts.URI)
+	session, err := connectMongo(exporter.Opts.URI)
+    if err != nil{
+		return
+    }
+	serverStatus := collector_mongos.GetServerStatus(session)
 
 	if serverStatus != nil {
 		serverStatus.Describe(ch)
 	}
 }
 
-func connectMongo(uri string) *mgo.Session {
+func connectMongo(uri string)(*mgo.Session, error) {
 	session, err := mgo.Dial(uri)
 	if err != nil {
 		glog.Errorf("Cannot connect to server using url: %s", uri)
-		return nil
+		return nil,err
 	}
 
 	session.SetMode(mgo.Eventual, true)
@@ -56,21 +61,20 @@ func connectMongo(uri string) *mgo.Session {
 		session.Close()
 	}()
 	err = nil 
-	return session, err 
+	return session,err
 }
-
 
 // GetNodeType checks if the connected Session is a mongos, standalone, or replset,
 // by looking at the result of calling isMaster.
-func (session *mgo.Session) GetNodeType() (NodeType, error) {
+func GetNodeType(session *mgo.Session)(string, error) {
 	masterDoc := struct {
 		SetName interface{} `bson:"setName"`
 		Hosts   interface{} `bson:"hosts"`
 		Msg     string      `bson:"msg"`
 	}{}
-	err = session.Run("isMaster", &masterDoc)
+	err := session.Run("isMaster", &masterDoc)
 	if err != nil {
-		return Unknown, err
+		return "unknown", err
 	}
 
 	if masterDoc.SetName != nil || masterDoc.Hosts != nil {
@@ -83,23 +87,29 @@ func (session *mgo.Session) GetNodeType() (NodeType, error) {
 	return "mongod", nil
 }
 
-func AuthIfIneeded(session *mgo.Session, exporter *MongodbCollector){
-	//Need to add some body here to try the user/pass/authdb opts if present, 
-	//if not should run "ping" command to ensure access is allowed
-}
-
 // Collect collects all mongodb's metrics.
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
     glog.Info("Collecting Server Status")
     session, err := connectMongo(exporter.Opts.URI)
-    if err != nil:
-		error()
+    if err != nil{
+		return
+    }
 
-    authIfNeeded(&session,exporter.Opts)
-    nodeType := GetNodeType(session)
+    nodeType,err := GetNodeType(session)
+    if err != nil{
+    	return 
+    }
 
+    switch {
+    	case nodeType == "mongos":
+    		serverStatus := collector_mongos.GetServerStatus(session)
+    		if serverStatus != nil {
+				serverStatus.Export(ch)
+			}
+    }
+    /**
     switch nodeType {
-        case 'mongos':
+    	case 'mongos':
             collector_mongos.ServerStatus(ch, session)
         	collector_mongos.BalancingData(ch, session)
         case 'replset':
@@ -107,17 +117,18 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
            	collector_mongos.ElectionInfo(ch, session)
         	collector_mongos.OpLogInfo(ch, session)
         	collector_mongos.ReplicationInfo(ch, session)
-        case "mongod":
+        case 'mongod':
             collector_mongod.ServerStatus(ch, session)
-        case "arbiter":
+        case 'arbiter':
         		continue
         default:
         	error()
     }
+    **/
 	//exporter.collectMongodServerStatus(ch)
 	//exporter.collectMongosServerStatus(ch)
 }
-
+/**
 func (exporter *MongodbCollector) collectMongodServerStatus(ch chan<- prometheus.Metric) *collector_mongod.ServerStatus {
 	serverStatus := collector_mongod.GetServerStatus(exporter.Opts.URI)
 
@@ -137,4 +148,4 @@ func (exporter *MongodbCollector) collectMongosServerStatus(ch chan<- prometheus
 
 	return serverStatus
 }
-
+**/

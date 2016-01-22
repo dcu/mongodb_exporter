@@ -163,13 +163,8 @@ func (status *ServerStatus) Describe(ch chan<- *prometheus.Desc) {
 }
 
 // GetServerStatus returns the server status info.
-func GetServerStatus(uri string) *ServerStatus {
+func GetServerStatus(session *mgo.Session) *ServerStatus {
 	result := &ServerStatus{}
-	session, err := mgo.Dial(uri)
-	if err != nil {
-		glog.Errorf("Cannot connect to server using url: %s", uri)
-		return nil
-	}
 
 	session.SetMode(mgo.Eventual, true)
 	session.SetSocketTimeout(0)
@@ -178,7 +173,7 @@ func GetServerStatus(uri string) *ServerStatus {
 		session.Close()
 	}()
 
-	err = session.DB("admin").Run(bson.D{{"serverStatus", 1}, {"recordStats", 0}}, result)
+	err := session.DB("admin").Run(bson.D{{"serverStatus", 1}, {"recordStats", 0}}, result)
 	if err != nil {
 		glog.Error("Failed to get server status.")
 		return nil
