@@ -168,10 +168,6 @@ func GetServerStatus(session *mgo.Session) *ServerStatus {
 
 	session.SetMode(mgo.Eventual, true)
 	session.SetSocketTimeout(0)
-	defer func() {
-		glog.Info("Closing connection to database.")
-		session.Close()
-	}()
 
 	err := session.DB("admin").Run(bson.D{{"serverStatus", 1}, {"recordStats", 0}}, result)
 	if err != nil {

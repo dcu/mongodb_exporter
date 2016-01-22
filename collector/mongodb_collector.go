@@ -7,6 +7,8 @@ import (
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
+	"fmt"
+	"os"
 )
 
 var (
@@ -50,16 +52,14 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 func connectMongo(uri string)(*mgo.Session, error) {
 	session, err := mgo.Dial(uri)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+        os.Exit(1)
 		glog.Errorf("Cannot connect to server using url: %s", uri)
 		return nil,err
 	}
 
 	session.SetMode(mgo.Eventual, true)
 	session.SetSocketTimeout(0)
-	defer func() {
-		glog.Info("Closing connection to database.")
-		session.Close()
-	}()
 	err = nil 
 	return session,err
 }
@@ -74,16 +74,20 @@ func GetNodeType(session *mgo.Session)(string, error) {
 	}{}
 	err := session.Run("isMaster", &masterDoc)
 	if err != nil {
+		glog.Info("Got unknown node type\n")
 		return "unknown", err
 	}
 
 	if masterDoc.SetName != nil || masterDoc.Hosts != nil {
+		glog.Info("Got replset node type")
 		return "replset", nil
 	} else if masterDoc.Msg == "isdbgrid" {
+		glog.Info("Got mongos node type\n")
 		// isdbgrid is always the msg value when calling isMaster on a mongos
 		// see http://docs.mongodb.org/manual/core/sharded-cluster-query-router/
 		return "mongos", nil
 	}
+	glog.Info("defaulted to mongod node type\n")
 	return "mongod", nil
 }
 
@@ -92,20 +96,27 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
     glog.Info("Collecting Server Status")
     session, err := connectMongo(exporter.Opts.URI)
     if err != nil{
-		return
+		 glog.Error(fmt.Printf("We failed to connect to mongo with error of %s\n", err))
     }
-
+    glog.Info("Passed connecting")
     nodeType,err := GetNodeType(session)
     if err != nil{
-    	return 
+    	glog.Error(fmt.Printf("We run had a node type error of %s\n", err))
     }
-
+	glog.Info(fmt.Printf("Passed nodeType with %s", nodeType))
     switch {
     	case nodeType == "mongos":
     		serverStatus := collector_mongos.GetServerStatus(session)
     		if serverStatus != nil {
 				serverStatus.Export(ch)
 			}
+			glog.Error(fmt.Printf("We run mongod server status it had %s\n", err))
+		case nodeType == "mongod":
+			glog.Info("Mongod stuff isnt setup yet!\n")
+		case nodeType == "replset":
+			glog.Info("ReplicaSet stuff isnt setup yet!\n")
+		default:
+			glog.Info("No process for current node type no metrics printing!\n")
     }
     /**
     switch nodeType {
