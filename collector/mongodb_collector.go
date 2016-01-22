@@ -2,7 +2,7 @@ package collector
 
 import (
 	//"github.com/dcu/mongodb_exporter/shared"
-	_ "github.com/dcu/mongodb_exporter/collector/mongod"
+	"github.com/dcu/mongodb_exporter/collector/mongod"
 	"github.com/dcu/mongodb_exporter/collector/mongos"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -114,7 +114,7 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 			//Need to build BalanceData
 			//Need to build ChangeLogActions
 		case nodeType == "mongod":
-			serverStatus := collector_mongos.GetServerStatus(session)
+			serverStatus := collector_mongod.GetServerStatus(session)
     		if serverStatus != nil {
 				serverStatus.Export(ch)
 			}
