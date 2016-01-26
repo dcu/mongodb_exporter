@@ -16,7 +16,7 @@ var (
     }, []string{"type"})
 )
 
-func IsBalancerEnabled(session *mgo.Session) (bool) {
+func IsBalancerEnabled(session *mgo.Session) (float64) {
     var balancerConfig map[string]interface{}
     err := session.DB("config").C("settings").Find(bson.M{ "_id" : "balancer" }).Select(bson.M{ "_id" : 0 }).One(&balancerConfig)
     if err != nil {
@@ -25,97 +25,99 @@ func IsBalancerEnabled(session *mgo.Session) (bool) {
 
     balancerStopped := balancerConfig["stopped"].(bool)
     if balancerStopped == false {
-        return true
+        return 1
     }
-    return false
+    return 0
 }
 
-func GetTotalShards(session *mgo.Session) (int) {
+func GetTotalShards(session *mgo.Session) (float64) {
     shardCount, err := session.DB("config").C("shards").Find(bson.M{}).Count()
     if err != nil {
         glog.Error("Could not find shard information in 'config.settings'!")
     }
-    return shardCount
+    return float64(shardCount)
 }
 
-func GetTotalChunks(session *mgo.Session) (int) {
+func GetTotalChunks(session *mgo.Session) (float64) {
     chunkCount, err := session.DB("config").C("chunks").Find(bson.M{}).Count()
     if err != nil {
         glog.Error("Could not find chunk information in 'config.chunks'!")
     }
-    return chunkCount
+    return float64(chunkCount)
 }
 
-func GetTotalShardedDatabases(session *mgo.Session) (int) {
+func GetTotalShardedDatabases(session *mgo.Session) (float64) {
     dbCount, err := session.DB("config").C("databases").Find(bson.M{ "partitioned" : true }).Count()
     if err != nil {
         glog.Error("Could not find database information in 'config.databases'!")
     }
-    return dbCount
+    return float64(dbCount)
 }
 
-func GetTotalShardedCollections(session *mgo.Session) (int) {
+func GetTotalShardedCollections(session *mgo.Session) (float64) {
     collCount, err := session.DB("config").C("collections").Find(bson.M{ "dropped" : false }).Count()
     if err != nil {
         glog.Error("Could not find collection information in 'config.collections'!")
     }
-    return collCount
+    return float64(collCount)
 }
 
 func TwentyFourHoursAgo() (time.Time) {
     return time.Now().Add(-24 * time.Hour)
 }
 
-func GetBalancerRoundCount24h(errorOccured bool, session *mgo.Session) (int) {
+func GetBalancerRoundCount24h(errorOccured bool, session *mgo.Session) (float64) {
     findQuery := bson.M{ "what" : "balancer.round", "details.errorOccured" : errorOccured, "time" : bson.M{ "$gt" : TwentyFourHoursAgo() } }
     roundCount, err := session.DB("config").C("actionlog").Find(findQuery).Count()
     if err != nil {
         glog.Error("Could not find balancer round info in 'config.actionlog'!")
     }
-    return roundCount
+    return float64(roundCount)
 }
 
-func GetFailedBalancerRoundCount24h(session *mgo.Session) (int) {
-    return GetBalancerRoundCount24h(true, session)
+func GetFailedBalancerRoundCount24h(session *mgo.Session) (float64) {
+    roundCount := GetBalancerRoundCount24h(true, session)
+    return float64(roundCount)
 }
 
-func GetSplitCount24h(session *mgo.Session) (int) {
+func GetSplitCount24h(session *mgo.Session) (float64) {
     findQuery := bson.M{ "what" : "split", "time" : bson.M{ "$gt" : TwentyFourHoursAgo() } }
     splitCount, err := session.DB("config").C("changelog").Find(findQuery).Count()
     if err != nil {
         glog.Error("Could not find split information in 'config.changelog'!")
     }
-    return splitCount
+    return float64(splitCount)
 }
 
-func GetMoveChunkStartCount24h(session *mgo.Session) (int) {
+func GetMoveChunkStartCount24h(session *mgo.Session) (float64) {
     findQuery := bson.M{ "what" : "moveChunk.start", "time" : bson.M{ "$gt" : TwentyFourHoursAgo() } }
     moveChunkStartCount, err := session.DB("config").C("changelog").Find(findQuery).Count()
     if err != nil {
         glog.Error("Could not find moveChunk.start info in 'config.changelog'!")
     }
-    return moveChunkStartCount
+    return float64(moveChunkStartCount)
 }
 
-func GetAllShardChunkInfo(session *mgo.Session) (map[string]int) {
+func GetAllShardChunkInfo(session *mgo.Session) (map[string]float64) {
+    var result []map[string]int64
     err := session.DB("config").C("chunks").Pipe([]bson.M{{ "$group" : bson.M{ "_id" : "$shard", "count" : bson.M{ "$sum" : 1  } } }}).All(&result)
     if err != nil {
         glog.Error("Could not find shard chunk info!")
     }
 
-    shardChunkCounts := make(map[string]int)
+    shardChunkCounts := make(map[string]float64)
     for _, element := range result {
-        shard := element["_id"].(string)
-        shardChunkCounts[shard] = element["count"].(int)
+        shard := string(element["_id"])
+        shardChunkCounts[shard] = float64(element["count"])
     }
 
     return shardChunkCounts
 }
 
-func IsClusterBalanced(session *mgo.Session) (bool) {
+func IsClusterBalanced(session *mgo.Session) (float64) {
     // Different thresholds based on size
     // http://docs.mongodb.org/manual/core/sharding-internals/#sharding-migration-thresholds
-    var threshold int
+    var threshold float64
     totalChunkCount := GetTotalChunks(session)
     if totalChunkCount < 20 {
         threshold = 2
@@ -125,14 +127,14 @@ func IsClusterBalanced(session *mgo.Session) (bool) {
         threshold = 8
     }
 
-    var minChunkCount int = -1
-    var maxChunkCount int = 0
+    var minChunkCount float64 = -1
+    var maxChunkCount float64 = 0
     shardChunkInfoAll := GetAllShardChunkInfo(session)
     for _, chunkCount := range shardChunkInfoAll {
         if chunkCount > maxChunkCount {
             maxChunkCount = chunkCount
         } else {
-            if minChunkCount < 0 {
+            if minChunkCount < float64(0) {
                 minChunkCount = chunkCount
             } else if chunkCount < minChunkCount {
                 minChunkCount = chunkCount
@@ -143,25 +145,25 @@ func IsClusterBalanced(session *mgo.Session) (bool) {
     // return true if the difference between the min and max is < the thresold
     chunkDifference := maxChunkCount - minChunkCount
     if chunkDifference < threshold {
-        return true
+        return 1
     }
 
-    return false
+    return 0
 }
 
-type BalancerStatus struct {
-    IsBalanced			bool	
-    BalancerEnabled		bool
-    TotalShards			int
-    TotalChunks			int
-    TotalDatabases		int
-    TotalCollections		int
-    BalancerRoundFailureLast24h	int
-    SplitCountLast24h		int
-    MoveChunkStartCountLast24h	int
+type BalancerStats struct {
+    IsBalanced			float64	
+    BalancerEnabled		float64
+    TotalShards			float64
+    TotalChunks			float64
+    TotalDatabases		float64
+    TotalCollections		float64
+    BalancerRoundFailureLast24h	float64
+    SplitCountLast24h		float64
+    MoveChunkStartCountLast24h	float64
 }
 
-func (status *BalancerStatus) Export(ch chan<- prometheus.Metric) {
+func (status *BalancerStats) Export(ch chan<- prometheus.Metric) {
     balancerInfo.WithLabelValues("is_balanced").Set(status.IsBalanced)
     balancerInfo.WithLabelValues("balancer_on").Set(status.BalancerEnabled)
     balancerInfo.WithLabelValues("total_shards").Set(status.TotalShards)
@@ -174,8 +176,8 @@ func (status *BalancerStatus) Export(ch chan<- prometheus.Metric) {
     balancerInfo.Collect(ch)
 }
 
-func GetBalancerStatus(session *.mgo.Session) *BalancerStatus {
-    results := &BalancerStatus{}
+func GetBalancerStatus(session *mgo.Session) *BalancerStats {
+    results := &BalancerStats{}
 
     session.SetMode(mgo.Eventual, true)
     session.SetSocketTimeout(0)

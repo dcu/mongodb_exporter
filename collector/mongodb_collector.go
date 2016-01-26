@@ -43,7 +43,6 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 		return
     }
 	serverStatus := collector_mongos.GetServerStatus(session)
-
 	if serverStatus != nil {
 		serverStatus.Describe(ch)
 	}
@@ -94,7 +93,7 @@ func GetNodeType(session *mgo.Session)(string, error) {
 
 // Collect collects all mongodb's metrics.
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
-    glog.Info("Collecting Server Status")
+    glog.Info("Collecting Server Status from:", exporter.Opts.URI)
     session, err := connectMongo(exporter.Opts.URI)
     if err != nil{
 		 glog.Error(fmt.Printf("We failed to connect to mongo with error of %s\n", err))
@@ -107,39 +106,51 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 	glog.Info(fmt.Printf("Passed nodeType with %s", nodeType))
     switch {
     	case nodeType == "mongos":
-    		serverStatus := collector_mongos.GetServerStatus(session)
-    		if serverStatus != nil {
-				serverStatus.Export(ch)
-			}
-			//Need to build BalanceData
-			//Need to build ChangeLogActions
-		case nodeType == "mongod":
-			serverStatus := collector_mongod.GetServerStatus(session)
-    		if serverStatus != nil {
-				serverStatus.Export(ch)
-			}
-		case nodeType == "replset":
-			glog.Info("ReplicaSet stuff isnt setup yet!\n")
-		default:
-			glog.Info("No process for current node type no metrics printing!\n")
+    	    serverStatus := collector_mongos.GetServerStatus(session)
+    	    if serverStatus != nil {
+	        serverStatus.Export(ch)
+	    }
+            balancerStatus := collector_mongos.GetBalancerStatus(session)
+            if balancerStatus != nil {
+                balancerStatus.Export(ch)
+            }
+
+	    //Need to build ChangeLogActions
+        case nodeType == "mongod":
+	    serverStatus := collector_mongod.GetServerStatus(session)
+    	    if serverStatus != nil {
+	        serverStatus.Export(ch)
+	    }
+        case nodeType == "replset":
+	    glog.Info("ReplicaSet stuff isnt setup yet!\n")
+	    //serverStatus := collector_mongod.GetServerStatus(session)
+    	    //if serverStatus != nil {
+	    //    serverStatus.Export(ch)
+	    //}
+            //replSetStatus := collector_mongod.GetReplSetStatus(session)
+            //if replSetStatus != nil {
+            //    replSetStatus.Export(ch)
+            //}
+	default:
+	    glog.Info("No process for current node type no metrics printing!\n")
     }
     session.Close()
     /**
     switch nodeType {
     	case 'mongos':
             collector_mongos.ServerStatus(ch, session)
-        	collector_mongos.BalancingData(ch, session)
+            collector_mongos.BalancingData(ch, session)
         case 'replset':
             collector_mongos.ServerStatus(ch, session)
-           	collector_mongos.ElectionInfo(ch, session)
-        	collector_mongos.OpLogInfo(ch, session)
-        	collector_mongos.ReplicationInfo(ch, session)
+            collector_mongos.ElectionInfo(ch, session)
+            collector_mongos.OpLogInfo(ch, session)
+            collector_mongos.ReplicationInfo(ch, session)
         case 'mongod':
             collector_mongod.ServerStatus(ch, session)
         case 'arbiter':
-        		continue
+            continue
         default:
-        	error()
+            error()
     }
     **/
 	//exporter.collectMongodServerStatus(ch)
