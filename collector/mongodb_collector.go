@@ -114,8 +114,14 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
             if balancerStatus != nil {
                 balancerStatus.Export(ch)
             }
-
-	    //Need to build ChangeLogActions
+            balancerTopoStatus := collector_mongos.GetBalancerTopoStatus(session)
+            if balancerTopoStatus != nil {
+                balancerTopoStatus.Export(ch)
+            }
+            balancerChangelogStatus := collector_mongos.GetBalancerChangelogStatus(session)
+            if balancerChangelogStatus != nil {
+                balancerChangelogStatus.Export(ch)
+            }
         case nodeType == "mongod":
 	    serverStatus := collector_mongod.GetServerStatus(session)
     	    if serverStatus != nil {
