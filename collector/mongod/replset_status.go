@@ -1,8 +1,9 @@
-package main
+package collector_mongod
 
 import (
     "time"
-    "fmt"
+    "github.com/golang/glog"
+    "github.com/prometheus/client_golang/prometheus"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
 )
@@ -11,7 +12,7 @@ func GetReplSetConfig(session *mgo.Session) (map[string]interface{}) {
     var replSetConfig map[string]interface{}
     err := session.DB("admin").Run(bson.D{{"replSetGetConfig", 1}}, &replSetConfig)
     if err != nil {
-        panic(err)
+        glog.Error("Error executing 'replSetGetConfig'!")
     }
 
     return replSetConfig["config"].(map[string]interface{})
@@ -60,7 +61,7 @@ func GetReplSetStatus(session *mgo.Session) (map[string]interface{}) {
     var replSetStatus map[string]interface{}
     err := session.DB("admin").Run(bson.D{{"replSetGetStatus", 1}}, &replSetStatus)
     if err != nil {
-        panic(err)
+        glog.Error("Error executing 'replSetStatus'!")
     }
 
     return replSetStatus
@@ -77,7 +78,7 @@ func GetReplSetStatusPrimary(session *mgo.Session) (map[string]interface{}) {
       }
     }
 
-    panic("Found no replSet member in Primary state!")
+    glog.Error("Found no replSet member in Primary state!")
 }
 
 func GetReplStatusSelf(session *mgo.Session) (map[string]interface{}) {
@@ -91,7 +92,7 @@ func GetReplStatusSelf(session *mgo.Session) (map[string]interface{}) {
         }
     }
     
-    panic("Could not find myself in the replset config!")
+    glog.Error("Could not find myself in the replset config!")
 }
 
 func GetReplSetLagMs(session *mgo.Session) (float64) {
@@ -130,20 +131,4 @@ func GetReplSetMaxNode2NodePingMs(session *mgo.Session) (int) {
     } 
     
     return maxNodePingMs
-}
-
-func main() {
-    uri := "mongodb://localhost:27017"
-    session, err := mgo.Dial(uri)
-
-    if err != nil {
-        fmt.Println("Failed to get collection stats.")
-    }
-
-    fmt.Println("replset members:", GetReplSetMemberCount(session))
-    fmt.Println("replset members w/data:", GetReplSetMembersWithDataCount(session))
-    fmt.Println("replset members w/votes:", GetReplSetMembersWithVotesCount(session))
-    fmt.Println("replset lag:", GetReplSetLagMs(session), "ms")
-    fmt.Println("max node2node ping:", GetReplSetMaxNode2NodePingMs(session), "ms")
-    fmt.Println("last election unixtime:", GetReplSetLastElectionUnixTime(session))
 }

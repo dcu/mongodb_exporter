@@ -1,7 +1,8 @@
-package main
+package collector_mongod
 
 import (
-    "fmt"
+    "github.com/golang/glog"
+    "github.com/prometheus/client_golang/prometheus"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
 )
@@ -10,7 +11,7 @@ func GetCollectionSizeGB(db string, collection string, session *mgo.Session) (fl
     var collStats map[string]interface{}
     err := session.DB(db).Run(bson.D{{"collStats", collection }}, &collStats)
     if err != nil {
-        panic(err)
+        glog.Error("Error getting collection stats!")
     }
 
     var size int
@@ -33,29 +34,17 @@ func GetOplogLengthSecs(session *mgo.Session) (int32) {
     var head map[string]interface{}
     err := col.Find(bson.M{}).Sort("$natural").One(&head)
     if err != nil {
-        panic(err)
+        glog.Error("Error getting head of oplog.rs!")
     } 
 
     var tail map[string]interface{}
     err = col.Find(bson.M{}).Sort("-$natural").One(&tail)
     if err != nil {
-        panic(err)
+        glog.Error("Error getting tail of oplog.rs!")
     }
 
     head_ts := ParseBsonMongoTimestamp(head["ts"].(bson.MongoTimestamp))
     tail_ts := ParseBsonMongoTimestamp(tail["ts"].(bson.MongoTimestamp))
    
     return tail_ts - head_ts
-}
-
-func main() {
-    uri := "mongodb://localhost:27017"
-    session, err := mgo.Dial(uri)
-
-    if err != nil {
-        fmt.Println("Failed to get collection stats.")
-    }
-
-    fmt.Println("oplog size:", GetOplogSizeGB(session), "gb")
-    fmt.Println("oplog length:", GetOplogLengthSecs(session), "sec(s)")
 }
