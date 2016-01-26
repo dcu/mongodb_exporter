@@ -29,17 +29,17 @@ func IsBalancerEnabled(session *mgo.Session) (float64) {
     return 0
 }
 
-func GetAllShardChunkInfo(session *mgo.Session) (map[string]float64) {
-    var result []map[string]int64
+func GetAllShardChunkInfo(session *mgo.Session) (map[string]int) {
+    var result []map[string]int
     err := session.DB("config").C("chunks").Pipe([]bson.M{{ "$group" : bson.M{ "_id" : "$shard", "count" : bson.M{ "$sum" : 1  } } }}).All(&result)
     if err != nil {
         glog.Error("Could not find shard chunk info!")
     }
 
-    shardChunkCounts := make(map[string]float64)
+    shardChunkCounts := make(map[string]int)
     for _, element := range result {
         shard := string(element["_id"])
-        shardChunkCounts[shard] = float64(element["count"])
+        shardChunkCounts[shard] = int(element["count"])
     }
 
     return shardChunkCounts
@@ -48,7 +48,7 @@ func GetAllShardChunkInfo(session *mgo.Session) (map[string]float64) {
 func IsClusterBalanced(session *mgo.Session) (float64) {
     // Different thresholds based on size
     // http://docs.mongodb.org/manual/core/sharding-internals/#sharding-migration-thresholds
-    var threshold float64
+    var threshold int
     totalChunkCount := GetTotalChunks(session)
     if totalChunkCount < 20 {
         threshold = 2
@@ -58,14 +58,14 @@ func IsClusterBalanced(session *mgo.Session) (float64) {
         threshold = 8
     }
 
-    var minChunkCount float64 = -1
-    var maxChunkCount float64 = 0
+    var minChunkCount int = -1
+    var maxChunkCount int = 0
     shardChunkInfoAll := GetAllShardChunkInfo(session)
     for _, chunkCount := range shardChunkInfoAll {
         if chunkCount > maxChunkCount {
             maxChunkCount = chunkCount
         } else {
-            if minChunkCount < float64(0) {
+            if 0 > minChunkCount {
                 minChunkCount = chunkCount
             } else if chunkCount < minChunkCount {
                 minChunkCount = chunkCount
@@ -75,6 +75,9 @@ func IsClusterBalanced(session *mgo.Session) (float64) {
 
     // return true if the difference between the min and max is < the thresold
     chunkDifference := maxChunkCount - minChunkCount
+
+    glog.Info("[IsBalanced] diff: ", chunkDifference, "min: ", minChunkCount, "max: ", maxChunkCount)
+
     if chunkDifference < threshold {
         return 1
     }

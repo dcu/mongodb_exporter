@@ -93,17 +93,17 @@ func GetNodeType(session *mgo.Session)(string, error) {
 
 // Collect collects all mongodb's metrics.
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
-    glog.Info("Collecting Server Status from:", exporter.Opts.URI)
+    glog.Info("Collecting Server Status from: ", exporter.Opts.URI)
     session, err := connectMongo(exporter.Opts.URI)
     if err != nil{
 		 glog.Error(fmt.Printf("We failed to connect to mongo with error of %s\n", err))
     }
-    glog.Info("Passed connecting")
+    glog.Info("Connected to: ", exporter.Opts.URI)
     nodeType,err := GetNodeType(session)
     if err != nil{
-    	glog.Error(fmt.Printf("We run had a node type error of %s\n", err))
+    	glog.Error("We run had a node type error of %s\n", err)
     }
-	glog.Info(fmt.Printf("Passed nodeType with %s", nodeType))
+    glog.Info("Passed nodeType with %s", nodeType)
     switch {
     	case nodeType == "mongos":
     	    serverStatus := collector_mongos.GetServerStatus(session)
@@ -128,15 +128,18 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 	        serverStatus.Export(ch)
 	    }
         case nodeType == "replset":
-	    glog.Info("ReplicaSet stuff isnt setup yet!\n")
-	    //serverStatus := collector_mongod.GetServerStatus(session)
-    	    //if serverStatus != nil {
-	    //    serverStatus.Export(ch)
-	    //}
-            //replSetStatus := collector_mongod.GetReplSetStatus(session)
-            //if replSetStatus != nil {
-            //    replSetStatus.Export(ch)
-            //}
+	    serverStatus := collector_mongod.GetServerStatus(session)
+    	    if serverStatus != nil {
+	        serverStatus.Export(ch)
+	    }
+            oplogStatus := collector_mongod.GetOplogStatus(session)
+            if oplogStatus != nil {
+                oplogStatus.Export(ch)
+            }
+            replSetStatus := collector_mongod.GetReplSetStatus(session)
+            if replSetStatus != nil {
+                replSetStatus.Export(ch)
+            }
 	default:
 	    glog.Info("No process for current node type no metrics printing!\n")
     }
