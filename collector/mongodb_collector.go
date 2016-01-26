@@ -9,6 +9,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"fmt"
 	"os"
+        "regexp"
 )
 
 var (
@@ -50,6 +51,15 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func connectMongo(uri string)(*mgo.Session, error) {
+        r, _ := regexp.Compile("connect=direct")
+        if r.MatchString(uri) != true {
+            r, _ := regexp.Compile("\\?")
+            if r.MatchString(uri) == true {
+                uri = uri + "&connect=direct"
+            } else {
+                uri = uri + "?connect=direct"
+            }
+        }
 	session, err := mgo.Dial(uri)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -103,7 +113,7 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
     if err != nil{
     	glog.Error("We run had a node type error of %s\n", err)
     }
-    glog.Info("Passed nodeType with %s", nodeType)
+    //glog.Info("Passed nodeType with %s", nodeType)
     switch {
     	case nodeType == "mongos":
     	    serverStatus := collector_mongos.GetServerStatus(session)
