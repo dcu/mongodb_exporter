@@ -11,7 +11,7 @@ var (
     balancerInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
             Name:      "balancer_info",
-            Help:      "TBD",
+            Help:      "Overall statistics for the MongoDB balancer",
     }, []string{"type"})
 )
 

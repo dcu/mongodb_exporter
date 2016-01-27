@@ -11,7 +11,7 @@ var (
     oplogInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
             Name:      "oplog_info",
-            Help:      "TBD",
+            Help:      "Replication oplog statistics for MongoDB ReplSet members",
     }, []string{"type"})
 )
 

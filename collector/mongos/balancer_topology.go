@@ -11,7 +11,7 @@ var (
     balancerTopoInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
             Name:      "balancer_topology",
-            Help:      "TBD",
+            Help:      "Cluster topology statistics for the MongoDB balancer",
     }, []string{"type"})
 )
 

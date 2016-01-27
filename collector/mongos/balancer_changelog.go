@@ -12,7 +12,7 @@ var (
     balancerChangelogInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
             Name:      "balancer_changelog",
-            Help:      "TBD",
+            Help:      "Changelog statistics for the MongoDB balancer",
     }, []string{"type"})
 )
 

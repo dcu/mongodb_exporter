@@ -12,7 +12,7 @@ var (
     replSetInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
             Name:      "replset_info",
-            Help:      "TBD",
+            Help:      "Replication config statistics for MongoDB ReplSet members",
     }, []string{"type"})
 )
 
