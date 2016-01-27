@@ -8,11 +8,18 @@ import (
 )
 
 var (
-    oplogInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
+    oplogStatusLengthSec = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Name:      "oplog_info",
-            Help:      "Replication oplog statistics for MongoDB ReplSet members",
-    }, []string{"type"})
+            Subsystem: "oplog_status",
+            Name:      "length_sec",
+            Help:      "Length of oplog in seconds from head to tail",
+    })
+    oplogStatusSizeGB = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "oplog_status",
+            Name:      "size_gb",
+            Help:      "Size of oplog in gigabytes",
+    })
 )
 
 func GetCollectionSizeGB(db string, collection string, session *mgo.Session) (float64) {
@@ -70,9 +77,10 @@ type OplogStats struct {
 }
 
 func (status *OplogStats) Export(ch chan<- prometheus.Metric) {
-    oplogInfo.WithLabelValues("length_sec").Set(status.LengthSec)
-    oplogInfo.WithLabelValues("size_gb").Set(status.SizeGB)
-    oplogInfo.Collect(ch)
+    oplogStatusLengthSec.Set(status.LengthSec)
+    oplogStatusSizeGB.Set(status.SizeGB)
+    oplogStatusLengthSec.Collect(ch)
+    oplogStatusSizeGB.Collect(ch)
 }
 
 func GetOplogStatus(session *mgo.Session) *OplogStats {

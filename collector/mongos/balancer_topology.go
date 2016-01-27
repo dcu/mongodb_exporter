@@ -8,11 +8,30 @@ import (
 )
 
 var (
-    balancerTopoInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
+    balancerTopoInfoTotalShards = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Name:      "balancer_topology",
-            Help:      "Cluster topology statistics for the MongoDB balancer",
-    }, []string{"type"})
+            Subsystem: "balancer_topology",
+            Name:      "total_shards",
+            Help:      "Total # of Shards in Cluster",
+    })
+    balancerTopoInfoTotalChunks = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "balancer_topology",
+            Name:      "total_chunks",
+            Help:      "Total # of Chunks in Cluster",
+    })
+    balancerTopoInfoTotalDatabases = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "balancer_topology",
+            Name:      "total_databases",
+            Help:      "Total # of Databases with Sharding Enabled",
+    })
+    balancerTopoInfoTotalCollections = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "balancer_topology",
+            Name:      "total_collections",
+            Help:      "Total # of Collections with Sharding Enabled",
+    })
 )
 
 func GetTotalShards(session *mgo.Session) (float64) {
@@ -55,11 +74,15 @@ type BalancerTopoStats struct {
 }
 
 func (status *BalancerTopoStats) Export(ch chan<- prometheus.Metric) {
-    balancerTopoInfo.WithLabelValues("shards").Set(status.TotalShards)
-    balancerTopoInfo.WithLabelValues("chunks").Set(status.TotalChunks)
-    balancerTopoInfo.WithLabelValues("databases").Set(status.TotalDatabases)
-    balancerTopoInfo.WithLabelValues("collections").Set(status.TotalCollections)
-    balancerTopoInfo.Collect(ch)
+    balancerTopoInfoTotalShards.Set(status.TotalShards)    
+    balancerTopoInfoTotalChunks.Set(status.TotalChunks)
+    balancerTopoInfoTotalDatabases.Set(status.TotalDatabases)
+    balancerTopoInfoTotalCollections.Set(status.TotalCollections)
+
+    balancerTopoInfoTotalShards.Collect(ch)
+    balancerTopoInfoTotalChunks.Collect(ch)
+    balancerTopoInfoTotalDatabases.Collect(ch)
+    balancerTopoInfoTotalCollections.Collect(ch)
 }
 
 func GetBalancerTopoStatus(session *mgo.Session) *BalancerTopoStats {

@@ -8,11 +8,18 @@ import (
 )
 
 var (
-    balancerInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
+    balancerIsEnabled = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Name:      "balancer_info",
-            Help:      "Overall statistics for the MongoDB balancer",
-    }, []string{"type"})
+            Subsystem: "balancer_status",
+            Name:      "is_enabled",
+            Help:      "Boolean reporting if cluster balancer is enabled",
+    })
+    balancerIsBalanced = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "balancer_status",
+            Name:      "is_balanced",
+            Help:      "Boolean reporting if cluster chunks are balanced across shards",
+    })
 )
 
 func IsBalancerEnabled(session *mgo.Session) (float64) {
@@ -89,9 +96,10 @@ type BalancerStats struct {
 }
 
 func (status *BalancerStats) Export(ch chan<- prometheus.Metric) {
-    balancerInfo.WithLabelValues("is_balanced").Set(status.IsBalanced)
-    balancerInfo.WithLabelValues("balancer_on").Set(status.BalancerEnabled)
-    balancerInfo.Collect(ch)
+    balancerIsEnabled.Set(status.IsBalanced)
+    balancerIsBalanced.Set(status.BalancerEnabled)
+    balancerIsEnabled.Collect(ch)
+    balancerIsBalanced.Collect(ch)
 }
 
 func GetBalancerStatus(session *mgo.Session) *BalancerStats {

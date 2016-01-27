@@ -9,11 +9,41 @@ import (
 )
 
 var (
-    replSetInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
+    replSetLastElection = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
-            Name:      "replset_info",
-            Help:      "Replication config statistics for MongoDB ReplSet members",
-    }, []string{"type"})
+            Name:      "replset_status_last",
+            Help:      "Last event times for replica set",
+    }, []string{"event"})
+    replSetTotalMembers = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "replset_status",
+            Name:      "members",
+            Help:      "Number of members in replica set",
+    })
+    replSetTotalMembersWithData = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "replset_status",
+            Name:      "members_w_data",
+            Help:      "Number of members in replica set with data",
+    })
+    replSetTotalMembersWithVotes = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "replset_status",
+            Name:      "members_w_votes",
+            Help:      "Number of members in replica set with votes",
+    })
+    replSetMyLagMs = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "replset_status",
+            Name:      "lag_ms",
+            Help:      "Lag in milliseconds in reference to replica set Primary node",
+    })
+    replSetMaxNode2NodePingMs = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "replset_status",
+            Name:      "max_n2n_ping_ms",
+            Help:      "Maximum ping in milliseconds to other replica set members",
+    })
 )
 
 func GetReplSetConfig(session *mgo.Session) (map[string]interface{}) {
@@ -189,13 +219,20 @@ type ReplSetStats struct {
 }
 
 func(status *ReplSetStats) Export(ch chan<- prometheus.Metric) {
-    replSetInfo.WithLabelValues("members").Set(status.Members)
-    replSetInfo.WithLabelValues("members_w_data").Set(status.MembersWithData)
-    replSetInfo.WithLabelValues("members_w_votes").Set(status.MembersWithVotes)
-    replSetInfo.WithLabelValues("lag_ms").Set(status.LagMs)
-    replSetInfo.WithLabelValues("max_n2n_ping_ms").Set(status.MaxNode2NodePingMs)
-    replSetInfo.WithLabelValues("last_election").Set(status.LastElection)
-    replSetInfo.Collect(ch)
+    replSetTotalMembers.Set(status.Members)
+    replSetTotalMembersWithData.Set(status.MembersWithData)
+    replSetTotalMembersWithVotes.Set(status.MembersWithVotes)
+    replSetMyLagMs.Set(status.LagMs)
+    replSetMaxNode2NodePingMs.Set(status.MaxNode2NodePingMs)
+
+    replSetLastElection.WithLabelValues("election").Set(status.LastElection)
+
+    replSetTotalMembers.Collect(ch)
+    replSetTotalMembersWithData.Collect(ch)
+    replSetTotalMembersWithVotes.Collect(ch)
+    replSetMyLagMs.Collect(ch)
+    replSetMaxNode2NodePingMs.Collect(ch)
+    replSetLastElection.Collect(ch)
 }
 
 func GetReplSetStatus(session *mgo.Session) *ReplSetStats {
