@@ -22,9 +22,13 @@ func GetCollectionSizeGB(db string, collection string, session *mgo.Session) (fl
         glog.Error("Error getting collection stats!")
     }
 
-    var size int
-    size = collStats["size"].(int)
-    return float64(size)/1024/1024/1024
+    var result float64 = -1
+    if collStats["size"] != nil {
+        size := collStats["size"].(int)
+        result = float64(size)/1024/1024/1024
+    }
+
+    return result
 }
 
 func GetOplogSizeGB(session *mgo.Session) (float64) {
@@ -32,8 +36,7 @@ func GetOplogSizeGB(session *mgo.Session) (float64) {
 }
 
 func ParseBsonMongoTsToUnixTime(timestamp bson.MongoTimestamp) (int32) {
-    ts := (timestamp >> 32)
-    return int32(ts)
+    return int32(timestamp >> 32)
 }
 
 func GetOplogLengthSecs(session *mgo.Session) (float64) {
@@ -51,10 +54,14 @@ func GetOplogLengthSecs(session *mgo.Session) (float64) {
         glog.Error("Error getting tail of oplog.rs!")
     }
 
-    head_ts := ParseBsonMongoTsToUnixTime(head["ts"].(bson.MongoTimestamp))
-    tail_ts := ParseBsonMongoTsToUnixTime(tail["ts"].(bson.MongoTimestamp))
-   
-    return float64(tail_ts - head_ts)
+    var result float64 = -1
+    if head["ts"] != nil && tail["ts"] != nil {
+        head_ts := ParseBsonMongoTsToUnixTime(head["ts"].(bson.MongoTimestamp))
+        tail_ts := ParseBsonMongoTsToUnixTime(tail["ts"].(bson.MongoTimestamp))
+        result = float64(tail_ts - head_ts)
+    }
+
+    return result
 }
 
 type OplogStats struct {

@@ -154,26 +154,8 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 	    glog.Info("No process for current node type no metrics printing!\n")
     }
     session.Close()
-    /**
-    switch nodeType {
-    	case 'mongos':
-            collector_mongos.ServerStatus(ch, session)
-            collector_mongos.BalancingData(ch, session)
-        case 'replset':
-            collector_mongos.ServerStatus(ch, session)
-            collector_mongos.ElectionInfo(ch, session)
-            collector_mongos.OpLogInfo(ch, session)
-            collector_mongos.ReplicationInfo(ch, session)
-        case 'mongod':
-            collector_mongod.ServerStatus(ch, session)
-        case 'arbiter':
-            continue
-        default:
-            error()
-    }
-    **/
-	//exporter.collectMongodServerStatus(ch)
-	//exporter.collectMongosServerStatus(ch)
+    //exporter.collectMongodServerStatus(ch)
+    //exporter.collectMongosServerStatus(ch)
 }
 /**
 func (exporter *MongodbCollector) collectMongodServerStatus(ch chan<- prometheus.Metric) *collector_mongod.ServerStatus {

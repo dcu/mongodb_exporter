@@ -49,8 +49,6 @@ type ServerStatus struct {
 	Metrics        *MetricsStats        `bson:"metrics"`
 
 	Cursors *Cursors `bson:"cursors"`
-
-        Balancer       *BalancerStats
 }
 
 // Export exports the server status to be consumed by prometheus.
@@ -83,9 +81,6 @@ func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
 	if status.Cursors != nil {
 		status.Cursors.Export(ch)
 	}
-        if status.Balancer != nil {
-                status.Balancer.Export(ch)
-        }
 }
 
 // Describe describes the server status for prometheus.

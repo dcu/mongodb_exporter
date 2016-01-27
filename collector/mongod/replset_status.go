@@ -23,30 +23,42 @@ func GetReplSetConfig(session *mgo.Session) (map[string]interface{}) {
         glog.Error("Error executing 'replSetGetConfig'!")
     }
 
-    return replSetConfig["config"].(map[string]interface{})
+    var result map[string]interface{}
+    if replSetConfig["config"] != nil {
+        result = replSetConfig["config"].(map[string]interface{})
+    }
+
+    return result
 }
 
 func GetReplSetMembers(session *mgo.Session) ([]interface{}) {
     replSetConfig := GetReplSetConfig(session)
-    return replSetConfig["members"].([]interface{})
+
+    var result []interface{}
+    if replSetConfig["members"] != nil {
+        result = replSetConfig["members"].([]interface{})
+    }
+
+    return result
 }
 
 func GetReplSetMemberCount(session *mgo.Session) (float64) {
     replSetMembers := GetReplSetMembers(session)
     return float64(len(replSetMembers))
-
 }
 
 func GetReplSetMembersWithDataCount(session *mgo.Session) (float64) {
     replSetMembers := GetReplSetMembers(session)
 
     var membersWithDataCount int = 0
-    for _, member := range replSetMembers {
-        memberInfo := member.(map[string]interface{})
-        if memberInfo["arbiterOnly"] == false {
-            membersWithDataCount = membersWithDataCount + 1
+    if replSetMembers != nil {
+        for _, member := range replSetMembers {
+            memberInfo := member.(map[string]interface{})
+            if memberInfo["arbiterOnly"] == false || memberInfo["health"] == 1 {
+                membersWithDataCount = membersWithDataCount + 1
+            }
         }
-    } 
+    }
 
     return float64(membersWithDataCount)
 }
@@ -55,10 +67,12 @@ func GetReplSetMembersWithVotesCount(session *mgo.Session) (float64) {
     replSetMembers := GetReplSetMembers(session)
 
     var membersWithVotesCount int = 0
-    for _, member := range replSetMembers {
-        memberInfo := member.(map[string]interface{})
-        if memberInfo["votes"].(int) > 0 {
-            membersWithVotesCount = membersWithVotesCount + 1
+    if replSetMembers != nil {
+        for _, member := range replSetMembers {
+            memberInfo := member.(map[string]interface{})
+            if memberInfo["votes"].(int) > 0 || memberInfo["health"] == 1 {
+                membersWithVotesCount = membersWithVotesCount + 1
+            }
         }
     }
 
@@ -77,32 +91,38 @@ func GetReplSetStatusInfo(session *mgo.Session) (map[string]interface{}) {
 
 func GetReplSetStatusPrimary(session *mgo.Session) (map[string]interface{}) {
     replSetStatus := GetReplSetStatusInfo(session)
-    replSetStatusMembers := replSetStatus["members"].([]interface{})
 
-    for _, member := range replSetStatusMembers {
-      memberInfo := member.(map[string]interface{})
-      if memberInfo["state"] == 1 {
-          return memberInfo
-      }
+    var result map[string]interface{}
+    if replSetStatus["members"] != nil {
+        replSetStatusMembers := replSetStatus["members"].([]interface{})
+        for _, member := range replSetStatusMembers {
+            memberInfo := member.(map[string]interface{})
+            if memberInfo["state"] == 1 {
+                result = memberInfo
+                break
+            }
+        }
     }
 
-    glog.Error("Found no replSet member in Primary state!")
-    return make(map[string]interface{})
+    return result
 }
 
 func GetReplStatusSelf(session *mgo.Session) (map[string]interface{}) {
     replSetStatus := GetReplSetStatusInfo(session)
-    replSetStatusMembers := replSetStatus["members"].([]interface{})
 
-    for _, member := range replSetStatusMembers {
-        memberInfo := member.(map[string]interface{})
-        if memberInfo["self"] == true {
-            return memberInfo
+    var result map[string]interface{}
+    if replSetStatus["members"] != nil {
+        replSetStatusMembers := replSetStatus["members"].([]interface{})
+        for _, member := range replSetStatusMembers {
+            memberInfo := member.(map[string]interface{})
+            if memberInfo["self"] == true {
+                result = memberInfo
+                break
+            }
         }
     }
     
-    glog.Error("Could not find myself in the replset config!")
-    return make(map[string]interface{})
+    return result
 }
 
 func GetReplSetLagMs(session *mgo.Session) (float64) {
@@ -114,32 +134,38 @@ func GetReplSetLagMs(session *mgo.Session) (float64) {
         return 0
     }
 
+    var result float64 = -1
     replSetStatusPrimary := GetReplSetStatusPrimary(session)
-    optimeNanoPrimary := replSetStatusPrimary["optimeDate"].(time.Time).UnixNano()
+    if replSetStatusPrimary["optimeDate"] != nil {
+        optimeNanoPrimary := replSetStatusPrimary["optimeDate"].(time.Time).UnixNano()
+        result = float64(optimeNanoPrimary - optimeNanoSelf)/1000000
+    }
 
-    return float64(optimeNanoPrimary - optimeNanoSelf)/1000000
+    return result
 }
 
 func GetReplSetLastElectionUnixTime(session *mgo.Session) (float64) {
+    var result float64 = -1
     memberInfo := GetReplStatusSelf(session)
     if memberInfo["electionDate"] != nil {
         electionUnixTime := memberInfo["electionDate"].(time.Time).Unix()
-        return float64(electionUnixTime)
+        result = float64(electionUnixTime)
     } else {
         replSetPrimary := GetReplSetStatusPrimary(session)
         if replSetPrimary != nil {
             electionUnixTime := replSetPrimary["electionDate"].(time.Time).Unix()
-            return float64(electionUnixTime)
+            result = float64(electionUnixTime)
         }
     }
-    return float64(-1)
+
+    return result
 }
 
 func GetReplSetMaxNode2NodePingMs(session *mgo.Session) (float64) {
     replSetStatus := GetReplSetStatusInfo(session)
     replSetStatusMembers := replSetStatus["members"].([]interface{})
     
-    var maxNodePingMs float64 = 0
+    var maxNodePingMs float64 = -1
     for _, member := range replSetStatusMembers {
         memberInfo := member.(map[string]interface{})
         if memberInfo["pingMs"] != nil {

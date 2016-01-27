@@ -22,11 +22,15 @@ func IsBalancerEnabled(session *mgo.Session) (float64) {
         glog.Error("Could not find balancer settings in 'config.settings'!")
     }
 
-    balancerStopped := balancerConfig["stopped"].(bool)
-    if balancerStopped == false {
-        return 1
+    var result float64 = 0
+    if balancerConfig["stopped"] != nil {
+        balancerStopped := balancerConfig["stopped"].(bool)
+        if balancerStopped == false {
+            result = 1
+        }
     }
-    return 0
+
+    return result
 }
 
 func GetAllShardChunkInfo(session *mgo.Session) (map[string]int64) {
