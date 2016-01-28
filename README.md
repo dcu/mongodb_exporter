@@ -13,10 +13,8 @@ Make sure $GOPATH/bin is in your $PATH, then:
 
 ## Building
 
-    go get -u github.com/dcu/mongodb_exporter
-    cd $GOPATH/src/github.com/dcu/mongodb_exporter
-    make build
-    ./mongodb_exporter -h
+    export GO_VERSION=1.5.1  # if you wish to use your system version
+    make
 
 ## Available groups of data
 

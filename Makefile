@@ -1,14 +1,17 @@
-test:
-	go test github.com/dcu/mongodb_exporter/collector -cover -coverprofile=collector_coverage.out -short
-	go tool cover -func=collector_coverage.out
-	go test github.com/dcu/mongodb_exporter/shared -cover -coverprofile=shared_coverage.out -short
-	go tool cover -func=shared_coverage.out
-	@rm *.out
+# Copyright 2015 The Prometheus Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-deps:
-	go get -u github.com/prometheus/client_golang/prometheus
-	go get -u gopkg.in/mgo.v2
+VERSION  := 0.1.0
+TARGET   := mongodb_exporter
 
-build: deps
-	go build mongodb_exporter.go
-
+include Makefile.COMMON
