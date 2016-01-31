@@ -11,69 +11,81 @@ import (
 var (
     balancerChangelogInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
-            Name:      "balancer_log",
+            Name:      "balancer_changelog",
             Help:      "Log event statistics for the MongoDB balancer",
-    }, []string{"type"})
+    }, []string{"event"})
 )
 
-func TwentyFourHoursAgo() (time.Time) {
-    return time.Now().Add(-24 * time.Hour)
-}
-
-func GetBalancerRoundCount24h(errorOccured bool, session *mgo.Session) (float64) {
-    findQuery := bson.M{ "what" : "balancer.round", "details.errorOccured" : errorOccured, "time" : bson.M{ "$gt" : TwentyFourHoursAgo() } }
-    roundCount, err := session.DB("config").C("actionlog").Find(findQuery).Count()
-    if err != nil {
-        glog.Error("Could not find balancer round info in 'config.actionlog'!")
-    }
-    return float64(roundCount)
-}
-
-func GetFailedBalancerRoundCount24h(session *mgo.Session) (float64) {
-    roundCount := GetBalancerRoundCount24h(true, session)
-    return float64(roundCount)
-}
-
-func GetSplitCount24h(session *mgo.Session) (float64) {
-    findQuery := bson.M{ "what" : "split", "time" : bson.M{ "$gt" : TwentyFourHoursAgo() } }
-    splitCount, err := session.DB("config").C("changelog").Find(findQuery).Count()
-    if err != nil {
-        glog.Error("Could not find split information in 'config.changelog'!")
-    }
-    return float64(splitCount)
-}
-
-func GetMoveChunkStartCount24h(session *mgo.Session) (float64) {
-    findQuery := bson.M{ "what" : "moveChunk.start", "time" : bson.M{ "$gt" : TwentyFourHoursAgo() } }
-    moveChunkStartCount, err := session.DB("config").C("changelog").Find(findQuery).Count()
-    if err != nil {
-        glog.Error("Could not find moveChunk.start info in 'config.changelog'!")
-    }
-    return float64(moveChunkStartCount)
+type BalancerChangelogAggregationResult struct {
+    Event string
+    Count float64
 }
 
 type BalancerChangelogStats struct {
-    BalancerRoundFailure24h	float64
-    SplitCount24h		float64
-    MoveChunkStartCount24h	float64
+    MoveChunkStart              float64
+    MoveChunkFrom               float64
+    MoveChunkTo                 float64
+    MoveChunkCommit             float64
+    Split                       float64
+    MultiSplit                  float64
+    ShardCollection             float64
+    ShardCollectionStart        float64
+    AddShard                    float64
+}
+
+func GetBalancerChangelogStats24hr(session *mgo.Session) *BalancerChangelogStats {
+    var qresults []BalancerChangelogAggregationResult
+    coll  := session.DB("config").C("changelog")
+    match := bson.M{ "time" : bson.M{ "$gt" : time.Now().Add(-24 * time.Hour) } }
+    group := bson.M{ "_id" : "$what", "count" : bson.M{ "$sum" : 1 }, "event" : bson.M{ "$last" : "$what" } }
+
+    err := coll.Pipe([]bson.M{{ "$match" : match }, { "$group" : group }}).All(&qresults)
+    if err != nil {
+        glog.Error("Error executing aggregation on 'config.changelog'!")
+    }
+
+    results := &BalancerChangelogStats{}
+    for _, stat := range qresults {
+        if stat.Event == "moveChunk.start" {
+            results.MoveChunkStart = stat.Count
+        } else if stat.Event == "moveChunk.to" {
+            results.MoveChunkTo = stat.Count
+        } else if stat.Event == "moveChunk.from" {
+            results.MoveChunkFrom = stat.Count
+        } else if stat.Event == "moveChunk.commit" {
+            results.MoveChunkCommit = stat.Count
+        } else if stat.Event == "addShard" {
+            results.AddShard = stat.Count
+        } else if stat.Event == "shardCollection" {
+            results.ShardCollection = stat.Count
+        } else if stat.Event == "shardCollection.start" {
+            results.ShardCollectionStart = stat.Count
+        } else if stat.Event == "split" {
+            results.Split = stat.Count
+        } else if stat.Event == "multi-split" {
+            results.MultiSplit = stat.Count
+        }
+    }
+
+    return results
 }
 
 func (status *BalancerChangelogStats) Export(ch chan<- prometheus.Metric) {
-    balancerChangelogInfo.WithLabelValues("splits_24h").Set(status.SplitCount24h)
-    balancerChangelogInfo.WithLabelValues("move_chunk_starts_24h").Set(status.MoveChunkStartCount24h)
-    balancerChangelogInfo.WithLabelValues("move_chunk_failed_24h").Set(status.BalancerRoundFailure24h)
+    balancerChangelogInfo.WithLabelValues("move_chunk_start").Set(status.MoveChunkStart)
+    balancerChangelogInfo.WithLabelValues("move_chunk_to").Set(status.MoveChunkTo)
+    balancerChangelogInfo.WithLabelValues("move_chunk_from").Set(status.MoveChunkFrom)
+    balancerChangelogInfo.WithLabelValues("move_chunk_commit").Set(status.MoveChunkCommit)
+    balancerChangelogInfo.WithLabelValues("add_shard").Set(status.AddShard)
+    balancerChangelogInfo.WithLabelValues("shard_collection").Set(status.ShardCollection)
+    balancerChangelogInfo.WithLabelValues("shard_collection_start").Set(status.ShardCollectionStart)
+    balancerChangelogInfo.WithLabelValues("split").Set(status.Split)
+    balancerChangelogInfo.WithLabelValues("multi_split").Set(status.MultiSplit)
     balancerChangelogInfo.Collect(ch)
 }
 
 func GetBalancerChangelogStatus(session *mgo.Session) *BalancerChangelogStats {
-    results := &BalancerChangelogStats{}
-
     session.SetMode(mgo.Eventual, true)
     session.SetSocketTimeout(0)
-
-    results.SplitCount24h = GetSplitCount24h(session)
-    results.MoveChunkStartCount24h = GetMoveChunkStartCount24h(session)
-    results.BalancerRoundFailure24h = GetFailedBalancerRoundCount24h(session)
-
+    results := GetBalancerChangelogStats24hr(session)
     return results
 }

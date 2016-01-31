@@ -24,16 +24,13 @@ var (
 
 func IsBalancerEnabled(session *mgo.Session) (float64) {
     var balancerConfig map[string]interface{}
-    err := session.DB("config").C("settings").Find(bson.M{ "_id" : "balancer" }).Select(bson.M{ "_id" : 0 }).One(&balancerConfig)
-    if err != nil {
-        glog.Error("Could not find balancer settings in 'config.settings'!")
-    }
+    session.DB("config").C("settings").Find(bson.M{ "_id" : "balancer" }).Select(bson.M{ "_id" : 0 }).One(&balancerConfig)
 
-    var result float64 = 0
+    var result float64 = 1
     if balancerConfig["stopped"] != nil {
         balancerStopped := balancerConfig["stopped"].(bool)
-        if balancerStopped == false {
-            result = 1
+        if balancerStopped == true {
+            result = 0
         }
     }
 
