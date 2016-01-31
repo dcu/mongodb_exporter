@@ -10,13 +10,13 @@ import (
 var (
     balancerIsEnabled = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "balancer_status",
+            Subsystem: "balancer",
             Name:      "is_enabled",
             Help:      "Boolean reporting if cluster balancer is enabled",
     })
     balancerIsBalanced = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "balancer_status",
+            Subsystem: "balancer",
             Name:      "is_balanced",
             Help:      "Boolean reporting if cluster chunks are balanced across shards",
     })

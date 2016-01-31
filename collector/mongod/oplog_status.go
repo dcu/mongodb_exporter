@@ -10,13 +10,13 @@ import (
 var (
     oplogStatusLengthSec = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "oplog_status",
+            Subsystem: "oplog",
             Name:      "length_sec",
             Help:      "Length of oplog in seconds from head to tail",
     })
     oplogStatusSizeGB = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "oplog_status",
+            Subsystem: "oplog",
             Name:      "size_gb",
             Help:      "Size of oplog in gigabytes",
     })

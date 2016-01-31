@@ -10,25 +10,25 @@ import (
 var (
     balancerTopoInfoTotalShards = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "balancer_topology",
+            Subsystem: "balancer_topo",
             Name:      "total_shards",
             Help:      "Total # of Shards in Cluster",
     })
     balancerTopoInfoTotalChunks = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "balancer_topology",
+            Subsystem: "balancer_topo",
             Name:      "total_chunks",
             Help:      "Total # of Chunks in Cluster",
     })
     balancerTopoInfoTotalDatabases = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "balancer_topology",
+            Subsystem: "balancer_topo",
             Name:      "total_databases",
             Help:      "Total # of Databases with Sharding Enabled",
     })
     balancerTopoInfoTotalCollections = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "balancer_topology",
+            Subsystem: "balancer_topo",
             Name:      "total_collections",
             Help:      "Total # of Collections with Sharding Enabled",
     })

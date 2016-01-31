@@ -11,36 +11,36 @@ import (
 var (
     replSetLastElection = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
-            Name:      "replset_status_last",
+            Name:      "replset_last",
             Help:      "Last event times for replica set",
     }, []string{"event"})
     replSetTotalMembers = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "replset_status",
+            Subsystem: "replset",
             Name:      "members",
             Help:      "Number of members in replica set",
     })
     replSetTotalMembersWithData = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "replset_status",
+            Subsystem: "replset",
             Name:      "members_w_data",
             Help:      "Number of members in replica set with data",
     })
     replSetTotalMembersWithVotes = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "replset_status",
+            Subsystem: "replset",
             Name:      "members_w_votes",
             Help:      "Number of members in replica set with votes",
     })
     replSetMyLagMs = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "replset_status",
-            Name:      "lag_ms",
+            Subsystem: "replset",
+            Name:      "my_lag_ms",
             Help:      "Lag in milliseconds in reference to replica set Primary node",
     })
     replSetMaxNode2NodePingMs = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
-            Subsystem: "replset_status",
+            Subsystem: "replset",
             Name:      "max_n2n_ping_ms",
             Help:      "Maximum ping in milliseconds to other replica set members",
     })

@@ -11,8 +11,8 @@ import (
 var (
     balancerChangelogInfo = prometheus.NewCounterVec(prometheus.CounterOpts{
             Namespace: Namespace,
-            Name:      "balancer_changelog",
-            Help:      "Changelog statistics for the MongoDB balancer",
+            Name:      "balancer_log",
+            Help:      "Log event statistics for the MongoDB balancer",
     }, []string{"type"})
 )
 
