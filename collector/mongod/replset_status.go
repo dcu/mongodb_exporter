@@ -109,16 +109,27 @@ func GetReplSetPrimary(status *ReplicaSetStatus) *ReplicaSetMemberStatus {
     return result
 }
 
-// Return the data of a member by name:
-//func GetReplSetMemberByName(status *ReplicaSetStatus, name string) {
-//
-//}
+func GetReplSetMemberByName(status *ReplicaSetStatus, name string) *ReplicaSetMemberStatus {
+    result := &ReplicaSetMemberStatus{}
 
-// Return the data of the member "I" am syncing from:
-//func GetReplSetSyncingTo(status *ReplicaSetStatus) *ReplicaSetMemberStatus {
-//    ...
-//    return GetReplSetMemberByName(status, syncingToName)
-//}
+    for _, member := range status.Members {
+        if member.Name == name {
+            result = &member
+            break
+        }
+    }
+
+    return result
+}
+
+func GetReplSetSyncingTo(status *ReplicaSetStatus) *ReplicaSetMemberStatus {
+    myInfo := GetReplSetSelf(status)
+    if len(myInfo.SyncingTo) > 0 {
+        return GetReplSetMemberByName(status, myInfo.SyncingTo)
+    } else {
+        return GetReplSetPrimary(status)
+    }
+}
 
 func GetReplSetMemberCount(status *ReplicaSetStatus) (float64) {
     var result float64 = 0
@@ -170,7 +181,7 @@ func GetReplSetLagMs(status *ReplicaSetStatus) (float64) {
 
     var result float64 = -1
     optimeNanoSelf := memberInfo.OptimeDate.UnixNano()
-    replSetStatusPrimary := GetReplSetPrimary(status)
+    replSetStatusPrimary := GetReplSetSyncingTo(status)
     if &replSetStatusPrimary.OptimeDate != nil {
         optimeNanoPrimary := replSetStatusPrimary.OptimeDate.UnixNano()
         result = float64(optimeNanoPrimary - optimeNanoSelf)/1000000
