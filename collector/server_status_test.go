@@ -1,17 +1,10 @@
 package collector
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"testing"
+
+	"gopkg.in/mgo.v2/bson"
 )
-
-func Test_ServerStatusCollectData(t *testing.T) {
-	data := LoadFixture("server_status.bson")
-	serverStatus := &ServerStatus{}
-	loadServerStatusFromBson(data, serverStatus)
-
-	serverStatus.Export()
-}
 
 func Test_ParserServerStatus(t *testing.T) {
 	data := LoadFixture("server_status.bson")

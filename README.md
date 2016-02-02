@@ -18,6 +18,9 @@ Make sure $GOPATH/bin is in your $PATH, then:
     make build
     ./mongodb_exporter -h
 
+The mongodb url can contain credentials which can be seen by other users on the system when passed in as command line flag.
+To pass in the mongodb url securely, you can set the MONGODB_URL environment variable instead.
+
 ## Available groups of data
 
 Name     | Description
