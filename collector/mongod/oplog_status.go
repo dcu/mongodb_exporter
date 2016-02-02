@@ -1,6 +1,7 @@
 package collector_mongod
 
 import (
+    "time"
     "github.com/golang/glog"
     "github.com/prometheus/client_golang/prometheus"
     "gopkg.in/mgo.v2"
@@ -13,6 +14,12 @@ var (
             Subsystem: "oplog",
             Name:      "length_sec",
             Help:      "Length of oplog in seconds from head to tail",
+    })
+    oplogStatusLengthSecNow = prometheus.NewGauge(prometheus.GaugeOpts{
+            Namespace: Namespace,
+            Subsystem: "oplog",
+            Name:      "length_sec_now",
+            Help:      "Length of oplog in seconds from now to tail",
     })
     oplogStatusSizeGB = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
@@ -42,51 +49,53 @@ func GetOplogSizeGB(session *mgo.Session) (float64) {
     return GetCollectionSizeGB("local", "oplog.rs", session)
 }
 
-func ParseBsonMongoTsToUnixTime(timestamp bson.MongoTimestamp) (int32) {
-    return int32(timestamp >> 32)
+func ParseBsonMongoTsToUnix(timestamp bson.MongoTimestamp) (int64) {
+    return int64(timestamp >> 32)
 }
 
-func GetOplogLengthSecs(session *mgo.Session) (float64) {
-    col := session.DB("local").C("oplog.rs")
+type OplogStatsData struct {
+    MinTime	bson.MongoTimestamp	`bson:"min"`
+    MaxTime	bson.MongoTimestamp	`bson:"max"`
+}
 
-    var head map[string]interface{}
-    err := col.Find(bson.M{}).Sort("$natural").One(&head)
+func GetOplogLengthSecs(session *mgo.Session) (float64, float64) {
+    results := &OplogStatsData{}
+    group := bson.M{ "_id" : 1, "min" : bson.M{ "$min" : "$ts" }, "max" : bson.M{ "$max" : "$ts" } }
+    err := session.DB("local").C("oplog.rs").Pipe([]bson.M{{ "$group" : group  }}).One(&results)
     if err != nil {
-        glog.Error("Error getting head of oplog.rs!")
-    } 
-
-    var tail map[string]interface{}
-    err = col.Find(bson.M{}).Sort("-$natural").One(&tail)
-    if err != nil {
-        glog.Error("Error getting tail of oplog.rs!")
+        glog.Error("Could not get the oplog time min/max!")
+        return -1, -1
     }
 
-    var result float64 = -1
-    if head["ts"] != nil && tail["ts"] != nil {
-        head_ts := ParseBsonMongoTsToUnixTime(head["ts"].(bson.MongoTimestamp))
-        tail_ts := ParseBsonMongoTsToUnixTime(tail["ts"].(bson.MongoTimestamp))
-        result = float64(tail_ts - head_ts)
-    }
+    minTime := ParseBsonMongoTsToUnix(results.MinTime)
+    maxTime := ParseBsonMongoTsToUnix(results.MaxTime)
 
-    return result
+    now := time.Now().Unix()
+    lengthSeconds := maxTime - minTime
+    lengthSecondsNow := now - minTime
+
+    return float64(lengthSeconds), float64(lengthSecondsNow)
 }
 
 type OplogStats struct {
-    LengthSec	float64
-    SizeGB	float64
+    LengthSec		float64
+    LengthSecNow	float64
+    SizeGB		float64
 }
 
 func (status *OplogStats) Export(ch chan<- prometheus.Metric) {
     oplogStatusLengthSec.Set(status.LengthSec)
+    oplogStatusLengthSecNow.Set(status.LengthSecNow)
     oplogStatusSizeGB.Set(status.SizeGB)
     oplogStatusLengthSec.Collect(ch)
+    oplogStatusLengthSecNow.Collect(ch)
     oplogStatusSizeGB.Collect(ch)
 }
 
 func GetOplogStatus(session *mgo.Session) *OplogStats {
     results := &OplogStats{}
 
-    results.LengthSec = GetOplogLengthSecs(session)
+    results.LengthSec, results.LengthSecNow = GetOplogLengthSecs(session)
     results.SizeGB = GetOplogSizeGB(session)
 
     return results

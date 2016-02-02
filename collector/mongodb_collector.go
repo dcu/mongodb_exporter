@@ -4,6 +4,7 @@ import (
 	//"github.com/dcu/mongodb_exporter/shared"
 	"github.com/dcu/mongodb_exporter/collector/mongod"
 	"github.com/dcu/mongodb_exporter/collector/mongos"
+	"github.com/dcu/mongodb_exporter/collector/shared"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
@@ -69,7 +70,8 @@ func connectMongo(uri string)(*mgo.Session, error) {
 	}
 
 	session.SetMode(mgo.Eventual, true)
-	session.SetSocketTimeout(0)
+  	session.SetSocketTimeout(0)
+
 	err = nil 
 	return session,err
 }
@@ -108,7 +110,10 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
     if err != nil{
 		 glog.Error(fmt.Printf("We failed to connect to mongo with error of %s\n", err))
     }
-    glog.Info("Connected to: ", exporter.Opts.URI)
+
+    version := collector_shared.GetServerVersion(session)
+    glog.Info("Connected to: ", exporter.Opts.URI, ", server version: ", version)
+
     nodeType,err := GetNodeType(session)
     if err != nil{
     	glog.Error("We run had a node type error of %s\n", err)

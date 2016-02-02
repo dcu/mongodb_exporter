@@ -17,8 +17,8 @@ var (
 )
 
 type BalancerChangelogAggregationResult struct {
-    Event string
-    Count float64
+    Event string	`bson:"_id"`
+    Count float64	`bson:"count"`
 }
 
 type BalancerChangelogStats struct {
@@ -37,9 +37,9 @@ func GetBalancerChangelogStats24hr(session *mgo.Session) *BalancerChangelogStats
     var qresults []BalancerChangelogAggregationResult
     coll  := session.DB("config").C("changelog")
     match := bson.M{ "time" : bson.M{ "$gt" : time.Now().Add(-24 * time.Hour) } }
-    group := bson.M{ "_id" : "$what", "count" : bson.M{ "$sum" : 1 }, "event" : bson.M{ "$last" : "$what" } }
+    group := bson.M{ "_id" : "$what", "count" : bson.M{ "$sum" : 1 } }
 
-    err := coll.Pipe([]bson.M{{ "$match" : match }, { "$group" : group }}).All(&qresults)
+    err := coll.Pipe([]bson.M{ { "$match" : match }, { "$group" : group } }).All(&qresults)
     if err != nil {
         glog.Error("Error executing aggregation on 'config.changelog'!")
     }
