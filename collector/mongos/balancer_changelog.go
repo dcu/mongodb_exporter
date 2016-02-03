@@ -16,15 +16,22 @@ var (
     }, []string{"event"})
 )
 
+type BalancerChangelogAggregationId struct {
+    Event	string	`bson:"event"`
+    Note	string	`bson:"note"`
+}
+
 type BalancerChangelogAggregationResult struct {
-    Event string	`bson:"_id"`
-    Count float64	`bson:"count"`
+    Id		*BalancerChangelogAggregationId	`bson:"_id"`
+    Count 	float64				`bson:"count"`
 }
 
 type BalancerChangelogStats struct {
     MoveChunkStart              float64
-    MoveChunkFrom               float64
-    MoveChunkTo                 float64
+    MoveChunkFromSuccess        float64
+    MoveChunkFromFailed         float64
+    MoveChunkToSuccess          float64
+    MoveChunkToFailed           float64
     MoveChunkCommit             float64
     Split                       float64
     MultiSplit                  float64
@@ -33,11 +40,11 @@ type BalancerChangelogStats struct {
     AddShard                    float64
 }
 
-func GetBalancerChangelogStats24hr(session *mgo.Session) *BalancerChangelogStats {
+func GetBalancerChangelogStats24hr(session *mgo.Session, showErrors bool) *BalancerChangelogStats {
     var qresults []BalancerChangelogAggregationResult
     coll  := session.DB("config").C("changelog")
     match := bson.M{ "time" : bson.M{ "$gt" : time.Now().Add(-24 * time.Hour) } }
-    group := bson.M{ "_id" : "$what", "count" : bson.M{ "$sum" : 1 } }
+    group := bson.M{ "_id" : bson.M{ "event" : "$what", "note" : "$details.note" }, "count" : bson.M{ "$sum" : 1 } }
 
     err := coll.Pipe([]bson.M{ { "$match" : match }, { "$group" : group } }).All(&qresults)
     if err != nil {
@@ -46,23 +53,31 @@ func GetBalancerChangelogStats24hr(session *mgo.Session) *BalancerChangelogStats
 
     results := &BalancerChangelogStats{}
     for _, stat := range qresults {
-        if stat.Event == "moveChunk.start" {
+        if stat.Id.Event == "moveChunk.start" {
             results.MoveChunkStart = stat.Count
-        } else if stat.Event == "moveChunk.to" {
-            results.MoveChunkTo = stat.Count
-        } else if stat.Event == "moveChunk.from" {
-            results.MoveChunkFrom = stat.Count
-        } else if stat.Event == "moveChunk.commit" {
+        } else if stat.Id.Event == "moveChunk.to" {
+            if stat.Id.Note == "success" {
+                results.MoveChunkToSuccess = stat.Count
+            } else {
+                results.MoveChunkToFailed = stat.Count
+            }
+        } else if stat.Id.Event == "moveChunk.from" {
+            if stat.Id.Note == "success" {
+                results.MoveChunkFromSuccess = stat.Count
+            } else {
+                results.MoveChunkFromFailed = stat.Count
+            }
+        } else if stat.Id.Event == "moveChunk.commit" {
             results.MoveChunkCommit = stat.Count
-        } else if stat.Event == "addShard" {
+        } else if stat.Id.Event == "addShard" {
             results.AddShard = stat.Count
-        } else if stat.Event == "shardCollection" {
+        } else if stat.Id.Event == "shardCollection" {
             results.ShardCollection = stat.Count
-        } else if stat.Event == "shardCollection.start" {
+        } else if stat.Id.Event == "shardCollection.start" {
             results.ShardCollectionStart = stat.Count
-        } else if stat.Event == "split" {
+        } else if stat.Id.Event == "split" {
             results.Split = stat.Count
-        } else if stat.Event == "multi-split" {
+        } else if stat.Id.Event == "multi-split" {
             results.MultiSplit = stat.Count
         }
     }
@@ -72,8 +87,10 @@ func GetBalancerChangelogStats24hr(session *mgo.Session) *BalancerChangelogStats
 
 func (status *BalancerChangelogStats) Export(ch chan<- prometheus.Metric) {
     balancerChangelogInfo.WithLabelValues("move_chunk_start").Set(status.MoveChunkStart)
-    balancerChangelogInfo.WithLabelValues("move_chunk_to").Set(status.MoveChunkTo)
-    balancerChangelogInfo.WithLabelValues("move_chunk_from").Set(status.MoveChunkFrom)
+    balancerChangelogInfo.WithLabelValues("move_chunk_to_success").Set(status.MoveChunkToSuccess)
+    balancerChangelogInfo.WithLabelValues("move_chunk_to_failed").Set(status.MoveChunkToFailed)
+    balancerChangelogInfo.WithLabelValues("move_chunk_from_success").Set(status.MoveChunkFromSuccess)
+    balancerChangelogInfo.WithLabelValues("move_chunk_from_failed").Set(status.MoveChunkFromFailed)
     balancerChangelogInfo.WithLabelValues("move_chunk_commit").Set(status.MoveChunkCommit)
     balancerChangelogInfo.WithLabelValues("add_shard").Set(status.AddShard)
     balancerChangelogInfo.WithLabelValues("shard_collection").Set(status.ShardCollection)
@@ -86,6 +103,6 @@ func (status *BalancerChangelogStats) Export(ch chan<- prometheus.Metric) {
 func GetBalancerChangelogStatus(session *mgo.Session) *BalancerChangelogStats {
     session.SetMode(mgo.Eventual, true)
     session.SetSocketTimeout(0)
-    results := GetBalancerChangelogStats24hr(session)
+    results := GetBalancerChangelogStats24hr(session, false)
     return results
 }
