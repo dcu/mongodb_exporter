@@ -21,15 +21,15 @@ var (
             Name:      "length_sec_now",
             Help:      "Length of oplog in seconds from now to tail",
     })
-    oplogStatusSizeGB = prometheus.NewGauge(prometheus.GaugeOpts{
+    oplogStatusSizeMB = prometheus.NewGauge(prometheus.GaugeOpts{
             Namespace: Namespace,
             Subsystem: "oplog",
-            Name:      "size_gb",
-            Help:      "Size of oplog in gigabytes",
+            Name:      "size_mb",
+            Help:      "Size of oplog in megabytes",
     })
 )
 
-func GetCollectionSizeGB(db string, collection string, session *mgo.Session) (float64) {
+func GetCollectionSizeMB(db string, collection string, session *mgo.Session) (float64) {
     var collStats map[string]interface{}
     err := session.DB(db).Run(bson.D{{"collStats", collection }}, &collStats)
     if err != nil {
@@ -39,14 +39,14 @@ func GetCollectionSizeGB(db string, collection string, session *mgo.Session) (fl
     var result float64 = -1
     if collStats["size"] != nil {
         size := collStats["size"].(int)
-        result = float64(size)/1024/1024/1024
+        result = float64(size)/1024/1024
     }
 
     return result
 }
 
-func GetOplogSizeGB(session *mgo.Session) (float64) {
-    return GetCollectionSizeGB("local", "oplog.rs", session)
+func GetOplogSizeMB(session *mgo.Session) (float64) {
+    return GetCollectionSizeMB("local", "oplog.rs", session)
 }
 
 func ParseBsonMongoTsToUnix(timestamp bson.MongoTimestamp) (int64) {
@@ -80,23 +80,23 @@ func GetOplogLengthSecs(session *mgo.Session) (float64, float64) {
 type OplogStats struct {
     LengthSec		float64
     LengthSecNow	float64
-    SizeGB		float64
+    SizeMB		float64
 }
 
 func (status *OplogStats) Export(ch chan<- prometheus.Metric) {
     oplogStatusLengthSec.Set(status.LengthSec)
     oplogStatusLengthSecNow.Set(status.LengthSecNow)
-    oplogStatusSizeGB.Set(status.SizeGB)
+    oplogStatusSizeMB.Set(status.SizeMB)
     oplogStatusLengthSec.Collect(ch)
     oplogStatusLengthSecNow.Collect(ch)
-    oplogStatusSizeGB.Collect(ch)
+    oplogStatusSizeMB.Collect(ch)
 }
 
 func GetOplogStatus(session *mgo.Session) *OplogStats {
     results := &OplogStats{}
 
     results.LengthSec, results.LengthSecNow = GetOplogLengthSecs(session)
-    results.SizeGB = GetOplogSizeGB(session)
+    results.SizeMB = GetOplogSizeMB(session)
 
     return results
 }

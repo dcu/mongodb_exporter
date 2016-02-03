@@ -53,32 +53,35 @@ func GetBalancerChangelogStats24hr(session *mgo.Session, showErrors bool) *Balan
 
     results := &BalancerChangelogStats{}
     for _, stat := range qresults {
-        if stat.Id.Event == "moveChunk.start" {
-            results.MoveChunkStart = stat.Count
-        } else if stat.Id.Event == "moveChunk.to" {
-            if stat.Id.Note == "success" {
-                results.MoveChunkToSuccess = stat.Count
+        event := stat.Id.Event
+        note  := stat.Id.Note
+        count := stat.Count
+        if event == "moveChunk.start" {
+            results.MoveChunkStart = count
+        } else if event == "moveChunk.to" {
+            if note == "success" {
+                results.MoveChunkToSuccess = count
             } else {
-                results.MoveChunkToFailed = stat.Count
+                results.MoveChunkToFailed = count
             }
-        } else if stat.Id.Event == "moveChunk.from" {
-            if stat.Id.Note == "success" {
-                results.MoveChunkFromSuccess = stat.Count
+        } else if event == "moveChunk.from" {
+            if note == "success" {
+                results.MoveChunkFromSuccess = count
             } else {
-                results.MoveChunkFromFailed = stat.Count
+                results.MoveChunkFromFailed = count
             }
-        } else if stat.Id.Event == "moveChunk.commit" {
-            results.MoveChunkCommit = stat.Count
-        } else if stat.Id.Event == "addShard" {
-            results.AddShard = stat.Count
-        } else if stat.Id.Event == "shardCollection" {
-            results.ShardCollection = stat.Count
-        } else if stat.Id.Event == "shardCollection.start" {
-            results.ShardCollectionStart = stat.Count
-        } else if stat.Id.Event == "split" {
-            results.Split = stat.Count
-        } else if stat.Id.Event == "multi-split" {
-            results.MultiSplit = stat.Count
+        } else if event == "moveChunk.commit" {
+            results.MoveChunkCommit = count
+        } else if event == "addShard" {
+            results.AddShard = count
+        } else if event == "shardCollection" {
+            results.ShardCollection = count
+        } else if event == "shardCollection.start" {
+            results.ShardCollectionStart = count
+        } else if event == "split" {
+            results.Split = count
+        } else if event == "multi-split" {
+            results.MultiSplit = count
         }
     }
 
@@ -86,17 +89,17 @@ func GetBalancerChangelogStats24hr(session *mgo.Session, showErrors bool) *Balan
 }
 
 func (status *BalancerChangelogStats) Export(ch chan<- prometheus.Metric) {
-    balancerChangelogInfo.WithLabelValues("move_chunk_start").Set(status.MoveChunkStart)
-    balancerChangelogInfo.WithLabelValues("move_chunk_to_success").Set(status.MoveChunkToSuccess)
-    balancerChangelogInfo.WithLabelValues("move_chunk_to_failed").Set(status.MoveChunkToFailed)
-    balancerChangelogInfo.WithLabelValues("move_chunk_from_success").Set(status.MoveChunkFromSuccess)
-    balancerChangelogInfo.WithLabelValues("move_chunk_from_failed").Set(status.MoveChunkFromFailed)
-    balancerChangelogInfo.WithLabelValues("move_chunk_commit").Set(status.MoveChunkCommit)
-    balancerChangelogInfo.WithLabelValues("add_shard").Set(status.AddShard)
-    balancerChangelogInfo.WithLabelValues("shard_collection").Set(status.ShardCollection)
-    balancerChangelogInfo.WithLabelValues("shard_collection_start").Set(status.ShardCollectionStart)
+    balancerChangelogInfo.WithLabelValues("moveChunk.start").Set(status.MoveChunkStart)
+    balancerChangelogInfo.WithLabelValues("moveChunk.to").Set(status.MoveChunkToSuccess)
+    balancerChangelogInfo.WithLabelValues("moveChunk.to_failed").Set(status.MoveChunkToFailed)
+    balancerChangelogInfo.WithLabelValues("moveChunk.from").Set(status.MoveChunkFromSuccess)
+    balancerChangelogInfo.WithLabelValues("moveChunk.from_failed").Set(status.MoveChunkFromFailed)
+    balancerChangelogInfo.WithLabelValues("moveChunk.commit").Set(status.MoveChunkCommit)
+    balancerChangelogInfo.WithLabelValues("addShard").Set(status.AddShard)
+    balancerChangelogInfo.WithLabelValues("shardCollection").Set(status.ShardCollection)
+    balancerChangelogInfo.WithLabelValues("shardCollection.start").Set(status.ShardCollectionStart)
     balancerChangelogInfo.WithLabelValues("split").Set(status.Split)
-    balancerChangelogInfo.WithLabelValues("multi_split").Set(status.MultiSplit)
+    balancerChangelogInfo.WithLabelValues("multi-split").Set(status.MultiSplit)
     balancerChangelogInfo.Collect(ch)
 }
 
