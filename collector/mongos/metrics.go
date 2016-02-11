@@ -62,15 +62,40 @@ func (getLastErrorStats *GetLastErrorStats) Export(ch chan<- prometheus.Metric) 
 	metricsGetLastErrorWtimeoutsTotal.Set(getLastErrorStats.Wtimeouts)
 }
 
+// CursorStatsOpen are the stats for open cursors
+type CursorStatsOpen struct {
+        NoTimeout       float64 `bson:"noTimeout"`
+        Pinned          float64 `bson:"pinned"`
+        Total           float64 `bson:"total"`
+}
+
+// CursorStats are the stats for cursors
+type CursorStats struct {
+        TimedOut        float64                 `bson:"timedOut"`
+        Open            *CursorStatsOpen        `bson:"open"`
+}
+
+// Export exports the cursor stats.
+func (cursorStats *CursorStats) Export(ch chan<- prometheus.Metric) {
+        metricsCursorTimedOutTotal.Set(cursorStats.TimedOut)
+        metricsCursorOpen.WithLabelValues("noTimeout").Set(cursorStats.Open.NoTimeout)
+        metricsCursorOpen.WithLabelValues("pinned").Set(cursorStats.Open.Pinned)
+        metricsCursorOpen.WithLabelValues("total").Set(cursorStats.Open.Total)
+}
+
 // MetricsStats are all stats associated with metrics of the system
 type MetricsStats struct {
 	GetLastError  *GetLastErrorStats  `bson:"getLastError"`
+        Cursor        *CursorStats        `bson:"cursor"`
 }
 
 // Export exports the metrics stats.
 func (metricsStats *MetricsStats) Export(ch chan<- prometheus.Metric) {
 	if metricsStats.GetLastError != nil {
 		metricsStats.GetLastError.Export(ch)
+	}
+	if metricsStats.Cursor != nil {
+		metricsStats.Cursor.Export(ch)
 	}
 
 	metricsCursorTimedOutTotal.Collect(ch)
