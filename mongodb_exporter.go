@@ -8,6 +8,7 @@ import (
 
 	"github.com/dcu/mongodb_exporter/collector"
 	"github.com/dcu/mongodb_exporter/shared"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -24,9 +25,8 @@ var (
 
 	mongodbURIFlag    = flag.String("mongodb.uri", mongodbDefaultUri(), "Mongodb URI, format: [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]")
 	enabledGroupsFlag = flag.String("groups.enabled", "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics", "Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/")
-	//printCollectors   = flag.Bool("collectors.print", false, "If true, print available collectors and exit.")
-	authUserFlag = flag.String("auth.user", "", "Username for basic auth.")
-	authPassFlag = flag.String("auth.pass", "", "Password for basic auth.")
+	authUserFlag      = flag.String("auth.user", "", "Username for basic auth.")
+	authPassFlag      = flag.String("auth.pass", "", "Password for basic auth.")
 )
 
 type basicAuthHandler struct {
