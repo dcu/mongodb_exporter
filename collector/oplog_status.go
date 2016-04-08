@@ -10,25 +10,25 @@ import (
 var (
 	oplogStatusCount = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:	Namespace,
-		Subsystem:	"oplog",
+		Subsystem:	"replset_oplog",
 		Name:		"current_items",
 		Help:		"The current number of items in the oplog",
 	})
 	oplogStatusHeadTimestamp = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:	Namespace,
-		Subsystem:	"oplog",
+		Subsystem:	"replset_oplog",
 		Name:		"head_unix_timestamp",
 		Help:		"The unix timestamp of the newest change in the oplog",
 	})
 	oplogStatusTailTimestamp = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:	Namespace,
-		Subsystem:	"oplog",
+		Subsystem:	"replset_oplog",
 		Name:		"tail_unix_timestamp",
 		Help:		"The unix timestamp of the oldest change in the oplog",
 	})
 	oplogStatusSizeBytes = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace:	Namespace,
-		Subsystem:	"oplog",
+		Subsystem:	"replset_oplog",
 		Name:		"size_bytes",
 		Help:		"Size of oplog in bytes",
 	}, []string{"type"})
