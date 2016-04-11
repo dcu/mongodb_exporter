@@ -17,13 +17,13 @@ var (
 	oplogStatusHeadTimestamp = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:	Namespace,
 		Subsystem:	"replset_oplog",
-		Name:		"head_unix_timestamp",
+		Name:		"head_timestamp",
 		Help:		"The unix timestamp of the newest change in the oplog",
 	})
 	oplogStatusTailTimestamp = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:	Namespace,
 		Subsystem:	"replset_oplog",
-		Name:		"tail_unix_timestamp",
+		Name:		"tail_timestamp",
 		Help:		"The unix timestamp of the oldest change in the oplog",
 	})
 	oplogStatusSizeBytes = prometheus.NewGaugeVec(prometheus.GaugeOpts{
