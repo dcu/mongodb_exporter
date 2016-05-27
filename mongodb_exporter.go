@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	"fmt"
 	slog "log"
 	"net/http"
 	"os"
@@ -112,10 +113,10 @@ func startWebServer() {
 		if len(targetTlsPrivateKey) <= 0 {
 			targetTlsPrivateKey = *webTlsCert
 		}
-		glog.Infof("Listening on %s (scheme=HTTPS, secured=TLS, clientValidation=%s)\n", server.Addr, clientValidation)
+		fmt.Printf("Listening on %s (scheme=HTTPS, secured=TLS, clientValidation=%s)\n", server.Addr, clientValidation)
 		err = server.ListenAndServeTLS(*webTlsCert, targetTlsPrivateKey)
 	} else {
-		glog.Infof("Listening on %s (scheme=HTTP, secured=no, clientValidation=no)\n", server.Addr)
+		fmt.Printf("Listening on %s (scheme=HTTP, secured=no, clientValidation=no)\n", server.Addr)
 		err = server.ListenAndServe()
 	}
 
