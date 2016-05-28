@@ -46,6 +46,8 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		exporter.collectServerStatus(mongoSess, ch)
 		glog.Info("Collecting ReplSet Status")
 		exporter.collectReplSetStatus(mongoSess, ch)
+		glog.Info("Collecting Oplog Status")
+		exporter.collectOplogStatus(mongoSess, ch)
 	}
 }
 
@@ -67,4 +69,15 @@ func (exporter *MongodbCollector) collectReplSetStatus(session *mgo.Session, ch 
 	}
 
 	return replSetStatus
+}
+
+func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch chan<- prometheus.Metric) *OplogStatus {
+        oplogStatus := GetOplogStatus(session)
+
+        if oplogStatus != nil {
+                glog.Info("exporting OplogStatus Metrics")
+                oplogStatus.Export(ch)
+        }
+
+        return oplogStatus
 }
