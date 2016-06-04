@@ -52,28 +52,23 @@ func BsonMongoTimestampToUnix(timestamp bson.MongoTimestamp) float64 {
 }
 
 func GetOplogTimestamp(session *mgo.Session, returnHead bool) (float64, error) {
-	var tries int = 0
-	var maxTries int = 2
-	var result struct { Timestamp	bson.MongoTimestamp	`bson:"ts"` }
-
 	var sortBy string = "$natural"
 	if returnHead {
 		sortBy = "-$natural"
 	}
 
 	var err error
+	var tries int    = 0
+	var maxTries int = 2
+	var result struct { Timestamp bson.MongoTimestamp `bson:"ts"` }
 	for tries < maxTries {
 		err = session.DB("local").C("oplog.rs").Find(nil).Sort(sortBy).Limit(1).One(&result)
 		if err != nil {
 			tries += 1
 			time.Sleep(500 * time.Millisecond)
 		} else {
-			break
+			return BsonMongoTimestampToUnix(result.Timestamp), err
 		}
-	}
-	if err != nil {
-		unixTimestamp = BsonMongoTimestampToUnix(result.Timestamps)
-		return unixTimestamp, err
 	}
 
 	return nil, err
