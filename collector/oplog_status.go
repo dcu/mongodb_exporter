@@ -52,9 +52,9 @@ func BsonMongoTimestampToUnix(timestamp bson.MongoTimestamp) float64 {
 	return float64(timestamp >> 32)
 }
 
-func GetOplogTimestamp(session *mgo.Session, returnHead bool) (float64, error) {
+func GetOplogTimestamp(session *mgo.Session, returnTail bool) (float64, error) {
 	var sortBy string = "$natural"
-	if returnHead {
+	if returnTail {
 		sortBy = "-$natural"
 	}
 
@@ -72,7 +72,7 @@ func GetOplogTimestamp(session *mgo.Session, returnHead bool) (float64, error) {
 		}
 	}
 
-	return nil, err
+	return 0, err
 }
 
 func GetOplogCollectionStats(session *mgo.Session) (*OplogCollectionStats, error) {
@@ -89,7 +89,7 @@ func (status *OplogStatus) Export(ch chan<- prometheus.Metric) {
 		oplogStatusSizeBytes.WithLabelValues("current").Set(status.CollectionStats.Size)
 		oplogStatusSizeBytes.WithLabelValues("storage").Set(status.CollectionStats.StorageSize)
 	}
-	if status.HeadTimestamp != nil && status.TailTimestamp != nil {
+	if status.HeadTimestamp != 0 && status.TailTimestamp != 0 {
 		oplogStatusHeadTimestamp.Set(status.HeadTimestamp)
 		oplogStatusTailTimestamp.Set(status.TailTimestamp)
 	}
@@ -108,23 +108,23 @@ func (status *OplogStatus) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func GetOplogStatus(session *mgo.Session) *OplogStatus {
-	oplogStatus := &OplogStatus{}
+	oplogStatus          := &OplogStatus{}
 	collectionStats, err := GetOplogCollectionStats(session)
 	if err != nil {
 		glog.Error("Failed to get local.oplog_rs collection stats.")
 		return nil
 	}
 
-	tailTimestamp, err := GetOplogTimestamp(session, false)
-	headTimestamp, err := GetOplogTimestamp(session, true)
+	headTimestamp, err := GetOplogTimestamp(session, false)
+	tailTimestamp, err := GetOplogTimestamp(session, true)
 	if err != nil {
 		glog.Error("Failed to get oplog head or tail timestamps.")
 		return nil
 	}
 
 	oplogStatus.CollectionStats = collectionStats
-	oplogStatus.TailTimestamp   = tailTimestamp
 	oplogStatus.HeadTimestamp   = headTimestamp
+	oplogStatus.TailTimestamp   = tailTimestamp
 
 	return oplogStatus
 }
