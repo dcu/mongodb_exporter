@@ -383,15 +383,15 @@ func (storageStats *StorageStats) Export(ch chan<- prometheus.Metric) {
 
 // CursorStatsOpen are the stats for open cursors
 type CursorStatsOpen struct {
-	NoTimeout	float64	`bson:"noTimeout"`
-	Pinned		float64 `bson:"pinned"`
-	Total		float64 `bson:"total"`
+	NoTimeout float64 `bson:"noTimeout"`
+	Pinned    float64 `bson:"pinned"`
+	Total     float64 `bson:"total"`
 }
 
 // CursorStats are the stats for cursors
 type CursorStats struct {
-	TimedOut	float64			`bson:"timedOut"`
-	Open		*CursorStatsOpen	`bson:"open"`
+	TimedOut float64          `bson:"timedOut"`
+	Open     *CursorStatsOpen `bson:"open"`
 }
 
 // Export exports the cursor stats.
