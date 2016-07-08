@@ -26,7 +26,7 @@ func mongodbDefaultUri() string {
 var (
 	listenAddressFlag = flag.String("web.listen-address", ":9001", "Address on which to expose metrics and web interface.")
 	metricsPathFlag   = flag.String("web.metrics-path", "/metrics", "Path under which to expose metrics.")
-	webTlsCert        = flag.String("web.tls-cert", "", "Path to PEM file that conains the certificate (and opionally also the private key in PEM format).\n"+
+	webTlsCert        = flag.String("web.tls-cert", "", "Path to PEM file that conains the certificate (and optionally also the private key in PEM format).\n"+
 		"    \tThis should include the whole certificate chain.\n"+
 		"    \tIf provided: The web socket will be a HTTPS socket.\n"+
 		"    \tIf not provided: Only HTTP.")
@@ -36,7 +36,7 @@ var (
 		"    \tIf not provided: Every client will be accepted.")
 
 	mongodbURIFlag = flag.String("mongodb.uri", mongodbDefaultUri(), "Mongodb URI, format: [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]")
-	mongodbTlsCert = flag.String("mongodb.tls-cert", "", "Path to PEM file that conains the certificate (and opionally also the private key in PEM format).\n"+
+	mongodbTlsCert = flag.String("mongodb.tls-cert", "", "Path to PEM file that conains the certificate (and optionally also the private key in PEM format).\n"+
 		"    \tThis should include the whole certificate chain.\n"+
 		"    \tIf provided: The connection will be opened via TLS to the MongoDB server.")
 	mongodbTlsPrivateKey = flag.String("mongodb.tls-private-key", "", "Path to PEM file that conains the private key (if not contained in mongodb.tls-cert file).")
