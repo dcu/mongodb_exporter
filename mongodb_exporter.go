@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dcu/mongodb_exporter/collector"
+	"github.com/bsphere/mongodb_exporter/collector"
 	"github.com/dcu/mongodb_exporter/shared"
 
 	"github.com/golang/glog"
@@ -47,7 +47,6 @@ var (
 	enabledGroupsFlag                   = flag.String("groups.enabled", "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics", "Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/")
 	authUserFlag                        = flag.String("auth.user", "", "Username for basic auth.")
 	authPassFlag                        = flag.String("auth.pass", "", "Password for basic auth.")
-	namespace                           = flag.String("namespace", "mongodb", "Metric namespace")
 )
 
 type basicAuthHandler struct {
@@ -127,7 +126,7 @@ func startWebServer() {
 }
 
 func registerCollector() {
-	mongodbCollector := collector.NewMongodbCollector(*namespace, collector.MongodbCollectorOpts{
+	mongodbCollector := collector.NewMongodbCollector(collector.MongodbCollectorOpts{
 		URI:                   *mongodbURIFlag,
 		TLSCertificateFile:    *mongodbTlsCert,
 		TLSPrivateKeyFile:     *mongodbTlsPrivateKey,

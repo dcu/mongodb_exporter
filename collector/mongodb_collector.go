@@ -1,6 +1,8 @@
 package collector
 
 import (
+	"os"
+
 	"github.com/dcu/mongodb_exporter/shared"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -9,8 +11,16 @@ import (
 
 var (
 	// Namespace is the namespace of the metrics
-	Namespace = "mongodb"
+	Namespace = namespace()
 )
+
+func namespace() string {
+	n := os.Getenv("NAMESPACE")
+	if n == "" {
+		return "mongodb"
+	}
+	return n
+}
 
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
@@ -37,13 +47,9 @@ type MongodbCollector struct {
 }
 
 // NewMongodbCollector returns a new instance of a MongodbCollector.
-func NewMongodbCollector(namespace string, opts MongodbCollectorOpts) *MongodbCollector {
+func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 	exporter := &MongodbCollector{
 		Opts: opts,
-	}
-
-	if namespace != "" {
-		Namespace = namespace
 	}
 
 	return exporter
