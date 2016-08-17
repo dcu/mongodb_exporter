@@ -19,6 +19,8 @@ type MongodbCollectorOpts struct {
 	TLSPrivateKeyFile     string
 	TLSCaFile             string
 	TLSHostnameValidation bool
+	CollectReplSet        bool
+	CollectOplog          bool
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -58,10 +60,14 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		defer mongoSess.Close()
 		glog.Info("Collecting Server Status")
 		exporter.collectServerStatus(mongoSess, ch)
-		glog.Info("Collecting ReplSet Status")
-		exporter.collectReplSetStatus(mongoSess, ch)
-		glog.Info("Collecting Oplog Status")
-		exporter.collectOplogStatus(mongoSess, ch)
+		if exporter.Opts.CollectReplSet {
+			glog.Info("Collecting ReplSet Status")
+			exporter.collectReplSetStatus(mongoSess, ch)
+		}
+		if exporter.Opts.CollectOplog {
+			glog.Info("Collecting Oplog Status")
+			exporter.collectOplogStatus(mongoSess, ch)
+		}
 	}
 }
 
@@ -86,12 +92,12 @@ func (exporter *MongodbCollector) collectReplSetStatus(session *mgo.Session, ch 
 }
 
 func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch chan<- prometheus.Metric) *OplogStatus {
-        oplogStatus := GetOplogStatus(session)
+	oplogStatus := GetOplogStatus(session)
 
-        if oplogStatus != nil {
-                glog.Info("exporting OplogStatus Metrics")
-                oplogStatus.Export(ch)
-        }
+	if oplogStatus != nil {
+		glog.Info("exporting OplogStatus Metrics")
+		oplogStatus.Export(ch)
+	}
 
-        return oplogStatus
+	return oplogStatus
 }

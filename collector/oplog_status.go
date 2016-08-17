@@ -1,50 +1,50 @@
 package collector
 
 import (
-	"time"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 var (
 	oplogStatusCount = prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace:	Namespace,
-		Subsystem:	"replset_oplog",
-		Name:		"items_total",
-		Help:		"The total number of changes in the oplog",
+		Namespace: Namespace,
+		Subsystem: "replset_oplog",
+		Name:      "items_total",
+		Help:      "The total number of changes in the oplog",
 	})
 	oplogStatusHeadTimestamp = prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace:	Namespace,
-		Subsystem:	"replset_oplog",
-		Name:		"head_timestamp",
-		Help:		"The timestamp of the newest change in the oplog",
+		Namespace: Namespace,
+		Subsystem: "replset_oplog",
+		Name:      "head_timestamp",
+		Help:      "The timestamp of the newest change in the oplog",
 	})
 	oplogStatusTailTimestamp = prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace:	Namespace,
-		Subsystem:	"replset_oplog",
-		Name:		"tail_timestamp",
-		Help:		"The timestamp of the oldest change in the oplog",
+		Namespace: Namespace,
+		Subsystem: "replset_oplog",
+		Name:      "tail_timestamp",
+		Help:      "The timestamp of the oldest change in the oplog",
 	})
 	oplogStatusSizeBytes = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace:	Namespace,
-		Subsystem:	"replset_oplog",
-		Name:		"size_bytes",
-		Help:		"Size of oplog in bytes",
+		Namespace: Namespace,
+		Subsystem: "replset_oplog",
+		Name:      "size_bytes",
+		Help:      "Size of oplog in bytes",
 	}, []string{"type"})
 )
 
 type OplogCollectionStats struct {
-	Count		float64	`bson:"count"`
-	Size		float64	`bson:"size"`
-	StorageSize	float64 `bson:"storageSize"`
+	Count       float64 `bson:"count"`
+	Size        float64 `bson:"size"`
+	StorageSize float64 `bson:"storageSize"`
 }
 
 type OplogStatus struct {
-	TailTimestamp	float64
-	HeadTimestamp	float64
-	CollectionStats	*OplogCollectionStats
+	TailTimestamp   float64
+	HeadTimestamp   float64
+	CollectionStats *OplogCollectionStats
 }
 
 // there's gotta be a better way to do this, but it works for now :/
@@ -59,9 +59,11 @@ func GetOplogTimestamp(session *mgo.Session, returnTail bool) (float64, error) {
 	}
 
 	var err error
-	var tries int    = 0
+	var tries int = 0
 	var maxTries int = 2
-	var result struct { Timestamp bson.MongoTimestamp `bson:"ts"` }
+	var result struct {
+		Timestamp bson.MongoTimestamp `bson:"ts"`
+	}
 	for tries < maxTries {
 		err = session.DB("local").C("oplog.rs").Find(nil).Sort(sortBy).Limit(1).One(&result)
 		if err != nil {
@@ -77,7 +79,7 @@ func GetOplogTimestamp(session *mgo.Session, returnTail bool) (float64, error) {
 
 func GetOplogCollectionStats(session *mgo.Session) (*OplogCollectionStats, error) {
 	results := &OplogCollectionStats{}
-	err := session.DB("local").Run(bson.M{ "collStats" : "oplog.rs" }, &results)
+	err := session.DB("local").Run(bson.M{"collStats": "oplog.rs"}, &results)
 	return results, err
 }
 
@@ -108,7 +110,7 @@ func (status *OplogStatus) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func GetOplogStatus(session *mgo.Session) *OplogStatus {
-	oplogStatus          := &OplogStatus{}
+	oplogStatus := &OplogStatus{}
 	collectionStats, err := GetOplogCollectionStats(session)
 	if err != nil {
 		glog.Error("Failed to get local.oplog_rs collection stats.")
@@ -123,8 +125,8 @@ func GetOplogStatus(session *mgo.Session) *OplogStatus {
 	}
 
 	oplogStatus.CollectionStats = collectionStats
-	oplogStatus.HeadTimestamp   = headTimestamp
-	oplogStatus.TailTimestamp   = tailTimestamp
+	oplogStatus.HeadTimestamp = headTimestamp
+	oplogStatus.TailTimestamp = tailTimestamp
 
 	return oplogStatus
 }
