@@ -37,9 +37,13 @@ type MongodbCollector struct {
 }
 
 // NewMongodbCollector returns a new instance of a MongodbCollector.
-func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
+func NewMongodbCollector(namespace string, opts MongodbCollectorOpts) *MongodbCollector {
 	exporter := &MongodbCollector{
 		Opts: opts,
+	}
+
+	if namespace != "" {
+		Namespace = namespace
 	}
 
 	return exporter
@@ -86,12 +90,12 @@ func (exporter *MongodbCollector) collectReplSetStatus(session *mgo.Session, ch 
 }
 
 func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch chan<- prometheus.Metric) *OplogStatus {
-        oplogStatus := GetOplogStatus(session)
+	oplogStatus := GetOplogStatus(session)
 
-        if oplogStatus != nil {
-                glog.Info("exporting OplogStatus Metrics")
-                oplogStatus.Export(ch)
-        }
+	if oplogStatus != nil {
+		glog.Info("exporting OplogStatus Metrics")
+		oplogStatus.Export(ch)
+	}
 
-        return oplogStatus
+	return oplogStatus
 }
