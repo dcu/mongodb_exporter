@@ -9,7 +9,7 @@ var (
 		Namespace: Namespace,
 		Subsystem: "extra_info",
 		Name:      "page_faults_total",
-		Help:      "The page_faults Reports the total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data which isn’t available in active memory. The page_faults counter may increase dramatically during moments of poor performance and may correlate with limited memory environments and larger data sets. Limited and sporadic page faults do not necessarily indicate an issue",
+		Help:      "The page_faults Reports the total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data which isn't available in active memory. The page_faults counter may increase dramatically during moments of poor performance and may correlate with limited memory environments and larger data sets. Limited and sporadic page faults do not necessarily indicate an issue",
 	})
 	extraInfoheapUsageBytes = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
