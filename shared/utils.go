@@ -28,6 +28,7 @@ func ParameterizeString(text string) string {
 	return strings.ToLower(result)
 }
 
+// LoadCertificatesFrom returns certificates for a given pem file
 func LoadCertificatesFrom(pemFile string) (*x509.CertPool, error) {
 	caCert, err := ioutil.ReadFile(pemFile)
 	if err != nil {
@@ -38,6 +39,7 @@ func LoadCertificatesFrom(pemFile string) (*x509.CertPool, error) {
 	return certificates, nil
 }
 
+// LoadKeyPairFrom returns a configured TLS certificate
 func LoadKeyPairFrom(pemFile string, privateKeyPemFile string) (tls.Certificate, error) {
 	targetPrivateKeyPemFile := privateKeyPemFile
 	if len(targetPrivateKeyPemFile) <= 0 {
