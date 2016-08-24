@@ -35,7 +35,7 @@ var (
 		Namespace: Namespace,
 		Subsystem: "background_flushing",
 		Name:      "last_finished_time",
-		Help:      "The last_finished field provides a timestamp of the last completed flush operation in the ISODateformat. If this value is more than a few minutes old relative to your server’s current time and accounting for differences in time zone, restarting the database may result in some data loss",
+		Help:      "The last_finished field provides a timestamp of the last completed flush operation in the ISODateformat. If this value is more than a few minutes old relative to your server's current time and accounting for differences in time zone, restarting the database may result in some data loss",
 	})
 )
 

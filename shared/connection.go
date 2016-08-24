@@ -6,9 +6,10 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"net"
+
 	"github.com/golang/glog"
 	"gopkg.in/mgo.v2"
-	"net"
 )
 
 const (
