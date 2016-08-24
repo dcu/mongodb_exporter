@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dcu/mongodb_exporter/collector"
+	"github.com/bsphere/mongodb_exporter/collector"
 	"github.com/dcu/mongodb_exporter/shared"
 
 	"github.com/golang/glog"
