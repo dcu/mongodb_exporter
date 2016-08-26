@@ -91,6 +91,15 @@ func startWebServer() {
 	registerCollector()
 
 	http.Handle(*metricsPathFlag, handler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<html>
+<head><title>MongoDB Exporter</title></head>
+<body>
+<h1>MongoDB Exporter</h1>
+<p><a href='` + *metricsPathFlag + `'>Metrics</a></p>
+</body>
+</html>`))
+	})
 
 	server := &http.Server{
 		Addr:     *listenAddressFlag,
