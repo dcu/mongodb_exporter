@@ -17,6 +17,7 @@ const (
 	syncMongodbTimeout = 1 * time.Minute
 )
 
+// MongoSessionOpts represents options for a Mongo session
 type MongoSessionOpts struct {
 	URI                   string
 	TLSCertificateFile    string
@@ -25,6 +26,7 @@ type MongoSessionOpts struct {
 	TLSHostnameValidation bool
 }
 
+// MongoSession creates a Mongo session
 func MongoSession(opts MongoSessionOpts) *mgo.Session {
 	dialInfo, err := mgo.ParseURL(opts.URI)
 	if err != nil {

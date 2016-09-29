@@ -8,7 +8,7 @@ var (
 	networkBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "network_bytes_total",
-		Help:      "The network data structure contains data regarding MongoDB’s network use",
+		Help:      "The network data structure contains data regarding MongoDB's network use",
 	}, []string{"state"})
 )
 var (
@@ -16,7 +16,7 @@ var (
 		Namespace: Namespace,
 		Subsystem: "network_metrics",
 		Name:      "num_requests_total",
-		Help:      "The numRequests field is a counter of the total number of distinct requests that the server has received. Use this value to provide context for the bytesIn and bytesOut values to ensure that MongoDB’s network utilization is consistent with expectations and application use",
+		Help:      "The numRequests field is a counter of the total number of distinct requests that the server has received. Use this value to provide context for the bytesIn and bytesOut values to ensure that MongoDB's network utilization is consistent with expectations and application use",
 	})
 )
 

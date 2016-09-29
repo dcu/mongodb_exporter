@@ -36,39 +36,45 @@ var (
 	}, []string{"type"})
 )
 
+// OplogCollectionStats represents metrics about an oplog collection
 type OplogCollectionStats struct {
 	Count       float64 `bson:"count"`
 	Size        float64 `bson:"size"`
 	StorageSize float64 `bson:"storageSize"`
 }
 
+// OplogStatus represents oplog metrics
 type OplogStatus struct {
 	TailTimestamp   float64
 	HeadTimestamp   float64
 	CollectionStats *OplogCollectionStats
 }
 
+// BsonMongoTimestampToUnix converts a mongo timestamp to UNIX time
 // there's gotta be a better way to do this, but it works for now :/
 func BsonMongoTimestampToUnix(timestamp bson.MongoTimestamp) float64 {
 	return float64(timestamp >> 32)
 }
 
+// GetOplogTimestamp fetches the latest oplog timestamp
 func GetOplogTimestamp(session *mgo.Session, returnTail bool) (float64, error) {
-	var sortBy string = "$natural"
+	sortBy := "$natural"
 	if returnTail {
 		sortBy = "-$natural"
 	}
 
-	var err error
-	var tries int = 0
-	var maxTries int = 2
-	var result struct {
-		Timestamp bson.MongoTimestamp `bson:"ts"`
-	}
+	var (
+		err    error
+		tries  int
+		result struct {
+			Timestamp bson.MongoTimestamp `bson:"ts"`
+		}
+	)
+	maxTries := 2
 	for tries < maxTries {
 		err = session.DB("local").C("oplog.rs").Find(nil).Sort(sortBy).Limit(1).One(&result)
 		if err != nil {
-			tries += 1
+			tries++
 			time.Sleep(500 * time.Millisecond)
 		} else {
 			return BsonMongoTimestampToUnix(result.Timestamp), err
@@ -78,12 +84,14 @@ func GetOplogTimestamp(session *mgo.Session, returnTail bool) (float64, error) {
 	return 0, err
 }
 
+// GetOplogCollectionStats fetches oplog collection stats
 func GetOplogCollectionStats(session *mgo.Session) (*OplogCollectionStats, error) {
 	results := &OplogCollectionStats{}
 	err := session.DB("local").Run(bson.M{"collStats": "oplog.rs"}, &results)
 	return results, err
 }
 
+// Export exports metrics to Prometheus
 func (status *OplogStatus) Export(ch chan<- prometheus.Metric) {
 	oplogStatusSizeBytes.WithLabelValues("current").Set(0)
 	oplogStatusSizeBytes.WithLabelValues("storage").Set(0)
@@ -103,6 +111,7 @@ func (status *OplogStatus) Export(ch chan<- prometheus.Metric) {
 	oplogStatusSizeBytes.Collect(ch)
 }
 
+// Describe describes metrics collected
 func (status *OplogStatus) Describe(ch chan<- *prometheus.Desc) {
 	oplogStatusCount.Describe(ch)
 	oplogStatusHeadTimestamp.Describe(ch)
@@ -110,6 +119,7 @@ func (status *OplogStatus) Describe(ch chan<- *prometheus.Desc) {
 	oplogStatusSizeBytes.Describe(ch)
 }
 
+// GetOplogStatus fetches oplog collection stats
 func GetOplogStatus(session *mgo.Session) *OplogStatus {
 	oplogStatus := &OplogStatus{}
 	collectionStats, err := GetOplogCollectionStats(session)

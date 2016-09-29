@@ -16,7 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func mongodbDefaultUri() string {
+func mongodbDefaultURI() string {
 	if u := os.Getenv("MONGODB_URL"); u != "" {
 		return u
 	}
@@ -26,24 +26,24 @@ func mongodbDefaultUri() string {
 var (
 	listenAddressFlag = flag.String("web.listen-address", ":9001", "Address on which to expose metrics and web interface.")
 	metricsPathFlag   = flag.String("web.metrics-path", "/metrics", "Path under which to expose metrics.")
-	webTlsCert        = flag.String("web.tls-cert", "", "Path to PEM file that conains the certificate (and optionally also the private key in PEM format).\n"+
+	webTLSCert        = flag.String("web.tls-cert", "", "Path to PEM file that conains the certificate (and optionally also the private key in PEM format).\n"+
 		"    \tThis should include the whole certificate chain.\n"+
 		"    \tIf provided: The web socket will be a HTTPS socket.\n"+
 		"    \tIf not provided: Only HTTP.")
-	webTlsPrivateKey = flag.String("web.tls-private-key", "", "Path to PEM file that conains the private key (if not contained in web.tls-cert file).")
-	webTlsClientCa   = flag.String("web.tls-client-ca", "", "Path to PEM file that conains the CAs that are trused for client connections.\n"+
+	webTLSPrivateKey = flag.String("web.tls-private-key", "", "Path to PEM file that conains the private key (if not contained in web.tls-cert file).")
+	webTLSClientCa   = flag.String("web.tls-client-ca", "", "Path to PEM file that conains the CAs that are trused for client connections.\n"+
 		"    \tIf provided: Connecting clients should present a certificate signed by one of this CAs.\n"+
 		"    \tIf not provided: Every client will be accepted.")
 
-	mongodbURIFlag = flag.String("mongodb.uri", mongodbDefaultUri(), "Mongodb URI, format: [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]")
-	mongodbTlsCert = flag.String("mongodb.tls-cert", "", "Path to PEM file that conains the certificate (and optionally also the private key in PEM format).\n"+
+	mongodbURIFlag = flag.String("mongodb.uri", mongodbDefaultURI(), "Mongodb URI, format: [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]")
+	mongodbTLSCert = flag.String("mongodb.tls-cert", "", "Path to PEM file that conains the certificate (and optionally also the private key in PEM format).\n"+
 		"    \tThis should include the whole certificate chain.\n"+
 		"    \tIf provided: The connection will be opened via TLS to the MongoDB server.")
-	mongodbTlsPrivateKey = flag.String("mongodb.tls-private-key", "", "Path to PEM file that conains the private key (if not contained in mongodb.tls-cert file).")
-	mongodbTlsCa         = flag.String("mongodb.tls-ca", "", "Path to PEM file that conains the CAs that are trused for server connections.\n"+
+	mongodbTLSPrivateKey = flag.String("mongodb.tls-private-key", "", "Path to PEM file that conains the private key (if not contained in mongodb.tls-cert file).")
+	mongodbTLSCa         = flag.String("mongodb.tls-ca", "", "Path to PEM file that conains the CAs that are trused for server connections.\n"+
 		"    \tIf provided: MongoDB servers connecting to should present a certificate signed by one of this CAs.\n"+
 		"    \tIf not provided: System default CAs are used.")
-	mongodbTlsDisableHostnameValidation = flag.Bool("mongodb.tls-disable-hostname-validation", false, "Do hostname validation for server connection.")
+	mongodbTLSDisableHostnameValidation = flag.Bool("mongodb.tls-disable-hostname-validation", false, "Do hostname validation for server connection.")
 	enabledGroupsFlag                   = flag.String("groups.enabled", "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics", "Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/")
 	authUserFlag                        = flag.String("auth.user", "", "Username for basic auth.")
 	authPassFlag                        = flag.String("auth.pass", "", "Password for basic auth.")
@@ -103,16 +103,16 @@ func startWebServer() {
 
 	server := &http.Server{
 		Addr:     *listenAddressFlag,
-		ErrorLog: createHttpServerLogWrapper(),
+		ErrorLog: createHTTPServerLogWrapper(),
 	}
 
 	var err error
-	if len(*webTlsCert) > 0 {
+	if len(*webTLSCert) > 0 {
 		clientValidation := "no"
-		if len(*webTlsClientCa) > 0 && len(*webTlsCert) > 0 {
-			certificates, err := shared.LoadCertificatesFrom(*webTlsClientCa)
+		if len(*webTLSClientCa) > 0 && len(*webTLSCert) > 0 {
+			certificates, err := shared.LoadCertificatesFrom(*webTLSClientCa)
 			if err != nil {
-				glog.Fatalf("Couldn't load client CAs from %s. Got: %s", *webTlsClientCa, err)
+				glog.Fatalf("Couldn't load client CAs from %s. Got: %s", *webTLSClientCa, err)
 			}
 			server.TLSConfig = &tls.Config{
 				ClientCAs:  certificates,
@@ -120,12 +120,12 @@ func startWebServer() {
 			}
 			clientValidation = "yes"
 		}
-		targetTlsPrivateKey := *webTlsPrivateKey
-		if len(targetTlsPrivateKey) <= 0 {
-			targetTlsPrivateKey = *webTlsCert
+		targetTLSPrivateKey := *webTLSPrivateKey
+		if len(targetTLSPrivateKey) <= 0 {
+			targetTLSPrivateKey = *webTLSCert
 		}
 		fmt.Printf("Listening on %s (scheme=HTTPS, secured=TLS, clientValidation=%s)\n", server.Addr, clientValidation)
-		err = server.ListenAndServeTLS(*webTlsCert, targetTlsPrivateKey)
+		err = server.ListenAndServeTLS(*webTLSCert, targetTLSPrivateKey)
 	} else {
 		fmt.Printf("Listening on %s (scheme=HTTP, secured=no, clientValidation=no)\n", server.Addr)
 		err = server.ListenAndServe()
@@ -139,10 +139,10 @@ func startWebServer() {
 func registerCollector() {
 	mongodbCollector := collector.NewMongodbCollector(collector.MongodbCollectorOpts{
 		URI:                   *mongodbURIFlag,
-		TLSCertificateFile:    *mongodbTlsCert,
-		TLSPrivateKeyFile:     *mongodbTlsPrivateKey,
-		TLSCaFile:             *mongodbTlsCa,
-		TLSHostnameValidation: !(*mongodbTlsDisableHostnameValidation),
+		TLSCertificateFile:    *mongodbTLSCert,
+		TLSPrivateKeyFile:     *mongodbTLSPrivateKey,
+		TLSCaFile:             *mongodbTLSCa,
+		TLSHostnameValidation: !(*mongodbTLSDisableHostnameValidation),
 		CollectOplog:          *mongodbCollectOplog,
 		CollectReplSet:        *mongodbCollectReplSet,
 	})
@@ -158,7 +158,7 @@ func (w *bufferedLogWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func createHttpServerLogWrapper() *slog.Logger {
+func createHTTPServerLogWrapper() *slog.Logger {
 	return slog.New(&bufferedLogWriter{}, "", 0)
 }
 
