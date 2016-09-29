@@ -14,22 +14,23 @@ var (
 
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
-	URI                   string
-	TLSCertificateFile    string
-	TLSPrivateKeyFile     string
-	TLSCaFile             string
-	TLSHostnameValidation bool
-	CollectReplSet        bool
-	CollectOplog          bool
+	URI                    string
+	TlsCertificateFile     string
+	TlsPrivateKeyFile      string
+	TlsCaFile              string
+	TlsHostnameValidation  bool
+	CollectReplSet         bool
+	CollectOplog           bool
+	CollectDatabaseMetrics bool
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
 	return shared.MongoSessionOpts{
 		URI:                   in.URI,
-		TLSCertificateFile:    in.TLSCertificateFile,
-		TLSPrivateKeyFile:     in.TLSPrivateKeyFile,
-		TLSCaFile:             in.TLSCaFile,
-		TLSHostnameValidation: in.TLSHostnameValidation,
+		TlsCertificateFile:    in.TlsCertificateFile,
+		TlsPrivateKeyFile:     in.TlsPrivateKeyFile,
+		TlsCaFile:             in.TlsCaFile,
+		TlsHostnameValidation: in.TlsHostnameValidation,
 	}
 }
 
@@ -51,6 +52,7 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	(&ServerStatus{}).Describe(ch)
 	(&ReplSetStatus{}).Describe(ch)
+	(&DatabaseStatus{}).Describe(ch)
 }
 
 // Collect collects all mongodb's metrics.
@@ -67,6 +69,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		if exporter.Opts.CollectOplog {
 			glog.Info("Collecting Oplog Status")
 			exporter.collectOplogStatus(mongoSess, ch)
+		}
+
+		if exporter.Opts.CollectDatabaseMetrics {
+			glog.Info("Collecting Database Metrics")
+			exporter.collectDatabaseStatus(mongoSess, ch)
 		}
 	}
 }
@@ -100,4 +107,22 @@ func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch ch
 	}
 
 	return oplogStatus
+}
+
+func (exporter *MongodbCollector) collectDatabaseStatus(session *mgo.Session, ch chan<- prometheus.Metric) {
+	all, err := session.DatabaseNames()
+	if err != nil {
+		glog.Error("Failed to get database names")
+		return
+	}
+	for _, db := range all {
+		if db != "admin" && db != "test" {
+			dbStatus := GetDatabaseStatus(session, db)
+
+			if dbStatus != nil {
+				glog.Info("exporting Database Metrics")
+				dbStatus.Export(ch)
+			}
+		}
+	}
 }
