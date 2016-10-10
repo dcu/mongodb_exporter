@@ -115,7 +115,7 @@ func startWebServer() {
 			if err != nil {
 				glog.Fatalf("Couldn't load client CAs from %s. Got: %s", *webTLSClientCa, err)
 			}
-			server.TlsConfig = &tls.Config{
+			server.TLSConfig = &tls.Config{
 				ClientCAs:  certificates,
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			}
@@ -140,10 +140,10 @@ func startWebServer() {
 func registerCollector() {
 	mongodbCollector := collector.NewMongodbCollector(collector.MongodbCollectorOpts{
 		URI:                    *mongodbURIFlag,
-		TlsCertificateFile:     *mongodbTlsCert,
-		TlsPrivateKeyFile:      *mongodbTlsPrivateKey,
-		TlsCaFile:              *mongodbTlsCa,
-		TlsHostnameValidation:  !(*mongodbTlsDisableHostnameValidation),
+		TLSCertificateFile:     *mongodbTLSCert,
+		TLSPrivateKeyFile:      *mongodbTLSPrivateKey,
+		TLSCaFile:              *mongodbTLSCa,
+		TLSHostnameValidation:  !(*mongodbTLSDisableHostnameValidation),
 		CollectOplog:           *mongodbCollectOplog,
 		CollectReplSet:         *mongodbCollectReplSet,
 		CollectDatabaseMetrics: *mongodbCollectDatabaseMetrics,

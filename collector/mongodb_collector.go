@@ -15,10 +15,10 @@ var (
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
 	URI                    string
-	TlsCertificateFile     string
-	TlsPrivateKeyFile      string
-	TlsCaFile              string
-	TlsHostnameValidation  bool
+	TLSCertificateFile     string
+	TLSPrivateKeyFile      string
+	TLSCaFile              string
+	TLSHostnameValidation  bool
 	CollectReplSet         bool
 	CollectOplog           bool
 	CollectDatabaseMetrics bool
@@ -27,10 +27,10 @@ type MongodbCollectorOpts struct {
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
 	return shared.MongoSessionOpts{
 		URI:                   in.URI,
-		TlsCertificateFile:    in.TlsCertificateFile,
-		TlsPrivateKeyFile:     in.TlsPrivateKeyFile,
-		TlsCaFile:             in.TlsCaFile,
-		TlsHostnameValidation: in.TlsHostnameValidation,
+		TLSCertificateFile:    in.TLSCertificateFile,
+		TLSPrivateKeyFile:     in.TLSPrivateKeyFile,
+		TLSCaFile:             in.TLSCaFile,
+		TLSHostnameValidation: in.TLSHostnameValidation,
 	}
 }
 
