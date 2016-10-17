@@ -130,6 +130,20 @@ type Member struct {
 
 // Export exports the replSetGetStatus stati to be consumed by prometheus
 func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
+	myState.Reset()
+	term.Reset()
+	numberOfMembers.Reset()
+	heartbeatIntervalMillis.Reset()
+	memberState.Reset()
+	memberHealth.Reset()
+	memberUptime.Reset()
+	memberOptimeDate.Reset()
+	memberElectionDate.Reset()
+	memberLastHeartbeat.Reset()
+	memberLastHeartbeatRecv.Reset()
+	memberPingMs.Reset()
+	memberConfigVersion.Reset()
+
 	myState.WithLabelValues(replStatus.Set).Set(float64(replStatus.MyState))
 
 	// new in version 3.2
@@ -192,7 +206,6 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 	memberLastHeartbeatRecv.Collect(ch)
 	memberPingMs.Collect(ch)
 	memberConfigVersion.Collect(ch)
-
 }
 
 // Describe describes the replSetGetStatus metrics for prometheus
@@ -209,7 +222,6 @@ func (replStatus *ReplSetStatus) Describe(ch chan<- *prometheus.Desc) {
 	memberLastHeartbeatRecv.Describe(ch)
 	memberPingMs.Describe(ch)
 	memberConfigVersion.Describe(ch)
-
 }
 
 // GetReplSetStatus returns the replica status info
