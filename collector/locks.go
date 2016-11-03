@@ -10,15 +10,11 @@ var (
 		Name:      "locks_time_locked_global_microseconds_total",
 		Help:      "amount of time in microseconds that any database has held the global lock",
 	}, []string{"type", "database"})
-)
-var (
 	locksTimeLockedLocalMicrosecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "locks_time_locked_local_microseconds_total",
 		Help:      "amount of time in microseconds that any database has held the local lock",
 	}, []string{"type", "database"})
-)
-var (
 	locksTimeAcquiringGlobalMicrosecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "locks_time_acquiring_global_microseconds_total",
@@ -50,14 +46,14 @@ func (locks LockStatsMap) Export(ch chan<- prometheus.Metric) {
 			key = "dot"
 		}
 
-		locksTimeLockedGlobalMicrosecondsTotal.WithLabelValues("read", key).Set(locks.TimeLockedMicros.Read)
-		locksTimeLockedGlobalMicrosecondsTotal.WithLabelValues("write", key).Set(locks.TimeLockedMicros.Write)
+		locksTimeLockedGlobalMicrosecondsTotal.WithLabelValues("read", key).Add(locks.TimeLockedMicros.Read)
+		locksTimeLockedGlobalMicrosecondsTotal.WithLabelValues("write", key).Add(locks.TimeLockedMicros.Write)
 
-		locksTimeLockedLocalMicrosecondsTotal.WithLabelValues("read", key).Set(locks.TimeLockedMicros.ReadLower)
-		locksTimeLockedLocalMicrosecondsTotal.WithLabelValues("write", key).Set(locks.TimeLockedMicros.WriteLower)
+		locksTimeLockedLocalMicrosecondsTotal.WithLabelValues("read", key).Add(locks.TimeLockedMicros.ReadLower)
+		locksTimeLockedLocalMicrosecondsTotal.WithLabelValues("write", key).Add(locks.TimeLockedMicros.WriteLower)
 
-		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("read", key).Set(locks.TimeAcquiringMicros.ReadLower)
-		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("write", key).Set(locks.TimeAcquiringMicros.WriteLower)
+		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("read", key).Add(locks.TimeAcquiringMicros.ReadLower)
+		locksTimeAcquiringGlobalMicrosecondsTotal.WithLabelValues("write", key).Add(locks.TimeAcquiringMicros.WriteLower)
 	}
 
 	locksTimeLockedGlobalMicrosecondsTotal.Collect(ch)

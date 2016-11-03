@@ -10,8 +10,7 @@ var (
 		Name:      "connections",
 		Help:      "The connections sub document data regarding the current status of incoming connections and availability of the database server. Use these values to assess the current load and capacity requirements of the server",
 	}, []string{"state"})
-)
-var (
+
 	connectionsMetricsCreatedTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "connections_metrics",
@@ -33,7 +32,7 @@ func (connectionStats *ConnectionStats) Export(ch chan<- prometheus.Metric) {
 	connections.WithLabelValues("available").Set(connectionStats.Available)
 	connections.Collect(ch)
 
-	connectionsMetricsCreatedTotal.Set(connectionStats.TotalCreated)
+	connectionsMetricsCreatedTotal.Add(connectionStats.TotalCreated)
 	connectionsMetricsCreatedTotal.Collect(ch)
 }
 

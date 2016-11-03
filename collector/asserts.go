@@ -23,11 +23,11 @@ type AssertsStats struct {
 
 // Export exports the metrics to prometheus.
 func (asserts *AssertsStats) Export(ch chan<- prometheus.Metric) {
-	assertsTotal.WithLabelValues("regular").Set(asserts.Regular)
-	assertsTotal.WithLabelValues("warning").Set(asserts.Warning)
-	assertsTotal.WithLabelValues("msg").Set(asserts.Msg)
-	assertsTotal.WithLabelValues("user").Set(asserts.User)
-	assertsTotal.WithLabelValues("rollovers").Set(asserts.Rollovers)
+	assertsTotal.WithLabelValues("regular").Add(asserts.Regular)
+	assertsTotal.WithLabelValues("warning").Add(asserts.Warning)
+	assertsTotal.WithLabelValues("msg").Add(asserts.Msg)
+	assertsTotal.WithLabelValues("user").Add(asserts.User)
+	assertsTotal.WithLabelValues("rollovers").Add(asserts.Rollovers)
 	assertsTotal.Collect(ch)
 }
 

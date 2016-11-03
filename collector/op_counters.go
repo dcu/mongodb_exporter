@@ -10,8 +10,6 @@ var (
 		Name:      "op_counters_total",
 		Help:      "The opcounters data structure provides an overview of database operations by type and makes it possible to analyze the load on the database in more granular manner. These numbers will grow over time and in response to database use. Analyze these values over time to track database utilization",
 	}, []string{"type"})
-)
-var (
 	opCountersReplTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "op_counters_repl_total",
@@ -31,12 +29,12 @@ type OpcountersStats struct {
 
 // Export exports the data to prometheus.
 func (opCounters *OpcountersStats) Export(ch chan<- prometheus.Metric) {
-	opCountersTotal.WithLabelValues("insert").Set(opCounters.Insert)
-	opCountersTotal.WithLabelValues("query").Set(opCounters.Query)
-	opCountersTotal.WithLabelValues("update").Set(opCounters.Update)
-	opCountersTotal.WithLabelValues("delete").Set(opCounters.Delete)
-	opCountersTotal.WithLabelValues("getmore").Set(opCounters.GetMore)
-	opCountersTotal.WithLabelValues("command").Set(opCounters.Command)
+	opCountersTotal.WithLabelValues("insert").Add(opCounters.Insert)
+	opCountersTotal.WithLabelValues("query").Add(opCounters.Query)
+	opCountersTotal.WithLabelValues("update").Add(opCounters.Update)
+	opCountersTotal.WithLabelValues("delete").Add(opCounters.Delete)
+	opCountersTotal.WithLabelValues("getmore").Add(opCounters.GetMore)
+	opCountersTotal.WithLabelValues("command").Add(opCounters.Command)
 
 	opCountersTotal.Collect(ch)
 }
@@ -58,12 +56,12 @@ type OpcountersReplStats struct {
 
 // Export exports the data to prometheus.
 func (opCounters *OpcountersReplStats) Export(ch chan<- prometheus.Metric) {
-	opCountersReplTotal.WithLabelValues("insert").Set(opCounters.Insert)
-	opCountersReplTotal.WithLabelValues("query").Set(opCounters.Query)
-	opCountersReplTotal.WithLabelValues("update").Set(opCounters.Update)
-	opCountersReplTotal.WithLabelValues("delete").Set(opCounters.Delete)
-	opCountersReplTotal.WithLabelValues("getmore").Set(opCounters.GetMore)
-	opCountersReplTotal.WithLabelValues("command").Set(opCounters.Command)
+	opCountersReplTotal.WithLabelValues("insert").Add(opCounters.Insert)
+	opCountersReplTotal.WithLabelValues("query").Add(opCounters.Query)
+	opCountersReplTotal.WithLabelValues("update").Add(opCounters.Update)
+	opCountersReplTotal.WithLabelValues("delete").Add(opCounters.Delete)
+	opCountersReplTotal.WithLabelValues("getmore").Add(opCounters.GetMore)
+	opCountersReplTotal.WithLabelValues("command").Add(opCounters.Command)
 
 	opCountersReplTotal.Collect(ch)
 }
