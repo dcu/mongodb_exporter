@@ -26,3 +26,5 @@ _testmain.go
 *.swp
 
 mongodb_exporter
+vendor/
+release/
