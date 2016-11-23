@@ -15,6 +15,8 @@ Make sure $GOPATH/bin is in your $PATH, then:
 
 ## Building
 
+Requires [glide](https://github.com/Masterminds/glide) for dependency management
+
     go get -u github.com/dcu/mongodb_exporter
     cd $GOPATH/src/github.com/dcu/mongodb_exporter
     make build

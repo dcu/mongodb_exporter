@@ -6,8 +6,7 @@ test:
 	@rm *.out
 
 deps:
-	go get -u github.com/prometheus/client_golang/prometheus
-	go get -u gopkg.in/mgo.v2
+	glide install
 
 build: deps
 	go build mongodb_exporter.go
