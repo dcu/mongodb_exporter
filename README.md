@@ -6,6 +6,8 @@ MongoDB exporter for prometheus.io, written in go.
 
 ## Installing
 
+Requires Go 1.5+
+
 Make sure $GOPATH/bin is in your $PATH, then:
 
     go get -u github.com/dcu/mongodb_exporter
