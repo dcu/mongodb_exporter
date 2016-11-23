@@ -50,6 +50,7 @@ var (
 	mongodbCollectOplog                 = flag.Bool("mongodb.collect.oplog", true, "collect Mongodb Oplog status")
 	mongodbCollectReplSet               = flag.Bool("mongodb.collect.replset", true, "collect Mongodb replica set status")
 	mongodbCollectDatabaseMetrics       = flag.Bool("mongodb.collect.database", false, "collect MongoDB database metrics")
+	version                             = flag.Bool("version", false, "Print mongodb_exporter version")
 )
 
 type basicAuthHandler struct {
@@ -166,6 +167,10 @@ func createHTTPServerLogWrapper() *slog.Logger {
 
 func main() {
 	flag.Parse()
+	if *version {
+		fmt.Println("mongodb_exporter version: {{VERSION}}")
+		return
+	}
 	shared.ParseEnabledGroups(*enabledGroupsFlag)
 
 	startWebServer()

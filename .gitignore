@@ -27,3 +27,4 @@ _testmain.go
 
 mongodb_exporter
 vendor/
+release/
