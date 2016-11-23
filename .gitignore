@@ -24,6 +24,7 @@ _testmain.go
 *.test
 *.prof
 *.swp
+.DS_Store
 
 mongodb_exporter
 vendor/
