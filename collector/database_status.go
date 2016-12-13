@@ -53,6 +53,7 @@ type DatabaseStatus struct {
 	Shards      map[string]*RawStatus `bson:"raw,omitempty"`
 }
 
+// RawStatus represents stats about a database shard
 type RawStatus struct {
 	Name        string `bson:"db,omitempty"`
 	IndexSize   int    `bson:"indexSize,omitempty"`
