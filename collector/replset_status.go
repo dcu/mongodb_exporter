@@ -41,61 +41,67 @@ var (
 		Subsystem: subsystem,
 		Name:      "member_health",
 		Help:      "This field conveys if the member is up (1) or down (0).",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberState = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_state",
 		Help:      "The value of state is an integer between 0 and 10 that represents the replica state of the member.",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
+	memberStateStr = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: subsystem,
+		Name:      "member_state_str",
+		Help:      "The the replica state string of the member.",
+	}, []string{"set", "name"})
 	memberUptime = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_uptime",
 		Help:      "The uptime field holds a value that reflects the number of seconds that this member has been online.",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberOptimeDate = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_optime_date",
 		Help:      "The last entry from the oplog that this member applied.",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberElectionDate = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_election_date",
 		Help:      "The timestamp the node was elected as replica leader",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberLastHeartbeat = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_last_heartbeat",
 		Help:      "The lastHeartbeat value provides an ISODate formatted date and time of the transmission time of last heartbeat received from this member",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberLastHeartbeatRecv = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_last_heartbeat_recv",
 		Help:      "The lastHeartbeatRecv value provides an ISODate formatted date and time that the last heartbeat was received from this member",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberPingMs = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_ping_ms",
 		Help:      "The pingMs represents the number of milliseconds (ms) that a round-trip packet takes to travel between the remote member and the local instance.",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberConfigVersion = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_config_version",
 		Help:      "The configVersion value is the replica set configuration version.",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 	memberOptime = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "member_optime",
 		Help:      "Information regarding the last operation from the operation log that this member has applied.",
-	}, []string{"set", "name", "state"})
+	}, []string{"set", "name"})
 )
 
 // ReplSetStatus keeps the data returned by the GetReplSetStatus method
@@ -161,9 +167,9 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 		ls := prometheus.Labels{
 			"set":   replStatus.Set,
 			"name":  member.Name,
-			"state": member.StateStr,
 		}
 
+		memberStateStr.With(ls).Set(member.StateStr)
 		memberState.With(ls).Set(float64(member.State))
 
 		// ReplSetStatus.Member.Health is not available on the node you're connected to
