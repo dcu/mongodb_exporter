@@ -48,12 +48,6 @@ var (
 		Name:      "member_state",
 		Help:      "The value of state is an integer between 0 and 10 that represents the replica state of the member.",
 	}, []string{"set", "name"})
-	memberStateStr = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: Namespace,
-		Subsystem: subsystem,
-		Name:      "member_state_str",
-		Help:      "The the replica state string of the member.",
-	}, []string{"set", "name"})
 	memberUptime = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
@@ -169,7 +163,6 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 			"name":  member.Name,
 		}
 
-		memberStateStr.With(ls).Set(member.StateStr)
 		memberState.With(ls).Set(float64(member.State))
 
 		// ReplSetStatus.Member.Health is not available on the node you're connected to
