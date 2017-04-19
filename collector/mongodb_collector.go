@@ -120,7 +120,7 @@ func (exporter *MongodbCollector) collectDatabaseStatus(session *mgo.Session, ch
 			dbStatus := GetDatabaseStatus(session, db)
 
 			if dbStatus != nil {
-				glog.Info("exporting Database Metrics")
+				glog.Infof("exporting Database Metrics for db=%q", dbStatus.Name)
 				dbStatus.Export(ch)
 			}
 		}
