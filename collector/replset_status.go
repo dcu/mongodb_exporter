@@ -210,7 +210,7 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 		}
 	}
 	if !primaryOpTime.IsZero() && !myOpTime.IsZero() {
-		myReplicaLag.WithLabelValues(replStatus.Set).Set(float64(myOpTime.Unix() - primaryOpTime.Unix()))
+		myReplicaLag.WithLabelValues(replStatus.Set).Set(float64(primaryOpTime.Unix() - myOpTime.Unix()))
 	} else {
 		myReplicaLag.WithLabelValues(replStatus.Set).Set(-1.0)
 	}
