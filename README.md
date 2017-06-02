@@ -17,6 +17,23 @@ Requires [glide](https://github.com/Masterminds/glide) for dependency management
     make build
     ./mongodb_exporter -h
 
+## Building Docker image
+
+To keep the image size small (~15MB) we build the linux binary first which gets
+`COPY`'d into the Docker container (alpine base image)
+
+Create the linux binary
+
+    make release
+
+Build the Docker image
+
+    docker build -t mongodb_exporter .
+
+Verify Docker image runs
+
+    docker run --rm mongodb_exporter -h
+
 The mongodb url can contain credentials which can be seen by other users on the system when passed in as command line flag.
 To pass in the mongodb url securely, you can set the MONGODB_URL environment variable instead.
 
