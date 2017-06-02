@@ -14,14 +14,15 @@ var (
 
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
-	URI                    string
-	TLSCertificateFile     string
-	TLSPrivateKeyFile      string
-	TLSCaFile              string
-	TLSHostnameValidation  bool
-	CollectReplSet         bool
-	CollectOplog           bool
-	CollectDatabaseMetrics bool
+	URI                      string
+	TLSCertificateFile       string
+	TLSPrivateKeyFile        string
+	TLSCaFile                string
+	TLSHostnameValidation    bool
+	CollectReplSet           bool
+	CollectOplog             bool
+	CollectDatabaseMetrics   bool
+	CollectCollectionMetrics bool
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -75,6 +76,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 			glog.Info("Collecting Database Metrics")
 			exporter.collectDatabaseStatus(mongoSess, ch)
 		}
+
+		if exporter.Opts.CollectCollectionMetrics {
+			glog.Info("Collection Collection Metrics")
+			exporter.collectCollectionStatus(mongoSess, ch)
+		}
 	}
 }
 
@@ -123,6 +129,31 @@ func (exporter *MongodbCollector) collectDatabaseStatus(session *mgo.Session, ch
 				glog.Infof("exporting Database Metrics for db=%q", dbStatus.Name)
 				dbStatus.Export(ch)
 			}
+		}
+	}
+}
+
+func (exporter *MongodbCollector) collectCollectionStatus(session *mgo.Session, ch chan<- prometheus.Metric) {
+	database_names, err := session.DatabaseNames()
+	if err != nil {
+		glog.Error("failed to get database names")
+		return
+	}
+	for _, db := range database_names {
+		if db != "admin" && db != "test" {
+			collection_names, err := session.DB(db).CollectionNames()
+			if err != nil {
+				glog.Error("Failed to get collection names for db=" + db)
+				continue
+			}
+			for _, collection_name := range collection_names {
+				collStats := GetCollectionStatus(session, db, collection_name)
+				if collStats != nil {
+					glog.Infof("exporting Database Metrics for db=%q, table=%q", db, collection_name)
+					collStats.Export(ch)
+				}
+			}
+
 		}
 	}
 }
