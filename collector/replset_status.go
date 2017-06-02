@@ -23,7 +23,7 @@ var (
 		Namespace: Namespace,
 		Subsystem: subsystem,
 		Name:      "my_replica_lag",
-		Help:      "A interger shows the replication lag in seconds, -1 if no master found",
+		Help:      "An integer shows the replication lag in seconds, -1 if no master found",
 	}, []string{"set"})
 
 	term = prometheus.NewGaugeVec(prometheus.GaugeOpts{
