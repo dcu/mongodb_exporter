@@ -32,41 +32,30 @@ var (
 
 // ServerStatus keeps the data returned by the serverStatus() method.
 type ServerStatus struct {
-	Uptime         float64   `bson:"uptime"`
-	UptimeEstimate float64   `bson:"uptimeEstimate"`
-	LocalTime      time.Time `bson:"localTime"`
-
-	Asserts *AssertsStats `bson:"asserts"`
-
-	Dur *DurStats `bson:"dur"`
-
-	BackgroundFlushing *FlushStats `bson:"backgroundFlushing"`
-
-	Connections *ConnectionStats `bson:"connections"`
-
-	ExtraInfo *ExtraInfo `bson:"extra_info"`
-
-	GlobalLock *GlobalLockStats `bson:"globalLock"`
-
-	IndexCounter *IndexCounterStats `bson:"indexCounters"`
-
-	Locks LockStatsMap `bson:"locks,omitempty"`
-
-	Network *NetworkStats `bson:"network"`
-
-	Opcounters     *OpcountersStats     `bson:"opcounters"`
-	OpcountersRepl *OpcountersReplStats `bson:"opcountersRepl"`
-	Mem            *MemStats            `bson:"mem"`
-	Metrics        *MetricsStats        `bson:"metrics"`
-
-	Cursors *Cursors `bson:"cursors"`
+	Uptime             float64              `bson:"uptime"`
+	UptimeEstimate     float64              `bson:"uptimeEstimate"`
+	LocalTime          time.Time            `bson:"localTime"`
+	Asserts            *AssertsStats        `bson:"asserts"`
+	Dur                *DurStats            `bson:"dur"`
+	BackgroundFlushing *FlushStats          `bson:"backgroundFlushing"`
+	Connections        *ConnectionStats     `bson:"connections"`
+	ExtraInfo          *ExtraInfo           `bson:"extra_info"`
+	GlobalLock         *GlobalLockStats     `bson:"globalLock"`
+	IndexCounter       *IndexCounterStats   `bson:"indexCounters"`
+	Locks              LockStatsMap         `bson:"locks,omitempty"`
+	Network            *NetworkStats        `bson:"network"`
+	Opcounters         *OpcountersStats     `bson:"opcounters"`
+	OpcountersRepl     *OpcountersReplStats `bson:"opcountersRepl"`
+	Mem                *MemStats            `bson:"mem"`
+	Metrics            *MetricsStats        `bson:"metrics"`
+	Cursors            *Cursors             `bson:"cursors"`
 }
 
 // Export exports the server status to be consumed by prometheus.
 func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
-	instanceUptimeSeconds.Set(status.Uptime)
-	instanceUptimeEstimateSeconds.Set(status.Uptime)
-	instanceLocalTime.Set(float64(status.LocalTime.Unix()))
+	instanceUptimeSeconds.Add(status.Uptime)
+	instanceUptimeEstimateSeconds.Add(status.Uptime)
+	instanceLocalTime.Add(float64(status.LocalTime.Unix()))
 	instanceUptimeSeconds.Collect(ch)
 	instanceUptimeEstimateSeconds.Collect(ch)
 	instanceLocalTime.Collect(ch)

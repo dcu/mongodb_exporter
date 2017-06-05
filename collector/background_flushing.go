@@ -50,8 +50,8 @@ type FlushStats struct {
 
 // Export exports the metrics for prometheus.
 func (flushStats *FlushStats) Export(ch chan<- prometheus.Metric) {
-	backgroundFlushingflushesTotal.Set(flushStats.Flushes)
-	backgroundFlushingtotalMilliseconds.Set(flushStats.TotalMs)
+	backgroundFlushingflushesTotal.Add(flushStats.Flushes)
+	backgroundFlushingtotalMilliseconds.Add(flushStats.TotalMs)
 	backgroundFlushingaverageMilliseconds.Set(flushStats.AverageMs)
 	backgroundFlushinglastMilliseconds.Set(flushStats.LastMs)
 	backgroundFlushinglastFinishedTime.Set(float64(flushStats.LastFinished.Unix()))

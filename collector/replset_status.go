@@ -188,7 +188,7 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 			memberHealth.With(ls).Set(float64(*member.Health))
 		}
 
-		memberUptime.With(ls).Set(member.Uptime)
+		memberUptime.With(ls).Add(member.Uptime)
 
 		memberOptimeDate.With(ls).Set(float64(member.OptimeDate.Unix()))
 

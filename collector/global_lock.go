@@ -23,15 +23,11 @@ var (
 		Name:      "lock_total",
 		Help:      "The value of lockTime represents the time, in microseconds, since the database last started, that the globalLock has been held",
 	})
-)
-var (
 	globalLockCurrentQueue = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "global_lock_current_queue",
 		Help:      "The currentQueue data structure value provides more granular information concerning the number of operations queued because of a lock",
 	}, []string{"type"})
-)
-var (
 	globalLockClient = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "global_lock_client",
@@ -76,7 +72,7 @@ type GlobalLockStats struct {
 
 // Export exports the metrics to prometheus
 func (globalLock *GlobalLockStats) Export(ch chan<- prometheus.Metric) {
-	globalLockTotal.Set(globalLock.LockTime)
+	globalLockTotal.Add(globalLock.LockTime)
 	globalLockRatio.Set(globalLock.Ratio)
 
 	globalLock.CurrentQueue.Export(ch)

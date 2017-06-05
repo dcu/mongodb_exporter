@@ -11,22 +11,16 @@ var (
 		Name:      "timed_out_total",
 		Help:      "timedOut provides the total number of cursors that have timed out since the server process started. If this number is large or growing at a regular rate, this may indicate an application error",
 	})
-)
-var (
 	metricsCursorOpen = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "metrics_cursor_open",
 		Help:      "The open is an embedded document that contains data regarding open cursors",
 	}, []string{"state"})
-)
-var (
 	metricsDocumentTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "metrics_document_total",
 		Help:      "The document holds a document of that reflect document access and modification patterns and data use. Compare these values to the data in the opcounters document, which track total number of operations",
 	}, []string{"state"})
-)
-var (
 	metricsGetLastErrorWtimeNumTotal = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_get_last_error_wtime",
@@ -39,38 +33,28 @@ var (
 		Name:      "total_milliseconds",
 		Help:      "total_millis reports the total amount of time in milliseconds that the mongod has spent performing getLastError operations with write concern (i.e. w) that wait for one or more members of a replica set to acknowledge the write operation (i.e. a w value greater than 1.)",
 	})
-)
-var (
 	metricsGetLastErrorWtimeoutsTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_get_last_error",
 		Name:      "wtimeouts_total",
 		Help:      "wtimeouts reports the number of times that write concern operations have timed out as a result of the wtimeout threshold to getLastError.",
 	})
-)
-var (
 	metricsOperationTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "metrics_operation_total",
 		Help:      "operation is a sub-document that holds counters for several types of update and query operations that MongoDB handles using special operation types",
 	}, []string{"type"})
-)
-var (
 	metricsQueryExecutorTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "metrics_query_executor_total",
 		Help:      "queryExecutor is a document that reports data from the query execution system",
 	}, []string{"state"})
-)
-var (
 	metricsRecordMovesTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_record",
 		Name:      "moves_total",
 		Help:      "moves reports the total number of times documents move within the on-disk representation of the MongoDB data set. Documents move as a result of operations that increase the size of the document beyond their allocated record size",
 	})
-)
-var (
 	metricsReplApplyBatchesNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_apply_batches",
@@ -83,16 +67,12 @@ var (
 		Name:      "total_milliseconds",
 		Help:      "total_millis reports the total amount of time the mongod has spent applying operations from the oplog",
 	})
-)
-var (
 	metricsReplApplyOpsTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_apply",
 		Name:      "ops_total",
 		Help:      "ops reports the total number of oplog operations applied",
 	})
-)
-var (
 	metricsReplBufferCount = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_buffer",
@@ -111,8 +91,6 @@ var (
 		Name:      "size_bytes",
 		Help:      "sizeBytes reports the current size of the contents of the oplog buffer",
 	})
-)
-var (
 	metricsReplNetworkGetmoresNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_network_getmores",
@@ -125,8 +103,6 @@ var (
 		Name:      "total_milliseconds",
 		Help:      "total_millis reports the total amount of time required to collect data from getmore operations",
 	})
-)
-var (
 	metricsReplNetworkBytesTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_network",
@@ -145,8 +121,6 @@ var (
 		Name:      "readers_created_total",
 		Help:      "readersCreated reports the total number of oplog query processes created. MongoDB will create a new oplog query any time an error occurs in the connection, including a timeout, or a network operation. Furthermore, readersCreated will increment every time MongoDB selects a new source fore replication.",
 	})
-)
-var (
 	metricsReplOplogInsertNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_oplog_insert",
@@ -159,16 +133,12 @@ var (
 		Name:      "total_milliseconds",
 		Help:      "total_millis reports the total amount of time spent for the mongod to insert data into the oplog.",
 	})
-)
-var (
 	metricsReplOplogInsertBytesTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_oplog",
 		Name:      "insert_bytes_total",
 		Help:      "insertBytes the total size of documents inserted into the oplog.",
 	})
-)
-var (
 	metricsReplPreloadDocsNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_preload_docs",
@@ -181,8 +151,6 @@ var (
 		Name:      "total_milliseconds",
 		Help:      "total_millis reports the total amount of time spent loading documents as part of the pre-fetch stage of replication",
 	})
-)
-var (
 	metricsReplPreloadIndexesNumTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_repl_preload_indexes",
@@ -195,15 +163,11 @@ var (
 		Name:      "total_milliseconds",
 		Help:      "total_millis reports the total amount of time spent loading index entries as part of the pre-fetch stage of replication",
 	})
-)
-var (
 	metricsStorageFreelistSearchTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "metrics_storage_freelist_search_total",
 		Help:      "metrics about searching records in the database.",
 	}, []string{"type"})
-)
-var (
 	metricsTTLDeletedDocumentsTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "metrics_ttl",
@@ -228,10 +192,10 @@ type DocumentStats struct {
 
 // Export exposes the document stats to be consumed by the prometheus server.
 func (documentStats *DocumentStats) Export(ch chan<- prometheus.Metric) {
-	metricsDocumentTotal.WithLabelValues("deleted").Set(documentStats.Deleted)
-	metricsDocumentTotal.WithLabelValues("inserted").Set(documentStats.Inserted)
-	metricsDocumentTotal.WithLabelValues("returned").Set(documentStats.Returned)
-	metricsDocumentTotal.WithLabelValues("updated").Set(documentStats.Updated)
+	metricsDocumentTotal.WithLabelValues("deleted").Add(documentStats.Deleted)
+	metricsDocumentTotal.WithLabelValues("inserted").Add(documentStats.Inserted)
+	metricsDocumentTotal.WithLabelValues("returned").Add(documentStats.Returned)
+	metricsDocumentTotal.WithLabelValues("updated").Add(documentStats.Updated)
 }
 
 // BenchmarkStats is bechmark info about an operation.
@@ -249,9 +213,9 @@ type GetLastErrorStats struct {
 // Export exposes the get last error stats.
 func (getLastErrorStats *GetLastErrorStats) Export(ch chan<- prometheus.Metric) {
 	metricsGetLastErrorWtimeNumTotal.Set(getLastErrorStats.Wtime.Num)
-	metricsGetLastErrorWtimeTotalMilliseconds.Set(getLastErrorStats.Wtime.TotalMillis)
+	metricsGetLastErrorWtimeTotalMilliseconds.Add(getLastErrorStats.Wtime.TotalMillis)
 
-	metricsGetLastErrorWtimeoutsTotal.Set(getLastErrorStats.Wtimeouts)
+	metricsGetLastErrorWtimeoutsTotal.Add(getLastErrorStats.Wtimeouts)
 }
 
 // OperationStats are the stats for some kind of operations.
@@ -263,9 +227,9 @@ type OperationStats struct {
 
 // Export exports the operation stats.
 func (operationStats *OperationStats) Export(ch chan<- prometheus.Metric) {
-	metricsOperationTotal.WithLabelValues("fastmod").Set(operationStats.Fastmod)
-	metricsOperationTotal.WithLabelValues("idhack").Set(operationStats.Idhack)
-	metricsOperationTotal.WithLabelValues("scan_and_order").Set(operationStats.ScanAndOrder)
+	metricsOperationTotal.WithLabelValues("fastmod").Add(operationStats.Fastmod)
+	metricsOperationTotal.WithLabelValues("idhack").Add(operationStats.Idhack)
+	metricsOperationTotal.WithLabelValues("scan_and_order").Add(operationStats.ScanAndOrder)
 }
 
 // QueryExecutorStats are the stats associated with a query execution.
@@ -276,8 +240,8 @@ type QueryExecutorStats struct {
 
 // Export exports the query executor stats.
 func (queryExecutorStats *QueryExecutorStats) Export(ch chan<- prometheus.Metric) {
-	metricsQueryExecutorTotal.WithLabelValues("scanned").Set(queryExecutorStats.Scanned)
-	metricsQueryExecutorTotal.WithLabelValues("scanned_objects").Set(queryExecutorStats.ScannedObjects)
+	metricsQueryExecutorTotal.WithLabelValues("scanned").Add(queryExecutorStats.Scanned)
+	metricsQueryExecutorTotal.WithLabelValues("scanned_objects").Add(queryExecutorStats.ScannedObjects)
 }
 
 // RecordStats are stats associated with a record.
@@ -287,7 +251,7 @@ type RecordStats struct {
 
 // Export exposes the record stats.
 func (recordStats *RecordStats) Export(ch chan<- prometheus.Metric) {
-	metricsRecordMovesTotal.Set(recordStats.Moves)
+	metricsRecordMovesTotal.Add(recordStats.Moves)
 }
 
 // ApplyStats are the stats associated with the apply operation.
@@ -298,10 +262,10 @@ type ApplyStats struct {
 
 // Export exports the apply stats
 func (applyStats *ApplyStats) Export(ch chan<- prometheus.Metric) {
-	metricsReplApplyOpsTotal.Set(applyStats.Ops)
+	metricsReplApplyOpsTotal.Add(applyStats.Ops)
 
-	metricsReplApplyBatchesNumTotal.Set(applyStats.Batches.Num)
-	metricsReplApplyBatchesTotalMilliseconds.Set(applyStats.Batches.TotalMillis)
+	metricsReplApplyBatchesNumTotal.Add(applyStats.Batches.Num)
+	metricsReplApplyBatchesTotalMilliseconds.Add(applyStats.Batches.TotalMillis)
 }
 
 // BufferStats are the stats associated with the buffer
@@ -314,7 +278,7 @@ type BufferStats struct {
 // Export exports the buffer stats.
 func (bufferStats *BufferStats) Export(ch chan<- prometheus.Metric) {
 	metricsReplBufferCount.Set(bufferStats.Count)
-	metricsReplBufferMaxSizeBytes.Set(bufferStats.MaxSizeBytes)
+	metricsReplBufferMaxSizeBytes.Add(bufferStats.MaxSizeBytes)
 	metricsReplBufferSizeBytes.Set(bufferStats.SizeBytes)
 }
 
@@ -328,12 +292,12 @@ type MetricsNetworkStats struct {
 
 // Export exposes the network stats.
 func (metricsNetworkStats *MetricsNetworkStats) Export(ch chan<- prometheus.Metric) {
-	metricsReplNetworkBytesTotal.Set(metricsNetworkStats.Bytes)
-	metricsReplNetworkOpsTotal.Set(metricsNetworkStats.Ops)
-	metricsReplNetworkReadersCreatedTotal.Set(metricsNetworkStats.ReadersCreated)
+	metricsReplNetworkBytesTotal.Add(metricsNetworkStats.Bytes)
+	metricsReplNetworkOpsTotal.Add(metricsNetworkStats.Ops)
+	metricsReplNetworkReadersCreatedTotal.Add(metricsNetworkStats.ReadersCreated)
 
-	metricsReplNetworkGetmoresNumTotal.Set(metricsNetworkStats.GetMores.Num)
-	metricsReplNetworkGetmoresTotalMilliseconds.Set(metricsNetworkStats.GetMores.TotalMillis)
+	metricsReplNetworkGetmoresNumTotal.Add(metricsNetworkStats.GetMores.Num)
+	metricsReplNetworkGetmoresTotalMilliseconds.Add(metricsNetworkStats.GetMores.TotalMillis)
 }
 
 // ReplStats are the stats associated with the replication process.
@@ -360,11 +324,11 @@ type PreloadStats struct {
 
 // Export exposes the preload stats.
 func (preloadStats *PreloadStats) Export(ch chan<- prometheus.Metric) {
-	metricsReplPreloadDocsNumTotal.Set(preloadStats.Docs.Num)
-	metricsReplPreloadDocsTotalMilliseconds.Set(preloadStats.Docs.TotalMillis)
+	metricsReplPreloadDocsNumTotal.Add(preloadStats.Docs.Num)
+	metricsReplPreloadDocsTotalMilliseconds.Add(preloadStats.Docs.TotalMillis)
 
-	metricsReplPreloadIndexesNumTotal.Set(preloadStats.Indexes.Num)
-	metricsReplPreloadIndexesTotalMilliseconds.Set(preloadStats.Indexes.TotalMillis)
+	metricsReplPreloadIndexesNumTotal.Add(preloadStats.Indexes.Num)
+	metricsReplPreloadIndexesTotalMilliseconds.Add(preloadStats.Indexes.TotalMillis)
 }
 
 // StorageStats are the stats associated with the storage.
@@ -376,9 +340,9 @@ type StorageStats struct {
 
 // Export exports the storage stats.
 func (storageStats *StorageStats) Export(ch chan<- prometheus.Metric) {
-	metricsStorageFreelistSearchTotal.WithLabelValues("bucket_exhausted").Set(storageStats.BucketExhausted)
-	metricsStorageFreelistSearchTotal.WithLabelValues("requests").Set(storageStats.Requests)
-	metricsStorageFreelistSearchTotal.WithLabelValues("scanned").Set(storageStats.Scanned)
+	metricsStorageFreelistSearchTotal.WithLabelValues("bucket_exhausted").Add(storageStats.BucketExhausted)
+	metricsStorageFreelistSearchTotal.WithLabelValues("requests").Add(storageStats.Requests)
+	metricsStorageFreelistSearchTotal.WithLabelValues("scanned").Add(storageStats.Scanned)
 }
 
 // CursorStatsOpen are the stats for open cursors
@@ -396,7 +360,7 @@ type CursorStats struct {
 
 // Export exports the cursor stats.
 func (cursorStats *CursorStats) Export(ch chan<- prometheus.Metric) {
-	metricsCursorTimedOutTotal.Set(cursorStats.TimedOut)
+	metricsCursorTimedOutTotal.Add(cursorStats.TimedOut)
 	metricsCursorOpen.WithLabelValues("timed_out").Set(cursorStats.Open.NoTimeout)
 	metricsCursorOpen.WithLabelValues("pinned").Set(cursorStats.Open.Pinned)
 	metricsCursorOpen.WithLabelValues("total").Set(cursorStats.Open.Total)
