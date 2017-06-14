@@ -50,6 +50,7 @@ var (
 	mongodbCollectOplog                 = flag.Bool("mongodb.collect.oplog", true, "collect Mongodb Oplog status")
 	mongodbCollectReplSet               = flag.Bool("mongodb.collect.replset", true, "collect Mongodb replica set status")
 	mongodbCollectDatabaseMetrics       = flag.Bool("mongodb.collect.database", false, "collect MongoDB database metrics")
+	mongodbCollectCollectionMetrics     = flag.Bool("mongodb.collect.collection", false, "Collect MongoDB collection metrics")
 	version                             = flag.Bool("version", false, "Print mongodb_exporter version")
 )
 
@@ -140,14 +141,15 @@ func startWebServer() {
 
 func registerCollector() {
 	mongodbCollector := collector.NewMongodbCollector(collector.MongodbCollectorOpts{
-		URI:                    *mongodbURIFlag,
-		TLSCertificateFile:     *mongodbTLSCert,
-		TLSPrivateKeyFile:      *mongodbTLSPrivateKey,
-		TLSCaFile:              *mongodbTLSCa,
-		TLSHostnameValidation:  !(*mongodbTLSDisableHostnameValidation),
-		CollectOplog:           *mongodbCollectOplog,
-		CollectReplSet:         *mongodbCollectReplSet,
-		CollectDatabaseMetrics: *mongodbCollectDatabaseMetrics,
+		URI:                      *mongodbURIFlag,
+		TLSCertificateFile:       *mongodbTLSCert,
+		TLSPrivateKeyFile:        *mongodbTLSPrivateKey,
+		TLSCaFile:                *mongodbTLSCa,
+		TLSHostnameValidation:    !(*mongodbTLSDisableHostnameValidation),
+		CollectOplog:             *mongodbCollectOplog,
+		CollectReplSet:           *mongodbCollectReplSet,
+		CollectDatabaseMetrics:   *mongodbCollectDatabaseMetrics,
+		CollectCollectionMetrics: *mongodbCollectCollectionMetrics,
 	})
 	prometheus.MustRegister(mongodbCollector)
 }
