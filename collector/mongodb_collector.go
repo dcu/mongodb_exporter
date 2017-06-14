@@ -122,13 +122,13 @@ func (exporter *MongodbCollector) collectDatabaseStatus(session *mgo.Session, ch
 		return
 	}
 	for _, db := range all {
-		if db != "admin" && db != "test" {
-			dbStatus := GetDatabaseStatus(session, db)
-
-			if dbStatus != nil {
-				glog.Infof("exporting Database Metrics for db=%q", dbStatus.Name)
-				dbStatus.Export(ch)
-			}
+		if db == "admin" || db == "test" {
+			continue
+		}
+		dbStatus := GetDatabaseStatus(session, db)
+		if dbStatus != nil {
+			glog.Infof("exporting Database Metrics for db=%q", dbStatus.Name)
+			dbStatus.Export(ch)
 		}
 	}
 }
@@ -140,20 +140,9 @@ func (exporter *MongodbCollector) collectCollectionStatus(session *mgo.Session, 
 		return
 	}
 	for _, db := range database_names {
-		if db != "admin" && db != "test" {
-			collection_names, err := session.DB(db).CollectionNames()
-			if err != nil {
-				glog.Error("Failed to get collection names for db=" + db)
-				continue
-			}
-			for _, collection_name := range collection_names {
-				collStats := GetCollectionStatus(session, db, collection_name)
-				if collStats != nil {
-					glog.Infof("exporting Database Metrics for db=%q, table=%q", db, collection_name)
-					collStats.Export(ch)
-				}
-			}
-
+		if db == "admin" || db == "test" {
+			continue
 		}
+		CollectCollectionStatus(session, db, ch)
 	}
 }

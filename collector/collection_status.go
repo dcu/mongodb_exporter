@@ -91,3 +91,18 @@ func GetCollectionStatus(session *mgo.Session, db string, collection string) *Co
 
 	return &collStatus
 }
+
+func CollectCollectionStatus(session *mgo.Session, db string, ch chan<- prometheus.Metric) {
+	collection_names, err := session.DB(db).CollectionNames()
+	if err != nil {
+		glog.Error("Failed to get collection names for db=" + db)
+		return
+	}
+	for _, collection_name := range collection_names {
+		collStats := GetCollectionStatus(session, db, collection_name)
+		if collStats != nil {
+			glog.Infof("exporting Database Metrics for db=%q, table=%q", db, collection_name)
+			collStats.Export(ch)
+		}
+	}
+}
