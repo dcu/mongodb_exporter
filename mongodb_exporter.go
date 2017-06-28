@@ -47,6 +47,8 @@ var (
 	enabledGroupsFlag                   = flag.String("groups.enabled", "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics", "Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/")
 	authUserFlag                        = flag.String("auth.user", "", "Username for basic auth.")
 	authPassFlag                        = flag.String("auth.pass", "", "Password for basic auth.")
+	mongodbUserName                     = flag.String("mongodb.username", "", "Username to connect to Mongodb")
+	mongodbAuthMechanism                = flag.String("mongodb.mechanism", "", "auth mechanism to connect to Mongodb (ie: MONGODB-X509)")
 	mongodbCollectOplog                 = flag.Bool("mongodb.collect.oplog", true, "collect Mongodb Oplog status")
 	mongodbCollectReplSet               = flag.Bool("mongodb.collect.replset", true, "collect Mongodb replica set status")
 	mongodbCollectDatabaseMetrics       = flag.Bool("mongodb.collect.database", false, "collect MongoDB database metrics")
@@ -151,7 +153,9 @@ func registerCollector() {
 		CollectReplSet:           *mongodbCollectReplSet,
 		CollectDatabaseMetrics:   *mongodbCollectDatabaseMetrics,
 		CollectCollectionMetrics: *mongodbCollectCollectionMetrics,
-		CollectConnPoolStats: *mongodbCollectConnPoolStats,
+		CollectConnPoolStats:     *mongodbCollectConnPoolStats,
+		UserName:                 *mongodbUserName,
+		AuthMechanism:            *mongodbAuthMechanism,
 	})
 	prometheus.MustRegister(mongodbCollector)
 }

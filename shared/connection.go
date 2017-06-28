@@ -24,6 +24,8 @@ type MongoSessionOpts struct {
 	TLSPrivateKeyFile     string
 	TLSCaFile             string
 	TLSHostnameValidation bool
+	UserName              string
+	AuthMechanism         string
 }
 
 // MongoSession creates a Mongo session
@@ -36,6 +38,12 @@ func MongoSession(opts MongoSessionOpts) *mgo.Session {
 
 	dialInfo.Direct = true // Force direct connection
 	dialInfo.Timeout = dialMongodbTimeout
+	if opts.AuthMechanism != "" {
+		dialInfo.Mechanism = opts.AuthMechanism
+	}
+	if opts.UserName != "" {
+		dialInfo.Username = opts.UserName
+	}
 
 	err = opts.configureDialInfoIfRequired(dialInfo)
 	if err != nil {

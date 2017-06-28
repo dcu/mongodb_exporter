@@ -24,6 +24,8 @@ type MongodbCollectorOpts struct {
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
 	CollectConnPoolStats     bool
+	UserName                 string
+	AuthMechanism            string
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -33,6 +35,8 @@ func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
 		TLSPrivateKeyFile:     in.TLSPrivateKeyFile,
 		TLSCaFile:             in.TLSCaFile,
 		TLSHostnameValidation: in.TLSHostnameValidation,
+		UserName:              in.UserName,
+		AuthMechanism:         in.AuthMechanism,
 	}
 }
 
