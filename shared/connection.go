@@ -38,9 +38,6 @@ func MongoSession(opts MongoSessionOpts) *mgo.Session {
 
 	dialInfo.Direct = true // Force direct connection
 	dialInfo.Timeout = dialMongodbTimeout
-	if opts.AuthMechanism != "" {
-		dialInfo.Mechanism = opts.AuthMechanism
-	}
 	if opts.UserName != "" {
 		dialInfo.Username = opts.UserName
 	}
@@ -63,6 +60,9 @@ func MongoSession(opts MongoSessionOpts) *mgo.Session {
 }
 
 func (opts MongoSessionOpts) configureDialInfoIfRequired(dialInfo *mgo.DialInfo) error {
+	if opts.AuthMechanism != "" {
+		dialInfo.Mechanism = opts.AuthMechanism
+	}
 	if len(opts.TLSCertificateFile) > 0 {
 		certificates, err := LoadKeyPairFrom(opts.TLSCertificateFile, opts.TLSPrivateKeyFile)
 		if err != nil {
