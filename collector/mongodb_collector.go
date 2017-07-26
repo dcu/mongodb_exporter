@@ -23,6 +23,7 @@ type MongodbCollectorOpts struct {
 	CollectOplog             bool
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
+	CollectConnPoolStats     bool
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -80,6 +81,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		if exporter.Opts.CollectCollectionMetrics {
 			glog.Info("Collection Collection Metrics")
 			exporter.collectCollectionStatus(mongoSess, ch)
+		}
+
+		if exporter.Opts.CollectConnPoolStats {
+			glog.Info("Collecting Connection Pool Stats")
+			exporter.collectConnPoolStats(mongoSess, ch)
 		}
 	}
 }
@@ -144,5 +150,14 @@ func (exporter *MongodbCollector) collectCollectionStatus(session *mgo.Session, 
 			continue
 		}
 		CollectCollectionStatus(session, db, ch)
+	}
+}
+
+func (exporter *MongodbCollector) collectConnPoolStats(session *mgo.Session, ch chan<- prometheus.Metric) {
+	connPoolStats := GetConnPoolStats(session)
+
+	if connPoolStats != nil {
+		glog.Info("exporting ConnPoolStats Metrics")
+		connPoolStats.Export(ch)
 	}
 }
