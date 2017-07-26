@@ -51,6 +51,7 @@ var (
 	mongodbCollectReplSet               = flag.Bool("mongodb.collect.replset", true, "collect Mongodb replica set status")
 	mongodbCollectDatabaseMetrics       = flag.Bool("mongodb.collect.database", false, "collect MongoDB database metrics")
 	mongodbCollectCollectionMetrics     = flag.Bool("mongodb.collect.collection", false, "Collect MongoDB collection metrics")
+	mongodbCollectConnPoolStats         = flag.Bool("mongodb.collect.connpoolstats", false, "Collect MongoDB connpoolstats")
 	version                             = flag.Bool("version", false, "Print mongodb_exporter version")
 )
 
@@ -150,6 +151,7 @@ func registerCollector() {
 		CollectReplSet:           *mongodbCollectReplSet,
 		CollectDatabaseMetrics:   *mongodbCollectDatabaseMetrics,
 		CollectCollectionMetrics: *mongodbCollectCollectionMetrics,
+		CollectConnPoolStats: *mongodbCollectConnPoolStats,
 	})
 	prometheus.MustRegister(mongodbCollector)
 }
