@@ -21,6 +21,7 @@ type MongodbCollectorOpts struct {
 	TLSHostnameValidation    bool
 	CollectReplSet           bool
 	CollectOplog             bool
+	CollectTopMetrics        bool
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
 	CollectConnPoolStats     bool
@@ -57,8 +58,21 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 // Describe describes all mongodb's metrics.
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	(&ServerStatus{}).Describe(ch)
-	(&ReplSetStatus{}).Describe(ch)
-	(&DatabaseStatus{}).Describe(ch)
+	if exporter.Opts.CollectReplSet {
+		(&ReplSetStatus{}).Describe(ch)
+	}
+	if exporter.Opts.CollectOplog {
+		(&OplogStatus{}).Describe(ch)
+	}
+	if exporter.Opts.CollectTopMetrics {
+		(&TopStatus{}).Describe(ch)
+	}
+	if exporter.Opts.CollectDatabaseMetrics {
+		(&DatabaseStatus{}).Describe(ch)
+	}
+	if exporter.Opts.CollectCollectionMetrics {
+		(&CollectionStatus{}).Describe(ch)
+	}
 }
 
 // Collect collects all mongodb's metrics.
@@ -75,6 +89,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		if exporter.Opts.CollectOplog {
 			glog.Info("Collecting Oplog Status")
 			exporter.collectOplogStatus(mongoSess, ch)
+		}
+
+		if exporter.Opts.CollectTopMetrics {
+			glog.Info("Collecting Top Metrics")
+			exporter.collectTopStatus(mongoSess, ch)
 		}
 
 		if exporter.Opts.CollectDatabaseMetrics {
@@ -123,6 +142,15 @@ func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch ch
 	}
 
 	return oplogStatus
+}
+
+func (exporter *MongodbCollector) collectTopStatus(session *mgo.Session, ch chan<- prometheus.Metric) *TopStatus {
+	topStatus := GetTopStatus(session)
+	if topStatus != nil {
+		glog.Info("exporting Top Metrics")
+		topStatus.Export(ch)
+	}
+	return topStatus
 }
 
 func (exporter *MongodbCollector) collectDatabaseStatus(session *mgo.Session, ch chan<- prometheus.Metric) {

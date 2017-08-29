@@ -51,6 +51,7 @@ var (
 	mongodbAuthMechanism                = flag.String("mongodb.mechanism", "", "auth mechanism to connect to Mongodb (ie: MONGODB-X509)")
 	mongodbCollectOplog                 = flag.Bool("mongodb.collect.oplog", true, "collect Mongodb Oplog status")
 	mongodbCollectReplSet               = flag.Bool("mongodb.collect.replset", true, "collect Mongodb replica set status")
+	mongodbCollectTopMetrics            = flag.Bool("mongodb.collect.top", false, "collect Mongodb Top metrics")
 	mongodbCollectDatabaseMetrics       = flag.Bool("mongodb.collect.database", false, "collect MongoDB database metrics")
 	mongodbCollectCollectionMetrics     = flag.Bool("mongodb.collect.collection", false, "Collect MongoDB collection metrics")
 	mongodbCollectConnPoolStats         = flag.Bool("mongodb.collect.connpoolstats", false, "Collect MongoDB connpoolstats")
@@ -151,6 +152,7 @@ func registerCollector() {
 		TLSHostnameValidation:    !(*mongodbTLSDisableHostnameValidation),
 		CollectOplog:             *mongodbCollectOplog,
 		CollectReplSet:           *mongodbCollectReplSet,
+		CollectTopMetrics:        *mongodbCollectTopMetrics,
 		CollectDatabaseMetrics:   *mongodbCollectDatabaseMetrics,
 		CollectCollectionMetrics: *mongodbCollectCollectionMetrics,
 		CollectConnPoolStats:     *mongodbCollectConnPoolStats,
