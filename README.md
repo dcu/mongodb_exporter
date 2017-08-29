@@ -4,6 +4,8 @@ MongoDB exporter for prometheus.io, written in go.
 
 ![screenshot](https://raw.githubusercontent.com/dcu/mongodb_exporter/321189c90831d5ad5a8c6fb04925a335b37f51b8/screenshots/mongodb-dashboard-1.png)
 
+[Grafana Dashboard](https://grafana.com/dashboards/2583)
+
 ## Installing
 
 Download a [release](https://github.com/dcu/mongodb_exporter/releases)
@@ -55,6 +57,7 @@ memory | The memory group holds information regarding the target system architec
 locks | The locks group containsdata that provides a granular report on MongoDB database-level lock use
 metrics | The metrics group holds a number of statistics that reflect the current use and state of a running mongod instance.
 cursors | The cursors group contains data regarding cursor state and use. This group is disabled by default because it is deprecated in mongodb >= 2.6.
+top | The top group provides an overview of database operations by type for each database collections and makes it possible to analyze the load on the database in more granular manner. These numbers will grow over time and in response to database use. Analyze these values over time to track database utilization. For more information see [the official documentation.](http://docs.mongodb.com/manual/reference/command/top/index.html)
 
 For more information see [the official documentation.](http://docs.mongodb.org/manual/reference/command/serverStatus/)
 
@@ -62,5 +65,3 @@ For more information see [the official documentation.](http://docs.mongodb.org/m
 ## Roadmap
 
 - Collect data from http://docs.mongodb.org/manual/reference/command/replSetGetStatus/
-
-

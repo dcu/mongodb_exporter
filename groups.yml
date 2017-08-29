@@ -588,3 +588,74 @@ metrics_ttl:
     help: "passes reports the number of times the background process removes documents from collections with a ttl index"
     type: counter
 
+top_time_seconds_total:
+  metadata:
+    help: "The top command provides operation time, in seconds, for each database collection."
+    labels:
+    - type
+    - database
+    - collection
+    type: counter_vec
+  total:
+    help: "total provides a counter of the total operation time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  readLock:
+    help: "readLock provides a counter of the total read lock time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  writeLock:
+    help: "writeLock provides a counter of the total write lock time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  queries:
+    help: "queries provides a counter of the total queries operations time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  getmore:
+    help: "getmore provides a counter of the total \"getmore\" operations time, in seconds, proceed by the collection since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process."
+    type: counter
+  insert:
+    help: "insert provides a counter of the total insert operations time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  update:
+    help: "update provides a counter of the total update operations time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  remove:
+    help: "delete provides a counter of the total delete operations time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+  commands:
+    help: "commands provides a counter of the total commands issued time, in seconds, proceed by the collection since the mongod instance last started."
+    type: counter
+
+top_count_total:
+  metadata:
+    help: "The top command provides operation count for each database collection."
+    labels:
+    - type
+    - database
+    - collection
+    type: counter_vec
+  total:
+    help: "total provides a counter of the total number of operation received by the collection since the mongod instance last started."
+    type: counter
+  readLock:
+    help: "readLock provides a counter of the total number of read lock used by the collection since the mongod instance last started."
+    type: counter
+  writeLock:
+    help: "writeLock provides a counter of the total number of write lock used by the collection since the mongod instance last started."
+    type: counter
+  queries:
+    help: "queries provides a counter of the total number of queries received by the collection since the mongod instance last started."
+    type: counter
+  getmore:
+    help: "getmore provides a counter of the total number of \"getmore\" operations received by the collection since the mongod instance last started. This counter can be high even if the query count is low. Secondary nodes send getMore operations as part of the replication process."
+    type: counter
+  insert:
+    help: "insert provides a counter of the total number of insert operations received by the collection since the mongod instance last started."
+    type: counter
+  update:
+    help: "update provides a counter of the total number of update operations received by the collection since the mongod instance last started."
+    type: counter
+  remove:
+    help: "delete provides a counter of the total number of delete operations received by the collection since the mongod instance last started."
+    type: counter
+  commands:
+    help: "commands provides a counter of the total number of commands issued received by the collection since the mongod instance last started."
+    type: counter
