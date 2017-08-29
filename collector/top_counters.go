@@ -1,56 +1,22 @@
 package collector
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
-	topTotalTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	topTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
-		Name:      "top_total_time_seconds_total",
-		Help:      "The top command provides total operation time, in seconds, and count for each database collection",
+		Name:      "top_time_seconds_total",
+		Help:      "The top command provides operation time, in seconds, for each database collection",
 	}, []string{"type", "database", "collection"})
-	topReadLockTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	topCountTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
-		Name:      "top_read_lock_time_seconds_total",
-		Help:      "The top command provides read lock operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topWriteLockTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_write_lock_time_seconds_total",
-		Help:      "The top command provides write lock operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topQueriesTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_queries_time_seconds_total",
-		Help:      "The top command provides queries operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topGetMoreTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_get_more_time_seconds_total",
-		Help:      "The top command provides get more operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topInsertTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_insert_time_seconds_total",
-		Help:      "The top command provides insert operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topUpdateTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_update_time_seconds_total",
-		Help:      "The top command provides update operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topRemoveTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_remove_time_seconds_total",
-		Help:      "The top command provides remove operation time, in seconds, and count for each database collection",
-	}, []string{"type", "database", "collection"})
-	topCommandsTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "top_commands_time_seconds_total",
-		Help:      "The top command provides commands operation time, in seconds, and count for each database collection",
+		Name:      "top_count_total",
+		Help:      "The top command provides operation count for each database collection",
 	}, []string{"type", "database", "collection"})
 )
 
@@ -85,59 +51,29 @@ func (topStats TopStatsMap) Export(ch chan<- prometheus.Metric) {
 		database := namespace[0]
 		collection := strings.Join(namespace[1:], ".")
 
-		topTotalTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.Total.Time))
-		topTotalTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.Total.Count)
+		topStatTypes := reflect.TypeOf(topStat)
+		topStatValues := reflect.ValueOf(topStat)
 
-		topReadLockTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.ReadLock.Time))
-		topReadLockTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.ReadLock.Count)
+		for i := 0; i < topStatValues.NumField(); i++ {
 
-		topWriteLockTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.WriteLock.Time))
-		topWriteLockTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.WriteLock.Count)
+			metric_type := topStatTypes.Field(i).Name
 
-		topQueriesTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.Queries.Time))
-		topQueriesTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.Queries.Count)
+			op_count := topStatValues.Field(i).Field(1).Float()
 
-		topGetMoreTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.GetMore.Time))
-		topGetMoreTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.GetMore.Count)
+			op_time_microsecond := topStatValues.Field(i).Field(0).Float()
+			op_time_second := float64(op_time_microsecond / 1e6)
 
-		topInsertTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.Insert.Time))
-		topInsertTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.Insert.Count)
-
-		topUpdateTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.Update.Time))
-		topUpdateTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.Update.Count)
-
-		topRemoveTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.Remove.Time))
-		topRemoveTimeSecondsTotal.WithLabelValues("count", database, collection).Set(topStat.Remove.Count)
-
-		topCommandsTimeSecondsTotal.WithLabelValues("time", database, collection).Set(ConvertInSeconds(topStat.Commands.Time))
-		topCommandsTimeSecondsTotal.WithLabelValues("count", database, collection).Set(ConvertInSeconds(topStat.Commands.Count))
+			topTimeSecondsTotal.WithLabelValues(metric_type, database, collection).Set(op_time_second)
+			topCountTotal.WithLabelValues(metric_type, database, collection).Set(op_count)
+		}
 	}
 
-	topTotalTimeSecondsTotal.Collect(ch)
-	topReadLockTimeSecondsTotal.Collect(ch)
-	topWriteLockTimeSecondsTotal.Collect(ch)
-	topQueriesTimeSecondsTotal.Collect(ch)
-	topGetMoreTimeSecondsTotal.Collect(ch)
-	topInsertTimeSecondsTotal.Collect(ch)
-	topUpdateTimeSecondsTotal.Collect(ch)
-	topRemoveTimeSecondsTotal.Collect(ch)
-	topCommandsTimeSecondsTotal.Collect(ch)
+	topTimeSecondsTotal.Collect(ch)
+	topCountTotal.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus
 func (tops TopStatsMap) Describe(ch chan<- *prometheus.Desc) {
-	topTotalTimeSecondsTotal.Describe(ch)
-	topReadLockTimeSecondsTotal.Describe(ch)
-	topWriteLockTimeSecondsTotal.Describe(ch)
-	topQueriesTimeSecondsTotal.Describe(ch)
-	topGetMoreTimeSecondsTotal.Describe(ch)
-	topInsertTimeSecondsTotal.Describe(ch)
-	topUpdateTimeSecondsTotal.Describe(ch)
-	topRemoveTimeSecondsTotal.Describe(ch)
-	topCommandsTimeSecondsTotal.Describe(ch)
-}
-
-// ConvertInSeconds converts microseconds in seconds (seen Prometheus best practice)
-func ConvertInSeconds(microSeconds float64) float64 {
-	return float64(microSeconds / 1e6)
+	topTimeSecondsTotal.Describe(ch)
+	topCountTotal.Describe(ch)
 }
