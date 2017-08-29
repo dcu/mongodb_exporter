@@ -58,20 +58,11 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 // Describe describes all mongodb's metrics.
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	(&ServerStatus{}).Describe(ch)
-	if exporter.Opts.CollectReplSet {
-		(&ReplSetStatus{}).Describe(ch)
-	}
-	if exporter.Opts.CollectOplog {
-		(&OplogStatus{}).Describe(ch)
-	}
+	(&ReplSetStatus{}).Describe(ch)
+	(&DatabaseStatus{}).Describe(ch)
+
 	if exporter.Opts.CollectTopMetrics {
 		(&TopStatus{}).Describe(ch)
-	}
-	if exporter.Opts.CollectDatabaseMetrics {
-		(&DatabaseStatus{}).Describe(ch)
-	}
-	if exporter.Opts.CollectCollectionMetrics {
-		(&CollectionStatus{}).Describe(ch)
 	}
 }
 
