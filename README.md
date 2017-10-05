@@ -21,13 +21,6 @@ Requires [glide](https://github.com/Masterminds/glide) for dependency management
 
 ## Building Docker image
 
-To keep the image size small (~15MB) we build the linux binary first which gets
-`COPY`'d into the Docker container (alpine base image)
-
-Create the linux binary
-
-    make release
-
 Build the Docker image
 
     docker build -t mongodb_exporter .
