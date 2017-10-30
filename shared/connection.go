@@ -24,6 +24,8 @@ type MongoSessionOpts struct {
 	TLSPrivateKeyFile     string
 	TLSCaFile             string
 	TLSHostnameValidation bool
+	UserName              string
+	AuthMechanism         string
 }
 
 // MongoSession creates a Mongo session
@@ -36,6 +38,9 @@ func MongoSession(opts MongoSessionOpts) *mgo.Session {
 
 	dialInfo.Direct = true // Force direct connection
 	dialInfo.Timeout = dialMongodbTimeout
+	if opts.UserName != "" {
+		dialInfo.Username = opts.UserName
+	}
 
 	err = opts.configureDialInfoIfRequired(dialInfo)
 	if err != nil {
@@ -55,6 +60,9 @@ func MongoSession(opts MongoSessionOpts) *mgo.Session {
 }
 
 func (opts MongoSessionOpts) configureDialInfoIfRequired(dialInfo *mgo.DialInfo) error {
+	if opts.AuthMechanism != "" {
+		dialInfo.Mechanism = opts.AuthMechanism
+	}
 	if len(opts.TLSCertificateFile) > 0 {
 		certificates, err := LoadKeyPairFrom(opts.TLSCertificateFile, opts.TLSPrivateKeyFile)
 		if err != nil {
