@@ -2,7 +2,7 @@ FROM       golang:alpine as builder
 
 RUN apk --no-cache add curl git make perl
 RUN curl -s https://glide.sh/get | sh
-RUN git clone https://github.com/dcu/mongodb_exporter.git /go/src/github.com/dcu/mongodb_exporter
+COPY . /go/src/github.com/dcu/mongodb_exporter
 RUN cd /go/src/github.com/dcu/mongodb_exporter && make release
 
 FROM       alpine:3.4
