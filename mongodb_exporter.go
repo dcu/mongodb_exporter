@@ -54,6 +54,7 @@ var (
 	mongodbCollectTopMetrics            = flag.Bool("mongodb.collect.top", false, "collect Mongodb Top metrics")
 	mongodbCollectDatabaseMetrics       = flag.Bool("mongodb.collect.database", false, "collect MongoDB database metrics")
 	mongodbCollectCollectionMetrics     = flag.Bool("mongodb.collect.collection", false, "Collect MongoDB collection metrics")
+	mongodbCollectProfileMetrics        = flag.Bool("mongodb.collect.profile", false, "Collect MongoDB profile metrics")
 	mongodbCollectConnPoolStats         = flag.Bool("mongodb.collect.connpoolstats", false, "Collect MongoDB connpoolstats")
 	version                             = flag.Bool("version", false, "Print mongodb_exporter version")
 )
@@ -155,6 +156,7 @@ func registerCollector() {
 		CollectTopMetrics:        *mongodbCollectTopMetrics,
 		CollectDatabaseMetrics:   *mongodbCollectDatabaseMetrics,
 		CollectCollectionMetrics: *mongodbCollectCollectionMetrics,
+		CollectProfileMetrics:    *mongodbCollectProfileMetrics,
 		CollectConnPoolStats:     *mongodbCollectConnPoolStats,
 		UserName:                 *mongodbUserName,
 		AuthMechanism:            *mongodbAuthMechanism,

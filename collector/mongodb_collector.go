@@ -32,6 +32,7 @@ type MongodbCollectorOpts struct {
 	CollectTopMetrics        bool
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
+	CollectProfileMetrics    bool
 	CollectConnPoolStats     bool
 	UserName                 string
 	AuthMechanism            string
@@ -106,6 +107,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		if exporter.Opts.CollectCollectionMetrics {
 			glog.Info("Collection Collection Metrics")
 			exporter.collectCollectionStatus(mongoSess, ch)
+		}
+
+		if exporter.Opts.CollectProfileMetrics {
+			glog.Info("Collection Profile Metrics")
+			exporter.collectProfileStatus(mongoSess, ch)
 		}
 
 		if exporter.Opts.CollectConnPoolStats {
@@ -188,6 +194,20 @@ func (exporter *MongodbCollector) collectCollectionStatus(session *mgo.Session, 
 			continue
 		}
 		CollectCollectionStatus(session, db, ch)
+	}
+}
+
+func (exporter *MongodbCollector) collectProfileStatus(session *mgo.Session, ch chan<- prometheus.Metric) {
+	all, err := session.DatabaseNames()
+	if err != nil {
+		glog.Error("failed to get database names: %s", err)
+		return
+	}
+	for _, db := range all {
+		if db == "admin" || db == "test" {
+			continue
+		}
+		CollectProfileStatus(session, db, ch)
 	}
 }
 
