@@ -12,6 +12,14 @@ var (
 	Namespace = "mongodb"
 )
 
+var (
+	upGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Name:      "up",
+		Help:      "To show if we can connect to mongodb instance",
+	}, []string{})
+)
+
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
 	URI                      string
@@ -70,6 +78,9 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 	mongoSess := shared.MongoSession(exporter.Opts.toSessionOps())
 	if mongoSess != nil {
+		upGauge.WithLabelValues().Set(float64(1))
+		upGauge.Collect(ch)
+		upGauge.Reset()
 		defer mongoSess.Close()
 		glog.Info("Collecting Server Status")
 		exporter.collectServerStatus(mongoSess, ch)
@@ -101,6 +112,10 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 			glog.Info("Collecting Connection Pool Stats")
 			exporter.collectConnPoolStats(mongoSess, ch)
 		}
+	} else {
+		upGauge.WithLabelValues().Set(float64(0))
+		upGauge.Collect(ch)
+		upGauge.Reset()
 	}
 }
 

@@ -60,6 +60,9 @@ type ServerStatus struct {
 	Metrics        *MetricsStats        `bson:"metrics"`
 
 	Cursors *Cursors `bson:"cursors"`
+
+	StorageEngine *StorageEngineStats `bson:"storageEngine"`
+	WiredTiger    *WiredTigerStats    `bson:"wiredTiger"`
 }
 
 // Export exports the server status to be consumed by prometheus.
@@ -113,6 +116,20 @@ func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
 	if status.Cursors != nil {
 		status.Cursors.Export(ch)
 	}
+
+	if status.WiredTiger != nil {
+		status.WiredTiger.Export(ch)
+	}
+	// If db.serverStatus().storageEngine does not exist (3.0+ only) and status.BackgroundFlushing does (MMAPv1 only), default to mmapv1
+	// https://docs.mongodb.com/v3.0/reference/command/serverStatus/#storageengine
+	if status.StorageEngine == nil && status.BackgroundFlushing != nil {
+		status.StorageEngine = &StorageEngineStats{
+			Name: "mmapv1",
+		}
+	}
+	if status.StorageEngine != nil {
+		status.StorageEngine.Export(ch)
+	}
 }
 
 // Describe describes the server status for prometheus.
@@ -162,6 +179,12 @@ func (status *ServerStatus) Describe(ch chan<- *prometheus.Desc) {
 	}
 	if status.Cursors != nil {
 		status.Cursors.Describe(ch)
+	}
+	if status.WiredTiger != nil {
+		status.WiredTiger.Describe(ch)
+	}
+	if status.StorageEngine != nil {
+		status.StorageEngine.Describe(ch)
 	}
 }
 
