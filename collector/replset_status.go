@@ -26,6 +26,13 @@ var (
 		Help:      "An integer shows the replication lag in seconds, -1 if no master found",
 	}, []string{"set"})
 
+	masterCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: subsystem,
+		Name:      "master_count",
+		Help:      "The number of master, any value except 1 means something wrong",
+	}, []string{})
+
 	term = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: subsystem,
@@ -152,6 +159,7 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 	memberLastHeartbeatRecv.Reset()
 	memberPingMs.Reset()
 	memberConfigVersion.Reset()
+	masterCount.Reset()
 
 	myState.WithLabelValues(replStatus.Set).Set(float64(replStatus.MyState))
 
@@ -170,6 +178,7 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 		primaryOpTime time.Time
 		myOpTime      time.Time
 	)
+	mCount := 0
 	for _, member := range replStatus.Members {
 		ls := prometheus.Labels{
 			"set":  replStatus.Set,
@@ -182,6 +191,9 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 			myOpTime = member.OptimeDate
 		}
 		memberState.With(ls).Set(float64(member.State))
+		if member.State == 1 {
+			mCount += 1
+		}
 
 		// ReplSetStatus.Member.Health is not available on the node you're connected to
 		if member.Health != nil {
@@ -214,6 +226,7 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 	} else {
 		myReplicaLag.WithLabelValues(replStatus.Set).Set(-1.0)
 	}
+	masterCount.WithLabelValues().Set(float64(mCount))
 	// collect metrics
 	myState.Collect(ch)
 	myReplicaLag.Collect(ch)
@@ -221,6 +234,7 @@ func (replStatus *ReplSetStatus) Export(ch chan<- prometheus.Metric) {
 	numberOfMembers.Collect(ch)
 	heartbeatIntervalMillis.Collect(ch)
 	memberState.Collect(ch)
+	masterCount.Collect(ch)
 	memberHealth.Collect(ch)
 	memberUptime.Collect(ch)
 	memberOptimeDate.Collect(ch)
