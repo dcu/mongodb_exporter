@@ -1,0 +1,48 @@
+language: go
+go:
+  - 1.9.2
+
+branches:
+  only:
+    - master
+    - /^v\d+(\.\d+)+$/
+
+env:
+  - DIR_DARWIN=mongodb_exporter-${TRAVIS_BRANCH}.darwin-amd64 RELEASE_DIR_DARWIN=release/${DIR_DARWIN} DIR_LINUX=mongodb_exporter-${TRAVIS_BRANCH}.linux-amd64 RELEASE_DIR_LINUX=release/${DIR_LINUX}
+
+before_install:
+  - sudo apt-get install curl git make perl
+  - git clone https://github.com/dcu/mongodb_exporter.git $GOPATH/src/github.com/dcu/mongodb_exporter
+  - cd ../../dcu/mongodb_exporter && curl -s https://glide.sh/get | sh
+
+script:
+  - make release
+
+  - |
+    tarRelease() {
+      tarDirName=${1}
+      releaseBinary=${2}
+      arch=${3}
+
+      tarDir=release/${tarDirName}
+
+      mkdir -p ${tarDir}
+      cp release/${releaseBinary} ${tarDir}/mongodb_exporter
+      cp LICENSE README.md ${tarDir}
+      ( cd release; tar -cvzf mongodb_exporter-${TRAVIS_BRANCH}.${arch}.tar.gz $1/* )
+    }
+
+    tarRelease ${DIR_DARWIN} mongodb_exporter-darwin-amd64 darwin-amd64
+    tarRelease ${DIR_LINUX} mongodb_exporter-linux-amd64 linux-amd64
+
+
+deploy:
+  provider: releases
+  api_key:
+    secure: <GITHUB_API_KEY>
+  file:
+    - release/mongodb_exporter-${TRAVIS_BRANCH}.darwin-amd64.tar.gz
+    - release/mongodb_exporter-${TRAVIS_BRANCH}.linux-amd64.tar.gz
+  skip_cleanup: true
+  on:
+    tags: true
