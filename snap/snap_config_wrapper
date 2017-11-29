@@ -1,0 +1,6 @@
+#!/bin/sh
+
+test -e $SNAP_DATA/daemon_arguments || cp $SNAP/etc/prometheus-mongodb-exporter/daemon_arguments.example $SNAP_DATA/daemon_arguments
+
+. $SNAP_DATA/daemon_arguments
+exec $SNAP/bin/prometheus-mongodb-exporter $ARGS
