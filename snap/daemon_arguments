@@ -1,0 +1,61 @@
+# Set the command-line arguments to pass to the server.
+ARGS=""
+
+# The following options are supported by prometheus-mongodb-exporter :
+#  -alsologtostderr
+#        log to standard error as well as files
+#  -auth.pass string
+#        Password for basic auth.
+#  -auth.user string
+#        Username for basic auth.
+#  -groups.enabled string
+#        Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/ (default "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics")
+#  -log_backtrace_at value
+#        when logging hits line file:N, emit a stack trace
+#  -log_dir string
+#        If non-empty, write log files in this directory
+#  -logtostderr
+#        log to standard error instead of files
+#  -mongodb.collect.database
+#        collect MongoDB database metrics
+#  -mongodb.collect.oplog
+#        collect Mongodb Oplog status (default true)
+#  -mongodb.collect.replset
+#        collect Mongodb replica set status (default true)
+#  -mongodb.tls-ca string
+#        Path to PEM file that conains the CAs that are trused for server connections.
+#        If provided: MongoDB servers connecting to should present a certificate signed by one of this CAs.
+#        If not provided: System default CAs are used.
+#  -mongodb.tls-cert string
+#        Path to PEM file that conains the certificate (and optionally also the private key in PEM format).
+#        This should include the whole certificate chain.
+#        If provided: The connection will be opened via TLS to the MongoDB server.
+#  -mongodb.tls-disable-hostname-validation
+#        Do hostname validation for server connection.
+#  -mongodb.tls-private-key string
+#        Path to PEM file that conains the private key (if not contained in mongodb.tls-cert file).
+#  -mongodb.uri string
+#        Mongodb URI, format: [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options] (default "mongodb://localhost:27017")
+#  -stderrthreshold value
+#        logs at or above this threshold go to stderr
+#  -v value
+#        log level for V logs
+#  -version
+#        Print mongodb_exporter version
+#  -vmodule value
+#        comma-separated list of pattern=N settings for file-filtered logging
+#  -web.listen-address string
+#        Address on which to expose metrics and web interface. (default ":9001")
+#  -web.metrics-path string
+#        Path under which to expose metrics. (default "/metrics")
+#  -web.tls-cert string
+#        Path to PEM file that conains the certificate (and optionally also the private key in PEM format).
+#        This should include the whole certificate chain.
+#        If provided: The web socket will be a HTTPS socket.
+#        If not provided: Only HTTP.
+#  -web.tls-client-ca string
+#        Path to PEM file that conains the CAs that are trused for client connections.
+#        If provided: Connecting clients should present a certificate signed by one of this CAs.
+#        If not provided: Every client will be accepted.
+#  -web.tls-private-key string
+#        Path to PEM file that conains the private key (if not contained in web.tls-cert file).
