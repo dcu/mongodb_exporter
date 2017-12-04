@@ -12,8 +12,7 @@ env:
 
 before_install:
   - sudo apt-get install curl git make perl
-  - git clone https://github.com/dcu/mongodb_exporter.git $GOPATH/src/github.com/dcu/mongodb_exporter
-  - cd ../../dcu/mongodb_exporter && curl -s https://glide.sh/get | sh
+  - curl -s https://glide.sh/get | sh
 
 script:
   - make release
