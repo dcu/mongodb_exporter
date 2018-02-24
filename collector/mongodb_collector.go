@@ -68,6 +68,7 @@ func NewMongodbCollector(opts MongodbCollectorOpts) *MongodbCollector {
 func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	(&ServerStatus{}).Describe(ch)
 	(&ReplSetStatus{}).Describe(ch)
+	(&ReplSetConf{}).Describe(ch)
 	(&DatabaseStatus{}).Describe(ch)
 
 	if exporter.Opts.CollectTopMetrics {
@@ -88,6 +89,7 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		if exporter.Opts.CollectReplSet {
 			glog.Info("Collecting ReplSet Status")
 			exporter.collectReplSetStatus(mongoSess, ch)
+			exporter.collectReplSetConf(mongoSess, ch)
 		}
 		if exporter.Opts.CollectOplog {
 			glog.Info("Collecting Oplog Status")
@@ -143,6 +145,17 @@ func (exporter *MongodbCollector) collectReplSetStatus(session *mgo.Session, ch 
 	}
 
 	return replSetStatus
+}
+
+func (exporter *MongodbCollector) collectReplSetConf(session *mgo.Session, ch chan<- prometheus.Metric) *ReplSetConf {
+	replSetConf := GetReplSetConf(session)
+
+	if replSetConf != nil {
+		glog.Info("exporting ReplSetConf Metrics")
+		replSetConf.Export(ch)
+	}
+
+	return replSetConf
 }
 
 func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch chan<- prometheus.Metric) *OplogStatus {
