@@ -1,6 +1,8 @@
 package collector
 
 import (
+	"time"
+
 	"github.com/dcu/mongodb_exporter/shared"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -36,6 +38,7 @@ type MongodbCollectorOpts struct {
 	CollectConnPoolStats     bool
 	UserName                 string
 	AuthMechanism            string
+	SocketTimeout            time.Duration
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -47,6 +50,7 @@ func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
 		TLSHostnameValidation: in.TLSHostnameValidation,
 		UserName:              in.UserName,
 		AuthMechanism:         in.AuthMechanism,
+		SocketTimeout:         in.SocketTimeout,
 	}
 }
 

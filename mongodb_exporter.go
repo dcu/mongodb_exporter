@@ -56,6 +56,7 @@ var (
 	mongodbCollectCollectionMetrics     = flag.Bool("mongodb.collect.collection", false, "Collect MongoDB collection metrics")
 	mongodbCollectProfileMetrics        = flag.Bool("mongodb.collect.profile", false, "Collect MongoDB profile metrics")
 	mongodbCollectConnPoolStats         = flag.Bool("mongodb.collect.connpoolstats", false, "Collect MongoDB connpoolstats")
+	mongodbSocketTimeout                = flag.Duration("mongodb.socket-timeout", 0, "timeout for socket operations to mongodb")
 	version                             = flag.Bool("version", false, "Print mongodb_exporter version")
 )
 
@@ -160,6 +161,7 @@ func registerCollector() {
 		CollectConnPoolStats:     *mongodbCollectConnPoolStats,
 		UserName:                 *mongodbUserName,
 		AuthMechanism:            *mongodbAuthMechanism,
+		SocketTimeout:            *mongodbSocketTimeout,
 	})
 	prometheus.MustRegister(mongodbCollector)
 }
