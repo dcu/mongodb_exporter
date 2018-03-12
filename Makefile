@@ -16,7 +16,7 @@ build: deps
 
 release: deps
 	mkdir -p release
-	perl -p -i -e 's/{{VERSION}}/$(TAG)/g' mongodb_exporter.go
+	perl -p -i -e 's/\{\{VERSION}}/$(TAG)/g' mongodb_exporter.go
 	GOOS=darwin GOARCH=amd64 go build -o release/mongodb_exporter-darwin-amd64 $(package)
 	GOOS=linux GOARCH=amd64 go build -o release/mongodb_exporter-linux-amd64 $(package)
-	perl -p -i -e 's/$(TAG)/{{VERSION}}/g' mongodb_exporter.go
+	perl -p -i -e 's/$(TAG)/\{\{VERSION}}/g' mongodb_exporter.go
