@@ -31,6 +31,7 @@ type MongodbCollectorOpts struct {
 	TLSHostnameValidation    bool
 	CollectReplSet           bool
 	CollectOplog             bool
+	TailOplog                bool
 	CollectTopMetrics        bool
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
@@ -98,6 +99,11 @@ func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
 		if exporter.Opts.CollectOplog {
 			glog.Info("Collecting Oplog Status")
 			exporter.collectOplogStatus(mongoSess, ch)
+		}
+
+		if exporter.Opts.TailOplog {
+			glog.Info("Collecting Oplog Tail Stats")
+			exporter.collectOplogTailStats(mongoSess, ch)
 		}
 
 		if exporter.Opts.CollectTopMetrics {
@@ -171,6 +177,17 @@ func (exporter *MongodbCollector) collectOplogStatus(session *mgo.Session, ch ch
 	}
 
 	return oplogStatus
+}
+
+func (exporter *MongodbCollector) collectOplogTailStats(session *mgo.Session, ch chan<- prometheus.Metric) *OplogTailStats {
+	oplogTailStats := GetOplogTailStats(session)
+
+	if oplogTailStats != nil {
+		glog.Info("exporting oplogTailStats Metrics")
+		oplogTailStats.Export(ch)
+	}
+
+	return oplogTailStats
 }
 
 func (exporter *MongodbCollector) collectTopStatus(session *mgo.Session, ch chan<- prometheus.Metric) *TopStatus {
