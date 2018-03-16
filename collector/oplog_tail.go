@@ -63,7 +63,7 @@ func GetOplogTailStats(session *mgo.Session) *OplogTailStats {
 	if tailer == nil {
 		tailer = &OplogTailStats{}
 		// Start a tailer with a copy of the session (to avoid messing with the other metrics in the session)
-		tailer.Start(session.Copy())
+		go tailer.Start(session.Copy())
 	}
 
 	return tailer
