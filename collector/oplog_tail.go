@@ -1,8 +1,7 @@
 package collector
 
 import (
-	"fmt"
-
+	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rwynn/gtm"
 	"gopkg.in/mgo.v2"
@@ -32,6 +31,7 @@ func (o *OplogTailStats) Start(session *mgo.Session) {
 	session.SetMode(mgo.Monotonic, true)
 
 	ctx := gtm.Start(session, nil)
+	defer ctx.Stop()
 
 	// ctx.OpC is a channel to read ops from
 	// ctx.ErrC is a channel to read errors from
@@ -40,8 +40,7 @@ func (o *OplogTailStats) Start(session *mgo.Session) {
 		// loop forever receiving events
 		select {
 		case err := <-ctx.ErrC:
-			// handle errors
-			fmt.Println(err)
+			glog.Errorf("Error getting entry from oplog: %v", err)
 		case op := <-ctx.OpC:
 			oplogEntryCount.WithLabelValues(op.Namespace, op.Operation).Add(1)
 		}
