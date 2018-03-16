@@ -40,6 +40,7 @@ func (o *OplogTailStats) Start(session *mgo.Session) {
 		// loop forever receiving events
 		select {
 		case err := <-ctx.ErrC:
+			oplogTailError.Add(1)
 			glog.Errorf("Error getting entry from oplog: %v", err)
 		case op := <-ctx.OpC:
 			oplogEntryCount.WithLabelValues(op.Namespace, op.Operation).Add(1)
