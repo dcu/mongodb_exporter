@@ -101,7 +101,7 @@ func CollectCollectionStatus(session *mgo.Session, db string, ch chan<- promethe
 	for _, collection_name := range collection_names {
 		collStats := GetCollectionStatus(session, db, collection_name)
 		if collStats != nil {
-			glog.Infof("exporting Database Metrics for db=%q, table=%q", db, collection_name)
+			glog.V(1).Infof("exporting Database Metrics for db=%q, table=%q", db, collection_name)
 			collStats.Export(ch)
 		}
 	}
