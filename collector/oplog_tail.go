@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rwynn/gtm"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -32,7 +33,11 @@ func (o *OplogTailStats) Start(session *mgo.Session) {
 	// Override the socket timeout for oplog tailing
 	// Here we want a long-running socket, otherwise we cause lots of locks
 	// which seriously impede oplog performance
-	session.SetSocketTimeout(time.Second * 120)
+	timeout := time.Second * 120
+	session.SetSocketTimeout(timeout)
+	// Set cursor timeout
+	var tmp map[string]interface{}
+	session.Run(bson.D{{"setParameter", 1}, {"cursorTimeoutMillis", timeout / time.Millisecond}}, &tmp)
 
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
