@@ -1,6 +1,8 @@
 package collector
 
 import (
+	"time"
+
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rwynn/gtm"
@@ -27,6 +29,11 @@ var tailer *OplogTailStats
 type OplogTailStats struct{}
 
 func (o *OplogTailStats) Start(session *mgo.Session) {
+	// Override the socket timeout for oplog tailing
+	// Here we want a long-running socket, otherwise we cause lots of locks
+	// which seriously impede oplog performance
+	session.SetSocketTimeout(time.Second * 120)
+
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 
