@@ -29,7 +29,7 @@ func Test_ParserTopStatus(t *testing.T) {
 
 	for cid := range collections {
 		if _, ok := topStatus.TopStats[collections[cid]]; !ok {
-			t.Error("Database collection '%s' is missing", collections[cid])
+			t.Errorf("Database collection '%s' is missing", collections[cid])
 		}
 	}
 
