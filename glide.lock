@@ -1,5 +1,5 @@
-hash: 7dc238d7118210ebe55b508ed1d11af8c39132025807b9cddc2ec2489d9926f6
-updated: 2016-11-23T09:05:11.556107146-08:00
+hash: 2daa265ce1037e5ac801ef074714e212b1ff69f2fea2e5c69a6c05ece9326f31
+updated: 2018-03-15T17:01:48.086832728-07:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -8,7 +8,7 @@ imports:
 - name: github.com/golang/glog
   version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  version: 17ce1425424ab154092bbb43af630bd647f3bb0d
   subpackages:
   - proto
 - name: github.com/matttproud/golang_protobuf_extensions
@@ -20,22 +20,29 @@ imports:
   subpackages:
   - prometheus
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 0d5de9d6d8629cb8bee6d4674da4127cd8b615a3
+  version: e3fb1a1acd7605367a2b378bc2e2f893c05174b7
   subpackages:
   - expfmt
-  - model
   - internal/bitbucket.org/ww/goautoneg
+  - model
 - name: github.com/prometheus/procfs
-  version: abf152e5f3e97f2fafac028d2cc06c1feb87ffa5
+  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
+  subpackages:
+  - xfs
+- name: github.com/rwynn/gtm
+  version: 495abc277593067479c3c528864191804ab04cf7
+  repo: https://github.com/jacksontj/gtm.git
+- name: github.com/serialx/hashring
+  version: 6a9381c5a83e926b9f1fd907395a581e69747e96
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
+  - internal/json
   - internal/sasl
   - internal/scram
-  - internal/json
 testImports: []

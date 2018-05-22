@@ -8,3 +8,6 @@ import:
 - package: gopkg.in/mgo.v2
   subpackages:
   - bson
+- package: github.com/rwynn/gtm
+  version: 495abc277593067479c3c528864191804ab04cf7
+  repo: https://github.com/jacksontj/gtm.git
