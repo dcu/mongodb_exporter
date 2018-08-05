@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	topTimeSecondsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	topTimeSecondsTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "top_time_seconds_total",
 		Help:      "The top command provides operation time, in seconds, for each database collection",
 	}, []string{"type", "database", "collection"})
-	topCountTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	topCountTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "top_count_total",
 		Help:      "The top command provides operation count for each database collection",

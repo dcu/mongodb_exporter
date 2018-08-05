@@ -10,19 +10,19 @@ import (
 )
 
 var (
-	instanceUptimeSeconds = prometheus.NewCounter(prometheus.CounterOpts{
+	instanceUptimeSeconds = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "instance",
 		Name:      "uptime_seconds",
 		Help:      "The value of the uptime field corresponds to the number of seconds that the mongos or mongod process has been active.",
 	})
-	instanceUptimeEstimateSeconds = prometheus.NewCounter(prometheus.CounterOpts{
+	instanceUptimeEstimateSeconds = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "instance",
 		Name:      "uptime_estimate_seconds",
 		Help:      "uptimeEstimate provides the uptime as calculated from MongoDB's internal course-grained time keeping system.",
 	})
-	instanceLocalTime = prometheus.NewCounter(prometheus.CounterOpts{
+	instanceLocalTime = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "instance",
 		Name:      "local_time",
@@ -106,7 +106,7 @@ func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
 		status.OpcountersRepl.Export(ch)
 	}
 	if status.TCMallocStats != nil {
-	    status.TCMallocStats.Export(ch)
+		status.TCMallocStats.Export(ch)
 	}
 	if status.Mem != nil {
 		status.Mem.Export(ch)
@@ -173,7 +173,7 @@ func (status *ServerStatus) Describe(ch chan<- *prometheus.Desc) {
 		status.OpcountersRepl.Describe(ch)
 	}
 	if status.TCMallocStats != nil {
-	    status.TCMallocStats.Describe(ch)
+		status.TCMallocStats.Describe(ch)
 	}
 	if status.Mem != nil {
 		status.Mem.Describe(ch)
