@@ -27,13 +27,13 @@ var (
 		Help:      "Sizes for tcpmalloc caches in bytes",
 	}, []string{"cache", "type"})
 
-	tcmallocAggressiveDecommit = prometheus.NewCounter(prometheus.CounterOpts{
+	tcmallocAggressiveDecommit = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "tcmalloc_aggressive_memory_decommit",
 		Help:      "Whether aggressive_memory_decommit is on",
 	})
 
-	tcmallocFreeBytes = prometheus.NewCounter(prometheus.CounterOpts{
+	tcmallocFreeBytes = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Name:      "tcmalloc_free_bytes",
 		Help:      "Total free bytes of tcmalloc",

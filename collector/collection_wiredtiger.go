@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	collWTBlockManagerBlocksTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	collWTBlockManagerBlocksTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "collection_wiredtiger_blockmanager",
 		Name:      "blocks_total",
@@ -20,7 +20,7 @@ var (
 		Name:      "pages",
 		Help:      "The current number of pages in the WiredTiger Cache",
 	}, []string{"ns", "type"})
-	collWTCachePagesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	collWTCachePagesTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "collection_wiredtiger_cache",
 		Name:      "pages_total",
@@ -32,13 +32,13 @@ var (
 		Name:      "bytes",
 		Help:      "The current size of data in the WiredTiger Cache in bytes",
 	}, []string{"ns", "type"})
-	collWTCacheBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	collWTCacheBytesTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "collection_wiredtiger_cache",
 		Name:      "bytes_total",
 		Help:      "The total number of bytes read into/from the WiredTiger Cache",
 	}, []string{"ns", "type"})
-	collWTCacheEvictedTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	collWTCacheEvictedTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "collection_wiredtiger_cache",
 		Name:      "evicted_total",

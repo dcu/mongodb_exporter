@@ -37,7 +37,7 @@ var (
 		Help:      "Corresponds to the total number of client connections to mongo that are currently available.",
 	})
 
-	totalCreated = prometheus.NewCounter(prometheus.CounterOpts{
+	totalCreated = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "connpoolstats",
 		Name:      "connections_created_total",

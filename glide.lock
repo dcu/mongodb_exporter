@@ -1,5 +1,5 @@
-hash: 2daa265ce1037e5ac801ef074714e212b1ff69f2fea2e5c69a6c05ece9326f31
-updated: 2018-03-15T17:01:48.086832728-07:00
+hash: e0d331e004b8fd0b7e2b044a30b1f95c8bf1a0006badf93ae6d8af74f6869704
+updated: 2018-08-05T14:18:53.309129007-07:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -16,7 +16,7 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/prometheus/client_golang
-  version: c5b7fccd204277076155f10851dad72b76a49317
+  version: 967789050ba94deca04a5e84cce8ad472ce313c1
   subpackages:
   - prometheus
 - name: github.com/prometheus/client_model
