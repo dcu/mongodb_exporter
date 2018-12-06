@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"errors"
 	"time"
 
 	"github.com/dcu/mongodb_exporter/shared"
@@ -40,6 +41,7 @@ type MongodbCollectorOpts struct {
 	UserName                 string
 	AuthMechanism            string
 	SocketTimeout            time.Duration
+	KeepConnection           bool
 }
 
 func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
@@ -52,6 +54,7 @@ func (in MongodbCollectorOpts) toSessionOps() shared.MongoSessionOpts {
 		UserName:              in.UserName,
 		AuthMechanism:         in.AuthMechanism,
 		SocketTimeout:         in.SocketTimeout,
+		KeepConnection:        in.KeepConnection,
 	}
 }
 
@@ -81,14 +84,39 @@ func (exporter *MongodbCollector) Describe(ch chan<- *prometheus.Desc) {
 	}
 }
 
+var mongoGlobalSession *mgo.Session
+
+func checkGlobalSession(exporter *MongodbCollector) error {
+	if mongoGlobalSession == nil {
+		mongoGlobalSession = shared.MongoSession(exporter.Opts.toSessionOps())
+		if mongoGlobalSession == nil {
+			return errors.New("init mongo global session failed")
+		}
+	}
+	err := mongoGlobalSession.Ping()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Collect collects all mongodb's metrics.
 func (exporter *MongodbCollector) Collect(ch chan<- prometheus.Metric) {
-	mongoSess := shared.MongoSession(exporter.Opts.toSessionOps())
-	if mongoSess != nil {
+	var mongoSess *mgo.Session
+	var errCheckSession error
+	if exporter.Opts.KeepConnection {
+		mongoSess = mongoGlobalSession
+		errCheckSession = checkGlobalSession(exporter)
+	} else {
+		mongoSess = shared.MongoSession(exporter.Opts.toSessionOps())
+	}
+	if mongoSess != nil && errCheckSession == nil {
 		upGauge.WithLabelValues().Set(float64(1))
 		upGauge.Collect(ch)
 		upGauge.Reset()
-		defer mongoSess.Close()
+		if !exporter.Opts.KeepConnection {
+			defer mongoSess.Close()
+		}
 		glog.Info("Collecting Server Status")
 		exporter.collectServerStatus(mongoSess, ch)
 		if exporter.Opts.CollectReplSet {

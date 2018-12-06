@@ -27,6 +27,7 @@ type MongoSessionOpts struct {
 	UserName              string
 	AuthMechanism         string
 	SocketTimeout         time.Duration
+	KeepConnection        bool
 }
 
 // MongoSession creates a Mongo session
@@ -57,6 +58,10 @@ func MongoSession(opts MongoSessionOpts) *mgo.Session {
 	session.SetMode(mgo.Eventual, true)
 	session.SetSyncTimeout(syncMongodbTimeout)
 	session.SetSocketTimeout(opts.SocketTimeout)
+	if opts.KeepConnection {
+		session.SetMode(mgo.Eventual, false) // refresh doesn't work well while reconnect
+		session.SetPoolLimit(1)              // keep 1 global Connection
+	}
 	return session
 }
 
