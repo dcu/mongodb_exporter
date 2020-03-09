@@ -1,11 +1,11 @@
-FROM       golang:alpine as builder
+FROM       golang:1.14-alpine as builder
 
 RUN apk --no-cache add curl git make perl
 RUN curl -s https://glide.sh/get | sh
 COPY . /go/src/github.com/dcu/mongodb_exporter
 RUN cd /go/src/github.com/dcu/mongodb_exporter && make release
 
-FROM       alpine:3.4
+FROM       alpine:3.11
 MAINTAINER David Cuadrado <dacuad@facebook.com>
 EXPOSE     9001
 
