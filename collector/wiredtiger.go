@@ -19,17 +19,29 @@ import (
 )
 
 var (
-	wtBlockManagerBlocksTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	wtBlockManagerReadBlocksTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "wiredtiger_blockmanager",
-		Name:      "blocks_total",
+		Name:      "read_blocks_total",
 		Help:      "The total number of blocks read by the WiredTiger BlockManager",
 	}, []string{"type"})
-	wtBlockManagerBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	wtBlockManagerReadBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: "wiredtiger_blockmanager",
-		Name:      "bytes_total",
+		Name:      "read_bytes_total",
 		Help:      "The total number of bytes read by the WiredTiger BlockManager",
+	}, []string{"type"})
+	wtBlockManagerWriteBlocksTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_blockmanager",
+		Name:      "write_blocks_total",
+		Help:      "The total number of blocks write by the WiredTiger BlockManager",
+	}, []string{"type"})
+	wtBlockManagerWriteBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_blockmanager",
+		Name:      "write_bytes_total",
+		Help:      "The total number of bytes write by the WiredTiger BlockManager",
 	}, []string{"type"})
 )
 
@@ -75,6 +87,18 @@ var (
 		Subsystem: "wiredtiger_cache",
 		Name:      "overhead_percent",
 		Help:      "The percentage overhead of the WiredTiger Cache",
+	})
+	wtCacheReadTimeUsecs = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_cache",
+		Name:      "read_time_usecs",
+		Help:      "application threads page read from disk to cache time (usecs)",
+	})
+	wtCacheWriteTimeUsecs = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_cache",
+		Name:      "write_time_usecs",
+		Help:      "application threads page write from cache to disk time (usecs)",
 	})
 )
 
@@ -168,6 +192,30 @@ var (
 	}, []string{"type"})
 )
 
+var (
+	wtConnectionReadIOS = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_connection",
+		Name:      "read_IO_s",
+		Help:      "Wt connection total read IOS",
+	})
+        wtConnectionWriteIOS = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_connection",
+		Name:      "write_IO_s",
+		Help:      "Wt connection total read IOS",
+	})
+)
+
+var (
+	wtCursor = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Subsystem: "wiredtiger_cursor",
+		Name:      "calls",
+		Help:      "Number of times each operation was called",
+	}, []string{"type"})
+)
+
 // blockmanager stats
 type WTBlockManagerStats struct {
 	MappedBytesRead  float64 `bson:"mapped bytes read"`
@@ -180,18 +228,21 @@ type WTBlockManagerStats struct {
 }
 
 func (stats *WTBlockManagerStats) Export(ch chan<- prometheus.Metric) {
-	wtBlockManagerBlocksTotal.WithLabelValues("read").Set(stats.BlocksRead)
-	wtBlockManagerBlocksTotal.WithLabelValues("read_mapped").Set(stats.MappedBlocksRead)
-	wtBlockManagerBlocksTotal.WithLabelValues("pre_loaded").Set(stats.BlocksPreLoaded)
-	wtBlockManagerBlocksTotal.WithLabelValues("written").Set(stats.BlocksWritten)
-	wtBlockManagerBytesTotal.WithLabelValues("read").Set(stats.BytesRead)
-	wtBlockManagerBytesTotal.WithLabelValues("read_mapped").Set(stats.MappedBytesRead)
-	wtBlockManagerBytesTotal.WithLabelValues("written").Set(stats.BytesWritten)
+	wtBlockManagerReadBlocksTotal.WithLabelValues("read").Set(stats.BlocksRead)
+	wtBlockManagerReadBlocksTotal.WithLabelValues("read_mapped").Set(stats.MappedBlocksRead)
+	wtBlockManagerReadBlocksTotal.WithLabelValues("pre_loaded").Set(stats.BlocksPreLoaded)
+	wtBlockManagerWriteBlocksTotal.WithLabelValues("written").Set(stats.BlocksWritten)
+	wtBlockManagerWriteBlocksTotal.WithLabelValues("pre_loaded").Set(stats.BlocksPreLoaded)
+	wtBlockManagerReadBytesTotal.WithLabelValues("read").Set(stats.BytesRead)
+	wtBlockManagerReadBytesTotal.WithLabelValues("read_mapped").Set(stats.MappedBytesRead)
+	wtBlockManagerWriteBytesTotal.WithLabelValues("written").Set(stats.BytesWritten)
 }
 
 func (stats *WTBlockManagerStats) Describe(ch chan<- *prometheus.Desc) {
-	wtBlockManagerBlocksTotal.Describe(ch)
-	wtBlockManagerBytesTotal.Describe(ch)
+	wtBlockManagerReadBlocksTotal.Describe(ch)
+	wtBlockManagerWriteBlocksTotal.Describe(ch)
+	wtBlockManagerReadBytesTotal.Describe(ch)
+	wtBlockManagerWriteBytesTotal.Describe(ch)
 }
 
 // cache stats
@@ -210,6 +261,8 @@ type WTCacheStats struct {
 	PagesReadInto      float64 `bson:"pages read into cache"`
 	PagesWrittenFrom   float64 `bson:"pages written from cache"`
 	PagesDirty         float64 `bson:"tracked dirty pages in the cache"`
+        ReadTime           float64 `bson:"application threads page read from disk to cache time (usecs)"`
+        WriteTime          float64 `bson:"application threads page write from cache to disk time (usecs)"`
 }
 
 func (stats *WTCacheStats) Export(ch chan<- prometheus.Metric) {
@@ -227,6 +280,8 @@ func (stats *WTCacheStats) Export(ch chan<- prometheus.Metric) {
 	wtCacheBytes.WithLabelValues("leaf_pages").Set(stats.BytesLeafPages)
 	wtCacheMaxBytes.Set(stats.MaxBytes)
 	wtCachePercentOverhead.Set(stats.PercentOverhead)
+	wtCacheReadTimeUsecs.Set(stats.ReadTime)
+	wtCacheWriteTimeUsecs.Set(stats.WriteTime)
 }
 
 func (stats *WTCacheStats) Describe(ch chan<- *prometheus.Desc) {
@@ -236,6 +291,8 @@ func (stats *WTCacheStats) Describe(ch chan<- *prometheus.Desc) {
 	wtCacheBytes.Describe(ch)
 	wtCacheMaxBytes.Describe(ch)
 	wtCachePercentOverhead.Describe(ch)
+	wtCacheReadTimeUsecs.Describe(ch)
+	wtCacheWriteTimeUsecs.Describe(ch)
 }
 
 // log stats
@@ -354,6 +411,40 @@ func (stats *WTConcurrentTransactionsStats) Describe(ch chan<- *prometheus.Desc)
 	wtConcurrentTransactionsTotalTickets.Describe(ch)
 }
 
+// connection stats
+type WTConnectionStats struct {
+	ReadIOS   float64 `bson:"total read I/Os"`
+	WriteIOS  float64 `bson:"total write I/Os"`
+}
+
+func (stats *WTConnectionStats) Export(ch chan<- prometheus.Metric) {
+	wtConnectionReadIOS.Set(stats.ReadIOS)
+	wtConnectionWriteIOS.Set(stats.WriteIOS)
+}
+
+func (stats *WTConnectionStats) Describe(ch chan<- *prometheus.Desc) {
+	wtConnectionReadIOS.Describe(ch)
+	wtConnectionWriteIOS.Describe(ch)
+}
+
+// cursor stats
+type WTCursorStats struct {
+	Create  float64 `bson:"cursor create calls"`
+	Insert  float64 `bson:"cursor insert calls"`
+	Modify  float64 `bson:"cursor modify calls"`
+	Remove  float64 `bson:"cursor remove calls"`
+}
+
+func (stats *WTCursorStats) Export(ch chan<- prometheus.Metric) {
+	wtCursor.WithLabelValues("create").Set(stats.Create)
+	wtCursor.WithLabelValues("insert").Set(stats.Insert)
+	wtCursor.WithLabelValues("modify").Set(stats.Modify)
+	wtCursor.WithLabelValues("remove").Set(stats.Remove)
+}
+
+func (stats *WTCursorStats) Describe(ch chan<- *prometheus.Desc) {
+	wtCursor.Describe(ch)
+}
 // WiredTiger stats
 type WiredTigerStats struct {
 	BlockManager           *WTBlockManagerStats           `bson:"block-manager"`
@@ -362,6 +453,8 @@ type WiredTigerStats struct {
 	Session                *WTSessionStats                `bson:"session"`
 	Transaction            *WTTransactionStats            `bson:"transaction"`
 	ConcurrentTransactions *WTConcurrentTransactionsStats `bson:"concurrentTransactions"`
+	Connection             *WTConnectionStats             `bson:"connection"`
+	Cursor                 *WTCursorStats                 `bson:"cursor"`
 }
 
 func (stats *WiredTigerStats) Describe(ch chan<- *prometheus.Desc) {
@@ -382,6 +475,12 @@ func (stats *WiredTigerStats) Describe(ch chan<- *prometheus.Desc) {
 	}
 	if stats.ConcurrentTransactions != nil {
 		stats.ConcurrentTransactions.Describe(ch)
+	}
+	if stats.Connection != nil {
+		stats.Connection.Describe(ch)
+	}
+	if stats.Cursor != nil {
+		stats.Cursor.Describe(ch)
 	}
 }
 
@@ -404,9 +503,17 @@ func (stats *WiredTigerStats) Export(ch chan<- prometheus.Metric) {
 	if stats.ConcurrentTransactions != nil {
 		stats.ConcurrentTransactions.Export(ch)
 	}
+	if stats.Connection != nil {
+		stats.Connection.Export(ch)
+	}
+	if stats.Cursor != nil {
+		stats.Cursor.Export(ch)
+	}
 
-	wtBlockManagerBlocksTotal.Collect(ch)
-	wtBlockManagerBytesTotal.Collect(ch)
+	wtBlockManagerReadBlocksTotal.Collect(ch)
+	wtBlockManagerWriteBlocksTotal.Collect(ch)
+	wtBlockManagerReadBytesTotal.Collect(ch)
+	wtBlockManagerWriteBytesTotal.Collect(ch)
 
 	wtCachePagesTotal.Collect(ch)
 	wtCacheBytesTotal.Collect(ch)
@@ -415,6 +522,8 @@ func (stats *WiredTigerStats) Export(ch chan<- prometheus.Metric) {
 	wtCacheBytes.Collect(ch)
 	wtCacheMaxBytes.Collect(ch)
 	wtCachePercentOverhead.Collect(ch)
+	wtCacheReadTimeUsecs.Collect(ch)
+	wtCacheWriteTimeUsecs.Collect(ch)
 
 	wtTransactionsTotal.Collect(ch)
 	wtTransactionsTotalCheckpointMs.Collect(ch)
@@ -432,4 +541,9 @@ func (stats *WiredTigerStats) Export(ch chan<- prometheus.Metric) {
 	wtConcurrentTransactionsOut.Collect(ch)
 	wtConcurrentTransactionsAvailable.Collect(ch)
 	wtConcurrentTransactionsTotalTickets.Collect(ch)
+
+        wtConnectionReadIOS.Collect(ch)
+        wtConnectionWriteIOS.Collect(ch)
+
+	wtCursor.Collect(ch)
 }
