@@ -218,6 +218,14 @@ var (
 	})
 )
 
+var (
+	metricsAggStageCounters = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: Namespace,
+		Name:      "metrics_agg_stage_counters",
+		Help:      "the number of times the aggregate pipeline stage has been executed.",
+	}, []string{"type"})
+)
+
 // DocumentStats are the stats associated to a document.
 type DocumentStats struct {
 	Deleted  float64 `bson:"deleted"`
@@ -414,17 +422,27 @@ func (cursorStats *CursorStats) Export(ch chan<- prometheus.Metric) {
 	metricsCursorOpen.WithLabelValues("total").Set(cursorStats.Open.Total)
 }
 
+// AggStageCounterStats are the stats for aggStageCounters
+type AggStageCounterStats struct {
+	Lookup float64          `bson:"$lookup"`
+}
+
+// Export exports the aggStageCounter stats.
+func (AggStageCounterStats *AggStageCounterStats) Export(ch chan<- prometheus.Metric) {
+	metricsAggStageCounters.WithLabelValues("lookup").Set(AggStageCounterStats.Lookup)
+}
 // MetricsStats are all stats associated with metrics of the system
 type MetricsStats struct {
-	Document      *DocumentStats      `bson:"document"`
-	GetLastError  *GetLastErrorStats  `bson:"getLastError"`
-	Operation     *OperationStats     `bson:"operation"`
-	QueryExecutor *QueryExecutorStats `bson:"queryExecutor"`
-	Record        *RecordStats        `bson:"record"`
-	Repl          *ReplStats          `bson:"repl"`
-	Storage       *StorageStats       `bson:"storage"`
-	Cursor        *CursorStats        `bson:"cursor"`
-	Ttl           *TtlStats           `bson:"ttl"`
+	Document         *DocumentStats        `bson:"document"`
+	GetLastError     *GetLastErrorStats    `bson:"getLastError"`
+	Operation        *OperationStats       `bson:"operation"`
+	QueryExecutor    *QueryExecutorStats   `bson:"queryExecutor"`
+	Record           *RecordStats          `bson:"record"`
+	Repl             *ReplStats            `bson:"repl"`
+	Storage          *StorageStats         `bson:"storage"`
+	Cursor           *CursorStats          `bson:"cursor"`
+	Ttl              *TtlStats             `bson:"ttl"`
+	AggStageCounter  *AggStageCounterStats `bson:"aggStageCounters"`
 }
 
 // Export exports the metrics stats.
@@ -455,6 +473,9 @@ func (metricsStats *MetricsStats) Export(ch chan<- prometheus.Metric) {
 	}
 	if metricsStats.Cursor != nil {
 		metricsStats.Cursor.Export(ch)
+	}
+	if metricsStats.AggStageCounter != nil {
+		metricsStats.AggStageCounter.Export(ch)
 	}
 
 	metricsCursorTimedOutTotal.Collect(ch)
@@ -487,6 +508,7 @@ func (metricsStats *MetricsStats) Export(ch chan<- prometheus.Metric) {
 	metricsStorageFreelistSearchTotal.Collect(ch)
 	metricsTTLDeletedDocumentsTotal.Collect(ch)
 	metricsTTLPassesTotal.Collect(ch)
+        metricsAggStageCounters.Collect(ch)
 }
 
 // Describe describes the metrics for prometheus
@@ -521,4 +543,5 @@ func (metricsStats *MetricsStats) Describe(ch chan<- *prometheus.Desc) {
 	metricsStorageFreelistSearchTotal.Describe(ch)
 	metricsTTLDeletedDocumentsTotal.Describe(ch)
 	metricsTTLPassesTotal.Describe(ch)
+        metricsAggStageCounters.Describe(ch)
 }
